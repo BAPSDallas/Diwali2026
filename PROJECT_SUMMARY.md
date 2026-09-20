@@ -1,8 +1,129 @@
-# Original project handoff
+# Diwali 2026 calendar — project summary
 
-Imported for reference. The KP_Profile hosting URLs below describe the previous project. Current work uses https://github.com/BAPSDallas/Diwali2026 and the intended Pages URL https://bapsdallas.github.io/Diwali2026/add-calendar.html. Items described as planned or requiring testing are not confirmed behavior.
+A static, dependency-free site that lets someone scan a QR code and add BAPS Dallas
+and Frisco Diwali events to their phone calendar. No accounts, no calendar
+subscription, no build step, no server.
+
+- Repository: https://github.com/BAPSDallas/Diwali2026
+- Published: https://bapsdallas.github.io/Diwali2026/ (GitHub Pages, `main`, root folder)
+- `README.md` and `calendar.js` are authoritative for event data. This file is the
+  orientation document; the original handoff is preserved at the end.
+
+## The two pages
+
+| Page | Shows | QR code |
+| --- | --- | --- |
+| `add-calendar.html` | All four event slots. Both Annakut celebrations are always included; Kids Diwali is optional; Chopda Pujan offers a mutually exclusive Morning/Evening session. | `Diwali_Events_2026_Add_All_QR.png` |
+| `diwali-only.html` | Only the two Diwali & Annakut celebrations, nothing selectable. | `Diwali_2026_Two_Events_QR.png` |
+
+Both build the `.ics` in the browser from a Blob and hand it to the user as a
+download. Nothing points at a hosted `.ics` URL, because iOS Calendar treats a
+remote `.ics` link as a *subscription* rather than an import — that was the original
+problem this project exists to solve. Do not "simplify" a button back into a direct
+link to an `.ics` file.
+
+`index.html` redirects the site root to `add-calendar.html`.
+
+## Events
+
+All dates are 2026, all times America/Chicago. Every event carries its full address,
+a description of `https://www.baps.org/dallas`, and reminders one week and one day
+before.
+
+| Event | Date | Time | Included |
+| --- | --- | --- | --- |
+| Diwali & Annakut (Nutan Varsh), Dallas | Tue, November 10 | 11 AM – 8 PM | Always |
+| Diwali & Annakut (Nutan Varsh), Frisco | Sat, November 14 | 11 AM – 8 PM | Always |
+| Kids Diwali Celebration (KDC), Dallas | Sat, October 31 | 10 AM – 6 PM | Optional |
+| Chopda Pujan (Morning), Dallas | Sun, November 8 | 9 – 11 AM | Optional, provisional time |
+| Chopda Pujan (Evening), Dallas | Sun, November 8 | 5 – 7 PM | Optional, selected by default |
+
+Dallas: BAPS Shri Swaminarayan Mandir, 4601 N State Hwy 161, Irving, TX 75038.
+Frisco: BAPS Shri Swaminarayan Mandir, 9190 Sam Rayburn Tollway S, Frisco, TX 75035.
+
+## Files
+
+| File | Role |
+| --- | --- |
+| `calendar.js` | Source of truth for event data and `.ics` generation. Shared by the pages and the tests. |
+| `page.js` | Builds the cards, handles selection, triggers the download. Shared by both pages; `body[data-scope=diwali]` switches it to two-event mode. |
+| `styles.css` | The whole design system, loaded by both pages. |
+| `diwali-only.css` | Loaded *after* `styles.css`. Holds only the banner-layout override, nothing else. |
+| `assets/events/*.png` | Event photos, replaceable without touching code. See `IMAGES.md`. |
+| `tests/` | Unit tests for the calendar output, Playwright tests for the pages. |
+
+## Design decisions worth knowing before editing
+
+These are the things that are easy to undo by accident.
+
+**The pages are sized to fit one screen with no scrolling.** `body` has a definite
+`height: 100svh` — not `min-height` — because a flex chain with only a minimum
+height sizes to its content and refuses to shrink. The card grid uses
+`grid-auto-rows: minmax(86px, 1fr)` so the cards absorb whatever height is left over.
+Verified at zero overflow on iPhone 15, 17 Pro and 17 Pro Max, iPad and desktop.
+Below 700 points tall there genuinely is not room, so a media query releases the
+fixed height and lets those screens scroll rather than clipping card text.
+
+**Glassmorphism only works if exactly one layer blurs.** `main` is pure layout with
+no background and no `backdrop-filter`; the cards, hero and action bar each blur the
+fixed backdrop directly. Giving `main` its own `backdrop-filter` over a
+near-opaque background — as an earlier revision did — means the cards blur a flat
+wash and the effect disappears entirely. The `brightness()` inside `--glass-blur` is
+what keeps dark text legible over the dark maroon artwork.
+
+**The date accent needs lining figures.** Georgia defaults to old-style figures,
+where 3, 4, 7 and 9 drop below the baseline and 6 and 8 rise above it, so every card
+cropped its numeral to a different height. The stack is Iowan Old Style (Apple),
+Palatino Linotype (Windows), Times New Roman (everywhere else) — all lining. Do not
+put Georgia back on `.date-num`. The numeral is sized in container query units
+against the date column, so it fills correctly at any card height without
+per-breakpoint tuning.
+
+**Addresses join the city, state and ZIP with non-breaking spaces** so an address too
+long for one line breaks after the street the way a postal address reads.
+
+**The Chopda Pujan card is a normal card.** Its Morning/Evening segmented toggle
+occupies the same slot the time line uses on the other cards, so it keeps the shared
+height and silhouette instead of becoming a special case.
+
+## Changing things
+
+- **Event data**: edit `calendar.js`, then regenerate the standalone default calendars
+  (see `README.md` for the commands). Keep existing UIDs where possible.
+- **Photos**: drop replacements into `assets/events/` with the same filenames. No code
+  changes. `IMAGES.md` has the slot sizes and framing guidance — note that the
+  Included/Optional chip sits over the top-left corner of each photo.
+- **Layout**: prefer `styles.css`. Anything you add to `diwali-only.css` is a
+  divergence between the two pages and should earn its place.
+
+## Verifying
+
+```sh
+node --test tests/calendar.test.cjs          # calendar output
+python3 -m http.server 8765 --bind 127.0.0.1 # then, with Playwright installed:
+node tests/browser.cjs                       # pages, downloads, no-scroll on 17 Pro/Pro Max
+```
+
+The browser suite covers all six valid selection states, mutually exclusive Chopda
+sessions, real downloads, responsive widths, and asserts both pages fit an iPhone
+17 Pro and 17 Pro Max without scrolling.
+
+## Open items
+
+- Confirm the provisional Chopda Pujan morning time with the organisers.
+- Confirm the Frisco address, retained from the supplied handoff.
+- Replace the placeholder event photos with real ones.
+- Test the end-to-end scan-to-import flow on real iPhones, then confirm Android
+  behaviour.
 
 ---
+
+# Appendix: original project handoff
+
+Imported for reference and preserved unchanged. It describes the earlier KP_Profile
+hosting and an earlier set of event times and spellings, **all since superseded** by
+the sections above and by `calendar.js`. Kept because it records why the landing-page
+approach was chosen over linking straight to an `.ics` file.
 
 Diwali 2026 Calendar QR Project Summary
 

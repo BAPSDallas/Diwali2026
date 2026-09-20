@@ -26,12 +26,18 @@ function railParts(event) {
 /* "9 AM – 11 AM" -> "9–11 AM" so the session segments can run larger type. */
 const compactTime = label => label.replace(/(\d+) (AM|PM) – (\d+) \2/, '$1–$3 $2');
 
-/* Drop only the mandir name; street, city, state and ZIP all stay. */
-const shortAddress = venue => addresses[venue].replace('BAPS Shri Swaminarayan Mandir, ', '');
+/* Drop only the mandir name; street, city, state and ZIP all stay. The
+   city/state/ZIP tail is joined with non-breaking spaces so an address too long
+   for one line breaks after the street, the way a postal address reads, rather
+   than mid-street or with the ZIP orphaned. */
+function shortAddress(venue) {
+  const [, street, city, stateZip] = addresses[venue].split(', ');
+  return `${street}, ${`${city}, ${stateZip}`.replace(/ /g, '\u00a0')}`;
+}
 
 function makePhoto(event) {
   const photo = element('div', `event-photo ${event.id}`);
-  photo.append(element('span', 'badge', event.required ? '✓ Included' : 'Optional'));
+  photo.append(element('span', 'badge', event.required ? 'Included' : 'Optional'));
   if (event.image) {
     const image = element('img');
     image.src = event.image;
@@ -47,14 +53,13 @@ function makePhoto(event) {
   return photo;
 }
 
-/* Month and weekday pin to the top; the numeral is an oversized layer that
-   rises from the bottom and is deliberately cropped by the card edge. */
+/* Month and weekday sit on one line directly above an oversized numeral, the
+   pair anchored to the bottom so the numeral is cropped by the card edge. */
 function makeDateRail(event) {
   const { weekday, month, day } = railParts(event);
   const rail = element('div', 'date-rail');
-  const labels = element('div', 'date-labels');
+  const labels = element('div', 'date-labels', `${month} · ${weekday}`);
   labels.setAttribute('aria-hidden', 'true');
-  labels.append(element('span', '', month), element('span', '', weekday));
   const numeral = element('strong', 'date-num', day);
   numeral.setAttribute('aria-hidden', 'true');
   rail.append(labels, numeral);

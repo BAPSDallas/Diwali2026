@@ -132,8 +132,8 @@ label.event-card { cursor: pointer; }
 .event-card:focus-within { outline: 3px solid #f2c46a; outline-offset: 2px; }
 
 .event-photo {
-  flex: 0 0 22%;
-  max-width: 98px;
+  flex: 0 0 20%;
+  max-width: 92px;
   position: relative;
   display: grid;
   place-items: center;
@@ -182,7 +182,8 @@ label.event-card { cursor: pointer; }
   box-shadow: 0 1px 3px rgba(60, 10, 0, .25);
   font-size: 8.5px;
   font-weight: 700;
-  letter-spacing: .06em;
+  letter-spacing: .05em;
+  white-space: nowrap;
   text-transform: uppercase;
   color: var(--gold);
 }
@@ -220,8 +221,6 @@ h2 {
   color: var(--ink-soft);
   margin: 3px 0 0;
   line-height: 1.25;
-  /* Frisco's address needs two lines; balance keeps the ZIP off its own line. */
-  text-wrap: balance;
 }
 
 /* ---------- Date accent ----------
@@ -231,22 +230,26 @@ h2 {
    so it fills each card whatever height the grid gives it. */
 
 .date-rail {
-  flex: 0 0 80px;
+  flex: 0 0 90px;
   align-self: stretch;
   position: relative;
   container-type: size;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  padding: 6px 4px 0 0;
+  /* Bottom-anchored: the label line rides directly on top of the numeral. */
+  justify-content: flex-end;
+  padding: 0 4px 0 0;
   overflow: hidden;
   color: var(--red);
   text-align: center;
 }
 
 .date-rail input[type=checkbox] {
-  flex: none;
+  position: absolute;
+  top: 7px;
+  left: 50%;
+  transform: translateX(-50%);
   margin: 0;
   width: 22px;
   height: 22px;
@@ -255,26 +258,23 @@ h2 {
 }
 
 .date-labels {
-  position: relative;
+  flex: none;
   z-index: 2;
-}
-
-.date-labels span {
-  display: block;
-  font-size: 9.5px;
+  margin-bottom: 1px;
+  font-size: 10px;
   font-weight: 700;
-  line-height: 1.25;
-  letter-spacing: .12em;
+  line-height: 1.2;
+  letter-spacing: .02em;
+  white-space: nowrap;
   text-transform: uppercase;
   color: #9c3a1c;
-  opacity: .85;
+  opacity: .9;
 }
 
 .date-num {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -.05em;
+  flex: none;
+  /* Overhang the rail's bottom edge; overflow:hidden does the cropping. */
+  margin-bottom: -.1em;
   /* Lining figures are the whole point of this stack: Georgia's default
      old-style figures give 3, 4, 7 and 9 descenders and 6, 8 ascenders, so
      every card cropped to a different height. Iowan (Apple), Palatino
@@ -284,9 +284,9 @@ h2 {
   font-variant-numeric: lining-nums;
   font-feature-settings: 'lnum' 1;
   font-weight: 600;
-  font-size: clamp(42px, 12vw, 68px);
-  font-size: min(104cqh, 92cqw);
-  line-height: .76;
+  font-size: clamp(46px, 13vw, 76px);
+  font-size: min(100cqh, 94cqw);
+  line-height: .78;
   opacity: .5;
   text-shadow: 0 1px 0 rgba(255, 255, 255, .4);
 }
@@ -450,8 +450,8 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
 /* ---------- Narrow phones ---------- */
 
 @media (max-width: 360px) {
-  .event-photo { flex-basis: 20%; }
-  .date-rail { flex-basis: 68px; }
+  .event-photo { flex-basis: 18%; }
+  .date-rail { flex-basis: 78px; }
   .event-body { padding: 7px 8px; }
   .session { font-size: 10.5px; }
 }
