@@ -149,3 +149,54 @@ labels are invalid and misbehave.
 - `text-wrap: balance` on headings; non-breaking spaces to steer address breaks.
 
 Each of these bought roughly a text line per card.
+
+## Telling two similar cards apart by colour
+
+Multi-venue series often repeat a name — two "Diwali & Annakut" cards differing
+only by city. Colour separates them faster than text does, but only if the whole
+card commits: one teal word among maroon reads as a mistake.
+
+Declare the accent as tokens on the card, not on `:root`, so a venue can restate
+the set in one block:
+
+```css
+.event-card {
+  --accent: var(--red);
+  --accent-rgb: 140, 29, 22;      /* for rgba(var(--accent-rgb), .4) borders */
+  --accent-label: #9c3a1c;
+  --accent-shadow: rgba(92, 12, 6, .35);
+}
+
+.venue-frisco {
+  --accent: #0c5b56;
+  --accent-rgb: 12, 91, 86;
+  --accent-label: #0a4a46;
+  --accent-shadow: rgba(4, 46, 44, .35);
+  /* Restating the glass tokens re-tints the card surface itself, because
+     .event-card already paints background and border from them. */
+  --glass: linear-gradient(150deg, rgba(232, 253, 249, .93), rgba(180, 231, 224, .88));
+  --glass-edge: rgba(12, 91, 86, .34);
+}
+```
+
+Then swap every card-level `var(--red)` for `var(--accent)` — time badge, date
+numeral, label badge, checkbox `accent-color`, selected border, session segments.
+Page chrome (buttons, sheet) keeps `--red`; it belongs to the page, not a venue.
+
+Three things that bite:
+
+- **Pick the complement, not a second shade.** Teal against maroon reads as a
+  different place. Orange against maroon reads as a rendering bug.
+- **A tinted glass card needs more opacity than a neutral one.** At the alpha
+  that looks right for cream, a teal wash lets the warm backdrop through and
+  goes olive. Raise it until the tint is clean, then re-check the blur still
+  reads as glass.
+- **Assert the difference in a test.** A typo in the token block falls back to
+  the inherited accent and looks intentional. Compare computed styles across
+  venues on every surface that carries the colour:
+
+```js
+const read = venue => { const card = document.querySelector(`.venue-${venue}`); /* ... */ };
+for (const key of ['time','rail','label','surface','border'])
+  assert.notEqual(frisco[key], dallas[key], `must differ in ${key}`);
+```

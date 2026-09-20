@@ -109,6 +109,17 @@ makes them wrap and the page stops fitting one screen. The checkbox re-enables
 pointer events for itself, and the session toggle is capped so it cannot stretch
 under the numeral.
 
+**Venue colour is a token set, not a one-off.** `.event-card` declares
+`--accent`, `--accent-rgb`, `--accent-label` and `--accent-shadow`, and every
+card-level surface that carries the festival colour reads those rather than
+`--red`. `.venue-frisco` restates them — plus `--glass` and `--glass-edge`, which
+re-tint the card itself — to put Frisco in peacock teal. Two cards share the name
+"Diwali & Annakut", so colour is what distinguishes them at a glance. The teal
+glass is held more opaque than the cream cards: a thin teal wash over the maroon
+backdrop turns olive rather than mint. A browser test asserts the two venues
+differ on every accent surface, because a typo in the token block would silently
+fall back to red and look deliberate.
+
 **The fireworks marker is dormant, not deleted.** No event carries the
 `fireworks` property right now, but `.has-fireworks` in the stylesheet,
 `assets/events/fireworks.svg` and the generator in the skill all remain. Setting

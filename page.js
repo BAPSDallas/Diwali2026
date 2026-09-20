@@ -87,7 +87,7 @@ function makeDateRail(event) {
 }
 
 function makeCard(event, selectable = false) {
-  const card = element(selectable ? 'label' : 'article', `event-card${event.required ? ' included' : ''}`);
+  const card = element(selectable ? 'label' : 'article', `event-card venue-${event.venue}${event.required ? ' included' : ''}`);
   const body = element('div', 'event-body');
   body.append(titleNode(event), element('p', 'subtitle', subtitleOf(event)));
   body.append(element('p', 'event-time', event.timeLabel));

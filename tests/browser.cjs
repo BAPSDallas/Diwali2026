@@ -153,6 +153,21 @@ async function fits(page,name){
  });
  assert.equal(badges.fixed,badges.selected,'fixed time must match a selected session badge');
  assert.notEqual(badges.fixed,badges.unselected,'selected and unselected must stay distinguishable');
+ // Frisco is meant to read as a different place, not a variation of Dallas, so
+ // its accent has to actually resolve to a different colour on every surface
+ // that carries one. A typo in the token block would silently fall back to red.
+ const accents=await page.evaluate(()=>{
+  const read=venue=>{const card=document.querySelector(`.venue-${venue}`),s=getComputedStyle(card);
+   return {time:getComputedStyle(card.querySelector('.event-time')||card.querySelector('.session.selected')).backgroundColor,
+           rail:getComputedStyle(card.querySelector('.date-rail')).color,
+           label:getComputedStyle(card.querySelector('.date-labels')).color,
+           surface:s.backgroundImage,border:s.borderTopColor};};
+  return {dallas:read('dallas'),frisco:read('frisco')};
+ });
+ for(const key of ['time','rail','label','surface','border']){
+  assert.notEqual(accents.frisco[key],accents.dallas[key],`Frisco must differ from Dallas in ${key}`);
+ }
+ assert.equal(await page.locator('.venue-frisco').count(),1,'exactly one Frisco card');
  for(const title of await page.locator('h2').allTextContents()){
   assert(/·\s*(Dallas|Frisco)$/.test(title.replace(/\s+/g,' ').trim()),`title missing its city: "${title}"`);
  }
