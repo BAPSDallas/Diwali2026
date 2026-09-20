@@ -39,6 +39,22 @@ Frisco: BAPS Shri Swaminarayan Mandir, 9190 Sam Rayburn Tollway S, Frisco, TX 75
 - Replace the named PNGs in `assets/events/` to change photos on both pages without code edits. See [IMAGES.md](IMAGES.md) for filenames and publishing instructions.
 - `index.html` redirects the site root to `add-calendar.html`.
 - `PROJECT_SUMMARY.md` records the original handoff and has superseded event information. This README and calendar.js describe the current requirements.
+- `.claude/skills/save-the-date-site/` is a reusable skill capturing how this site is built — the workflow, the layout recipes, the ICS rules, and the lessons learned. Read it before making structural changes, and add to `references/lessons-learned.md` when you learn something new. It is committed deliberately so anyone working on this repo picks up the same conventions.
+
+## Shareable artefacts
+
+| File | What it is |
+| --- | --- |
+| `Diwali_Events_2026_Add_All_QR.png` | QR to `add-calendar.html` |
+| `Diwali_2026_Two_Events_QR.png` | QR to `diwali-only.html` |
+| `Diwali_2026_All_Events_Slide.png` | 16:9 slide, 3840x2160, all-events QR |
+| `Diwali_2026_Diwali_Only_Slide.png` | 16:9 slide, 3840x2160, Diwali-only QR |
+| `assets/preview-*.jpg` | 1200x630 link-preview cards referenced by `og:image` |
+
+Slides are rendered from `_flyer.html` with Playwright; the skill's
+`scripts/render_slides.cjs` and `assets/slide-template.html` generalise it.
+Decode a QR out of any regenerated slide before sharing it — scaling a QR into a
+layout can break module alignment.
 
 After changing event data, regenerate the standalone default calendar:
 

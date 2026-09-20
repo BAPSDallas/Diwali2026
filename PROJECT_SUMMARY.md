@@ -51,6 +51,8 @@ Frisco: BAPS Shri Swaminarayan Mandir, 9190 Sam Rayburn Tollway S, Frisco, TX 75
 | `diwali-only.css` | Loaded *after* `styles.css`. Holds only the banner-layout override, nothing else. |
 | `assets/events/*.png` | Event photos, replaceable without touching code. See `IMAGES.md`. |
 | `tests/` | Unit tests for the calendar output, Playwright tests for the pages. |
+| `_flyer.html` | Slide generator. Rendered to PNG with Playwright; not served to visitors. |
+| `.claude/skills/save-the-date-site/` | Reusable skill: the whole workflow, layout recipes, ICS rules, and lessons learned. Committed on purpose. |
 
 ## Design decisions worth knowing before editing
 
@@ -86,6 +88,12 @@ long for one line breaks after the street the way a postal address reads.
 occupies the same slot the time line uses on the other cards, so it keeps the shared
 height and silhouette instead of becoming a special case.
 
+**Link previews need explicit `og:` tags.** Scrapers only auto-pick images that
+are large enough, which is why one page previewed and the other rendered as bare
+text. Each page now declares its own `og:title` and a dedicated 1200x630
+`og:image` under 600 KB — a multi-megabyte event photo works in iMessage and
+fails in stricter clients.
+
 ## Changing things
 
 - **Event data**: edit `calendar.js`, then regenerate the standalone default calendars
@@ -95,6 +103,8 @@ height and silhouette instead of becoming a special case.
   Included/Optional chip sits over the top-left corner of each photo.
 - **Layout**: prefer `styles.css`. Anything you add to `diwali-only.css` is a
   divergence between the two pages and should earn its place.
+- **Slides and previews**: edit `_flyer.html`, re-render, then re-decode the QR
+  out of the finished PNG. The skill bundles scripts for both.
 
 ## Verifying
 

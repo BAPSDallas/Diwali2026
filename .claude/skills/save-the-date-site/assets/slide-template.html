@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>slide</title>
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { width: 1920px; height: 1080px; overflow: hidden;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    /* Sample this from the logo's own background plate so the logo blends in. */
+    background: #fefaee;
+    background-image: radial-gradient(ellipse 85% 75% at 50% 38%, #fffdf7 0%, #fdf6e6 52%, #f7ead0 100%);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 58px 110px 54px; }
+  /* Faint gold hairline frame so the slide has an edge on a light deck. */
+  body::before { content: ''; position: absolute; inset: 26px;
+    border: 2px solid rgba(184,134,46,.28); border-radius: 18px; pointer-events: none; }
+  .col { position: relative; display: flex; flex-direction: column;
+    align-items: center; text-align: center; }
+  .head { position: relative; text-align: center; }
+  .body { position: relative; flex: 1; min-height: 0; width: 100%;
+    display: flex; align-items: center; justify-content: center; gap: 96px; }
+  .logo-wrap { display: flex; align-items: center; justify-content: center; }
+  .logo { height: 680px; width: auto; display: block; }
+  h1 { font-family: Georgia, 'Times New Roman', serif; font-weight: 400;
+    font-size: 88px; line-height: 1.06; color: #8c1d16; }
+  .rule { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 22px; }
+  .rule i { display: block; width: 150px; height: 3px; border-radius: 2px;
+    background: linear-gradient(90deg, transparent, #b8872e); }
+  .rule i:last-child { background: linear-gradient(90deg, #b8872e, transparent); }
+  .rule b { color: #b8872e; font-size: 34px; line-height: 1; }
+  p { position: relative; margin-top: 14px; font-size: 44px; font-weight: 600; line-height: 1.3;
+    color: #6d4a20; max-width: 1580px; white-space: nowrap; }
+  .qr-card { padding: 32px; border-radius: 32px; background: #fff;
+    border: 2px solid rgba(184,134,46,.35);
+    box-shadow: 0 18px 44px rgba(120,74,20,.18); }
+  .qr-card img { display: block; width: 640px; height: 640px; image-rendering: pixelated; }
+  .scan { margin-top: 26px; font-size: 32px; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: #f4c978; text-shadow: 0 2px 10px rgba(30,1,0,.85); }
+</style></head>
+<body>
+  <div class="head">
+    <h1 id="title"></h1>
+    <div class="rule"><i></i><b>✦</b><i></i></div>
+  </div>
+  <div class="body">
+    <div class="logo-wrap" id="top"></div>
+    <div class="col">
+      <div class="qr-card"><img id="qr" alt=""></div>
+    </div>
+  </div>
+  <p id="caption"></p>
+<script>
+/* Fill in one entry per slide. `logo` should be the transparent variant when the
+   page background is the logo's own plate colour — that is what makes the logo
+   sit on the slide with no visible seam. Keep the caption identical across
+   variants unless the difference is meaningful, and keep it true for every
+   variant (a QR that adds two events should not promise "all the events"). */
+const V = {
+  all: {
+    logo: 'assets/logo-transparent.png',
+    qr: 'All_Events_QR.png',
+    title: 'Add Events to Calendar',
+    caption: 'Scan to save the dates to your calendar',
+  },
+  // second: { logo: ..., qr: ..., title: ..., caption: ... },
+};
+
+const v = V[new URLSearchParams(location.search).get('v') || 'all'];
+const img = new Image(); img.className = 'logo'; img.src = v.logo; img.alt = '';
+document.getElementById('top').append(img);
+document.getElementById('title').textContent = v.title;
+document.getElementById('qr').src = v.qr;
+document.getElementById('caption').textContent = v.caption;
+</script>
+</body></html>

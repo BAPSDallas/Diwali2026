@@ -1,0 +1,4 @@
+# Local Claude Code state stays local, but the project skill is shared on purpose
+# so anyone working on this repo picks up the same conventions.
+.claude/*
+!.claude/skills/

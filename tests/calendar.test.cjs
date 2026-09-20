@@ -45,6 +45,31 @@ test('only the Dallas Annakut is flagged for fireworks, and the flag stays out o
   assert(!buildCalendar(['kdc', 'evening']).toLowerCase().includes('firework'));
 });
 
+test('both pages carry distinct link-preview metadata pointing at real images', () => {
+  // A missing or oversized og:image is why a shared link renders as bare text.
+  const BASE = 'https://bapsdallas.github.io/Diwali2026/';
+  const seen = new Map();
+  for (const page of ['add-calendar.html', 'diwali-only.html']) {
+    const html = fs.readFileSync(page, 'utf8');
+    const meta = name => (html.match(new RegExp(`<meta property="og:${name}" content="([^"]+)"`)) || [])[1];
+    for (const tag of ['type', 'title', 'description', 'url', 'image']) {
+      assert(meta(tag), `${page} is missing og:${tag}`);
+    }
+    assert.equal(meta('url'), BASE + page, `${page} has the wrong og:url`);
+    const image = meta('image');
+    assert(image.startsWith(BASE), `${page} og:image must be an absolute URL`);
+    const file = image.slice(BASE.length);
+    assert(fs.existsSync(file), `${page} og:image points at a missing file: ${file}`);
+    // Scrapers drop images that are slow to fetch; keep link cards small.
+    const kb = fs.statSync(file).size / 1024;
+    assert(kb < 600, `${page} og:image is ${Math.round(kb)} KB, too heavy for a link preview`);
+    assert(!seen.has(image), `${page} reuses the og:image of ${seen.get(image)}`);
+    seen.set(image, page);
+    assert(!seen.has(meta('title')) , `${page} reuses another page's og:title`);
+    seen.set(meta('title'), page);
+  }
+});
+
 test('every event photo referenced by calendar.js exists on disk', () => {
   // Photos get swapped by hand, so a renamed file must fail here rather than
   // silently 404 and fall back to the placeholder motif on the live page.
