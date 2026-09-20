@@ -21,13 +21,13 @@ that opens over the page works well: it does not disturb a one-screen layout,
 and ticking off each row as it is tapped tells the visitor how far through they
 are, which matters when they are bouncing between two apps.
 
-Detect Android with a plain `/Android/i.test(navigator.userAgent)` to decide
-which action is *shown*, but never to decide which one *exists*. Show one button
-— the one that works on this device — and put the other behind a quiet text link
-underneath, worded for the case that would need it ("On Android? Add via Google
-Calendar"). User-agent sniffing misfires on tablets, ChromeOS and in-app
-browsers, and the cost of a wrong guess should be one extra tap, not a visitor
-with no way to add anything.
+Offer both calendars side by side, each with its brand mark, and let the device
+decide only which one is *filled in* — Apple filled on iOS and desktop, Google
+filled on Android, the other outlined. Detection should move emphasis, never
+remove a path: user-agent sniffing misfires on tablets, ChromeOS and in-app
+browsers, and neither path works on the other's platform, so hiding one can
+strand a visitor completely. Two visible buttons also answer the question
+"which one do I press?" without anyone reading a sentence.
 
 iPadOS 13+ reports itself as a Mac, so `navigator.platform === 'MacIntel' &&
 navigator.maxTouchPoints > 1` is what actually identifies an iPad.
@@ -175,6 +175,14 @@ for (const event of events) if (event.image) assert(fs.existsSync(event.image));
 **PNG is the wrong format for photographs.** Four event photos came in at 11.5 MB
 total as PNG; the same images at 1200px wide as quality-82 JPEG were 1.1 MB. On a
 page people reach by scanning a QR code on mobile data, that difference matters.
+
+**A firework is filaments, not rays.** Evenly spaced straight lines from a single
+centre read as a sun or an asterisk no matter how you colour them. What makes a
+burst look like a burst: many fine strands (150+, not 50), each curving slightly
+via a quadratic control point pushed off-axis, starting at *varying* inner radii
+so the centre does not collapse to a point, with widely varying lengths, and a
+small bright bulb at every tip. Shuffle the draw order so the layers interleave
+instead of stacking.
 
 **Generate small decorative marks as SVG, not photo crops.** A firework burst
 cropped from a photo was 1.4 MB and muddy at 90×128; a generated SVG was 13 KB,

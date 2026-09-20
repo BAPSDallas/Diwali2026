@@ -175,10 +175,7 @@ function updateSelection() {
   }
   if (pujanIncluded) pujanIncluded.closest('.event-card').classList.toggle('selected', pujanIncluded.checked);
   const hasChoice = ids().length > 0;
-  // On Android the .ics is the fallback, so name it for what it is.
-  document.getElementById('download-label').textContent = isAndroid
-    ? 'Download .ics file'
-    : hasChoice ? 'Add selected events' : 'Add all events';
+  // The button names the calendar; the summary line above it carries the count.
   document.getElementById('selection-count').textContent = diwaliOnly
     ? '2 events included'
     : hasChoice ? `${selectedEvents(downloadIds()).length} events selected` : '4 events · evening pujan included';
@@ -236,20 +233,11 @@ document.getElementById('sheet-close').addEventListener('click', closeSheet);
 sheet.addEventListener('click', event => { if (event.target === sheet) closeSheet(); });
 document.addEventListener('keydown', event => { if (event.key === 'Escape' && !sheet.hidden) closeSheet(); });
 
-/* Show the one action that works on this device, and keep the other reachable as
-   a quiet link underneath. Detection picks the default; it never removes a path,
-   because a misread on a tablet or an in-app browser would otherwise leave
-   someone with no way to add anything. */
-const bar = document.querySelector('.action-bar');
-bar.classList.add(isAndroid ? 'android' : 'file-first');
-document.getElementById('alt-path').textContent = isAndroid
-  ? 'Prefer a calendar file? Download .ics'
-  : isIOS ? 'On Android? Add via Google Calendar'
-  : 'Add to Google Calendar instead';
-document.getElementById('alt-path').addEventListener('click', event => {
-  event.preventDefault();
-  if (isAndroid) document.getElementById('download').click(); else openSheet();
-});
+/* Both calendars are always offered; the device only decides which one is
+   filled in. Android cannot import .ics at all and iPhones handle it natively,
+   so emphasising the right one saves a tap without ever hiding the other. */
+document.querySelector('.action-buttons')
+  .classList.add(isAndroid ? 'prefer-google' : 'prefer-apple');
 
 document.getElementById('download').disabled = false;
 document.getElementById('download').addEventListener('click', () => {
