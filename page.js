@@ -32,7 +32,7 @@ function element(tag, className, text) {
 function railParts(event) {
   const [weekday, monthAndDay] = event.dateLabel.split(', ');
   return {
-    weekday: weekday.slice(0, 3).toUpperCase(),
+    weekday: weekday.toUpperCase(),
     month: monthAndDay.split(' ')[0].slice(0, 3).toUpperCase(),
     day: String(Number(event.date.slice(6)))
   };
@@ -77,7 +77,7 @@ function makeDateRail(event) {
     rail.classList.add('has-fireworks');
     rail.style.setProperty('--fireworks', `url('${event.fireworks}')`);
   }
-  const labels = element('div', 'date-labels', `${month} · ${weekday}`);
+  const labels = element('div', 'date-labels', `${weekday} · ${month}`);
   labels.setAttribute('aria-hidden', 'true');
   const numeral = element('strong', 'date-num', day);
   numeral.setAttribute('aria-hidden', 'true');
@@ -89,7 +89,6 @@ function makeCard(event, selectable = false) {
   const card = element(selectable ? 'label' : 'article', `event-card${event.required ? ' included' : ''}`);
   const body = element('div', 'event-body');
   body.append(titleNode(event), element('p', 'subtitle', subtitleOf(event)));
-  body.append(element('p', 'event-date', `${event.dateLabel}, 2026`));
   body.append(element('p', 'event-time', event.timeLabel));
   body.append(element('p', 'address', shortAddress(event.venue)));
 

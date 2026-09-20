@@ -97,8 +97,14 @@ only the calendar it can use; an ambiguous agent sees both. Do not remove one pa
 the only thing that works on its platform.
 
 **The Chopda Pujan card is a normal card.** Its Morning/Evening segmented toggle
-occupies the same slot the time line uses on the other cards, so it keeps the shared
-height and silhouette instead of becoming a special case.
+occupies the same slot the time badge uses on the other cards, so it keeps the shared
+height and silhouette instead of becoming a special case. The fixed-time cards render
+their time in the same badge style, which is what makes the four read as one set.
+
+**The date lives only in the right-hand accent.** The label badge carries the
+weekday and month (`TUESDAY · NOV`) and the numeral carries the day, so the card
+body holds no written date. The Google Calendar sheet still spells the full date
+out, since there the rows have no accent beside them.
 
 **Link previews need explicit `og:` tags.** Scrapers only auto-pick images that
 are large enough, which is why one page previewed and the other rendered as bare

@@ -119,6 +119,12 @@ async function fits(page,name){
  assert(!/rgba\(0, 0, 0, 0\)/.test(styled.panelBg),'sheet panel is unstyled');
  await page.locator('#sheet-close').click();
  assert(await page.locator('#gcal-sheet').isHidden(),'sheet closes');
+ // The rail carries the whole date now, so every card must show a weekday badge
+ // and the time must render as a badge rather than a bare line.
+ for(const label of await page.locator('.date-labels').allTextContents()){
+  assert(/^(MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY) · [A-Z]{3}$/.test(label),`bad date badge: "${label}"`);
+ }
+ assert(await page.locator('.event-time').first().evaluate(n=>getComputedStyle(n).borderTopWidth!=='0px'),'time should render as a badge');
  for(const title of await page.locator('h2').allTextContents()){
   assert(/·\s*(Dallas|Frisco)$/.test(title.replace(/\s+/g,' ').trim()),`title missing its city: "${title}"`);
  }
