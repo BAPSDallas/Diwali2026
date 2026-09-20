@@ -119,6 +119,21 @@ async function fits(page,name){
  assert(!/rgba\(0, 0, 0, 0\)/.test(styled.panelBg),'sheet panel is unstyled');
  await page.locator('#sheet-close').click();
  assert(await page.locator('#gcal-sheet').isHidden(),'sheet closes');
+ // Titles and addresses must each fit one line. The accent is a layer rather than
+ // a column precisely so the text has the full card width; if it ever returns to
+ // the flow these wrap again and the cards stop fitting one screen.
+ for(const width of [320,375,402,440]){
+  await page.setViewportSize({width,height:740});
+  const wrapped=await page.evaluate(()=>{
+   const lines=n=>Math.round(n.getBoundingClientRect().height/parseFloat(getComputedStyle(n).lineHeight));
+   return [...document.querySelectorAll('h2, .address')].filter(n=>lines(n)>1).map(n=>n.textContent.trim());
+  });
+  assert.deepEqual(wrapped,[],`wrapped onto two lines at ${width}px`);
+  const layered=await page.evaluate(()=>getComputedStyle(document.querySelector('.date-rail')).position);
+  assert.equal(layered,'absolute',`date accent must stay a layer at ${width}px`);
+ }
+ await page.setViewportSize({width:402,height:740});
+
  // The rail carries the whole date now, so every card must show a weekday badge
  // and the time must render as a badge rather than a bare line.
  for(const label of await page.locator('.date-labels').allTextContents()){
@@ -143,5 +158,5 @@ async function fits(page,name){
  await page.setViewportSize({width:390,height:844});
  await page.screenshot({path:'/private/tmp/diwali-only.png',fullPage:true});
  assert.deepEqual(errors,[]);await browser.close();
- console.log('PASS: Google Calendar sheet styled and linked per event, no scroll on iPhone 17 Pro/Pro Max, no clipping on short screens, any photo aspect fills its panel, Dallas-only fireworks wash, clickable pujan card, six selection states, exclusive Chopda sessions, one calendar per phone platform and both when unknown, cities in every title, both-event page, downloads, responsive widths, no JS errors.');
+ console.log('PASS: Google Calendar sheet styled and linked per event, no scroll on iPhone 17 Pro/Pro Max, no clipping on short screens, any photo aspect fills its panel, Dallas-only fireworks wash, clickable pujan card, six selection states, exclusive Chopda sessions, one calendar per phone platform and both when unknown, one-line titles over a layered accent, both-event page, downloads, responsive widths, no JS errors.');
 })().catch(error=>{console.error(error);process.exit(1)});

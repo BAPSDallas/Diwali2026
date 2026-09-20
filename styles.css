@@ -156,12 +156,15 @@ label.event-card,
 
 /* Body + date rail sit side by side; in the banner layout they sit below the photo. */
 .card-main {
+  position: relative;
   flex: 1;
   min-width: 0;
   display: flex;
 }
 
 .event-body {
+  position: relative;
+  z-index: 1;
   flex: 1;
   min-width: 0;
   display: flex;
@@ -189,7 +192,9 @@ label.event-card,
   color: var(--gold);
 }
 
+/* Only the first line has to clear the checkbox corner. */
 h2 {
+  padding-right: 34px;
   font-family: Georgia, 'Times New Roman', serif;
   font-weight: 400;
   font-size: clamp(15px, 4.4vw, 19px);
@@ -233,9 +238,17 @@ h2 {
    so it fills each card whatever height the grid gives it. */
 
 .date-rail {
-  flex: 0 0 90px;
-  align-self: stretch;
-  position: relative;
+  /* A layer, not a column: out of the flow so the title and address get the
+     full card width, sitting behind text that is short enough not to reach it. */
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 104px;
+  /* No z-index here: a stacking context would trap the checkbox below the body,
+     which sits at z-index 1. The accent's own content has no z-index and so
+     paints under the body; the checkbox lifts itself above it. */
+  pointer-events: none;
   container-type: size;
   display: flex;
   flex-direction: column;
@@ -251,13 +264,14 @@ h2 {
 .date-rail input[type=checkbox] {
   position: absolute;
   top: 7px;
-  left: 50%;
-  transform: translateX(-50%);
+  right: 8px;
   margin: 0;
   width: 22px;
   height: 22px;
+  z-index: 2;
   accent-color: var(--red);
   cursor: pointer;
+  pointer-events: auto;
 }
 
 /* The one celebration with a fireworks finale gets a burst washed in behind its
@@ -319,6 +333,8 @@ h2 {
   display: flex;
   gap: 5px;
   margin: 5px 0 0;
+  /* Stop the segments stretching under the date accent. */
+  max-width: calc(100% - 96px);
 }
 
 .session {
@@ -592,7 +608,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
 
 @media (max-width: 360px) {
   .event-photo { flex-basis: 18%; }
-  .date-rail { flex-basis: 86px; }
+  .date-rail { width: 92px; }
   .event-body { padding: 7px 8px; }
   .session { font-size: 10.5px; }
   /* "SATURDAY · OCT" is the widest label and has to fit the narrow rail too. */

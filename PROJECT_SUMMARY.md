@@ -101,6 +101,14 @@ occupies the same slot the time badge uses on the other cards, so it keeps the s
 height and silhouette instead of becoming a special case. The fixed-time cards render
 their time in the same badge style, which is what makes the four read as one set.
 
+**The accent is a layer, not a column.** `.date-rail` is absolutely positioned
+over the right of the card with `pointer-events: none` and sits behind the text
+(`z-index: 0` against the body's `1`). That is what gives titles and addresses
+the full card width and keeps them on one line; putting it back in the flow
+makes them wrap and the page stops fitting one screen. The checkbox re-enables
+pointer events for itself, and the session toggle is capped so it cannot stretch
+under the numeral.
+
 **The date lives only in the right-hand accent.** The label badge carries the
 weekday and month (`TUESDAY · NOV`) and the numeral carries the day, so the card
 body holds no written date. The Google Calendar sheet still spells the full date

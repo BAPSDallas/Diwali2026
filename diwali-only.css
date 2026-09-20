@@ -28,10 +28,11 @@ h2 { font-size: clamp(19px, 5.6vw, 24px); }
 
 .event-date { font-size: 12.5px; margin-top: 9px; }
 
-.date-rail { flex-basis: 116px; }
+/* The accent is absolutely positioned now, so it is sized by width. */
+.date-rail { width: 124px; }
 
 .date-labels { font-size: 11px; }
 
 @media (max-width: 360px) {
-  .date-rail { flex-basis: 96px; }
+  .date-rail { width: 104px; }
 }

@@ -87,6 +87,24 @@ An oversized numeral in a full-height right column, cropped by the card edge.
 height. **Trap:** clamp on `cqw` as well as `cqh`, or two digits overflow the
 column sideways.
 
+**Make it a layer, not a column.** As a flex child the accent eats 90-100px of
+every card, which is usually the difference between a title fitting on one line
+and wrapping. Absolutely position it over the right edge instead and put it
+behind the text:
+
+```css
+.card-main  { position: relative; }
+.event-body { position: relative; z-index: 1; }
+.date-rail  { position: absolute; top: 0; right: 0; bottom: 0; width: 104px;
+              z-index: 0; pointer-events: none; container-type: size; }
+.date-rail input { pointer-events: auto; }   /* re-enable for controls */
+```
+
+The text lines are short and left-aligned, so they never actually reach the
+numeral; only full-width children need capping (`max-width: calc(100% - 96px)`)
+to stop them stretching under it. Container query units still work, because the
+element keeps a definite size.
+
 ## Mutually exclusive choice inside a card
 
 A segmented toggle keeps the card the same height and shape as its neighbours,
