@@ -32,7 +32,7 @@ iPhone and desktop get a single `.ics` file built in the browser and imported in
 
 Android gets a list of per-event Google Calendar links instead, because Google Calendar's Android app has no `.ics` import — a downloaded file simply sits in Downloads. Each link opens Google Calendar prefilled so the visitor taps Save. Google's template URL carries one event per link, so this is deliberately a list rather than a single button.
 
-Both calendars are offered side by side with their brand marks. The device decides only which one is filled in — Apple on iPhone and desktop, Google on Android — so a user-agent misread costs a glance rather than leaving someone stuck. iPadOS reports itself as a Mac, so iPad detection uses `maxTouchPoints` rather than the user-agent string alone.
+iPhones and iPads see a single **Add to Apple Calendar** button; Android sees **Add to Google Calendar**. Where the device cannot be identified — desktop, in-app browsers — both are shown, since hiding the wrong one there would leave someone with no way to add anything. iPadOS reports itself as a Mac, so iPad detection combines the platform string with `maxTouchPoints`.
 
 Every displayed title carries its city — `Diwali & Annakut · Dallas` and `Diwali & Annakut · Frisco` — because the two share a name and are otherwise indistinguishable, both on the cards and in the Google Calendar list.
 

@@ -476,15 +476,18 @@ a { color: #ffd9a0; }
 
 .g-chip svg { width: 13px; height: 13px; display: block; }
 
-/* Secondary: outlined rather than filled, so one action reads as the default. */
-.prefer-apple #gcal,
-.prefer-google #download {
+/* Phones get the one calendar they can actually use. */
+.show-apple #gcal,
+.show-google #download { display: none; }
+
+/* Where the device is unknown, both are offered with the file path leading,
+   since an .ics works with Apple Calendar, Outlook and Google Calendar on the
+   web, while the Google links only ever reach Google. */
+.show-both #gcal {
   background: transparent;
   color: var(--red);
   font-weight: 600;
 }
-
-.prefer-google #download .ico { opacity: .8; }
 
 button:disabled { opacity: .5; }
 

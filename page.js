@@ -198,8 +198,11 @@ if (clear) clear.addEventListener('click', () => {
    every platform, so a wrong guess never strands anyone. */
 const ua = navigator.userAgent;
 const isAndroid = /Android/i.test(ua);
-// iPadOS 13+ reports itself as a Mac, so the touch check is what catches iPads.
-const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+/* iPadOS 13+ reports itself as a Mac, so the touch check is what catches iPads.
+   Macs have no touchscreen, so any touch points alongside a Mac platform string
+   means iPad. */
+const isIOS = /iPad|iPhone|iPod/.test(ua)
+  || (/Mac/.test(navigator.platform || '') && navigator.maxTouchPoints > 0);
 const sheet = document.getElementById('gcal-sheet');
 const sheetList = document.getElementById('gcal-list');
 
@@ -233,11 +236,12 @@ document.getElementById('sheet-close').addEventListener('click', closeSheet);
 sheet.addEventListener('click', event => { if (event.target === sheet) closeSheet(); });
 document.addEventListener('keydown', event => { if (event.key === 'Escape' && !sheet.hidden) closeSheet(); });
 
-/* Both calendars are always offered; the device only decides which one is
-   filled in. Android cannot import .ics at all and iPhones handle it natively,
-   so emphasising the right one saves a tap without ever hiding the other. */
+/* On a phone we know which calendar the visitor has, so show only that one —
+   Android cannot import .ics at all, and iPhones handle it natively. Anywhere we
+   cannot tell (desktop, unknown agents) both stay on screen, because guessing
+   wrong there would leave someone with no way to add anything. */
 document.querySelector('.action-buttons')
-  .classList.add(isAndroid ? 'prefer-google' : 'prefer-apple');
+  .classList.add(isIOS ? 'show-apple' : isAndroid ? 'show-google' : 'show-both');
 
 document.getElementById('download').disabled = false;
 document.getElementById('download').addEventListener('click', () => {

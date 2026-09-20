@@ -42,11 +42,12 @@ async function fits(page,name){
 }
  async function download(){const wait=page.waitForEvent('download');await page.locator('#download').click();return fs.readFile(await (await wait).path(),'utf8');}
  await page.goto(base+'add-calendar.html');await page.waitForSelector('.event-card');
- // Both calendars are always offered; only the emphasis moves with the device.
- assert.equal(await page.locator('.action-buttons button').count(),2);
- assert(await page.locator('#download').isVisible(),'Apple Calendar button shown');
- assert(await page.locator('#gcal').isVisible(),'Google Calendar button shown');
- assert(await page.locator('.action-buttons.prefer-apple').count()===1,'Apple is emphasised off Android');
+ // A phone gets only the calendar it can use; an unknown agent gets both, because
+ // hiding the wrong one there would leave the visitor no way to add anything.
+ assert.equal(await page.locator('.action-buttons button').count(),2,'both buttons exist in the DOM');
+ assert.equal(await page.locator('.action-buttons.show-both').count(),1,'unknown agent sees both');
+ assert(await page.locator('#download').isVisible()&&await page.locator('#gcal').isVisible());
+ assert.equal(await page.locator('#download-label').textContent(),'Add to Apple Calendar');
  assert(await page.locator('#pujan-included').isChecked());
  assert(await page.locator('input[value=evening]').isChecked());
  const initial=await download();assert.equal((initial.match(/BEGIN:VEVENT/g)||[]).length,3);
@@ -56,7 +57,7 @@ async function fits(page,name){
   if(session){await page.locator('#pujan-included').check();await page.locator(`.session-choice:has(input[value=${session}])`).click();}
   if(kids)await page.locator('input[value=kdc]').check();
   const hasChoice=Boolean(session||kids);
-  assert.equal(await page.locator('#download-label').textContent(),'Apple Calendar');
+  assert.equal(await page.locator('#download-label').textContent(),'Add to Apple Calendar');
   assert.match(await page.locator('#selection-count').textContent(),hasChoice?/^\d+ events selected$/:/^4 events · evening pujan included$/);
   const text=await download();
   assert.equal((text.match(/BEGIN:VEVENT/g)||[]).length,hasChoice?2+Number(Boolean(session))+Number(kids):4);
@@ -120,5 +121,5 @@ async function fits(page,name){
  await page.setViewportSize({width:390,height:844});
  await page.screenshot({path:'/private/tmp/diwali-only.png',fullPage:true});
  assert.deepEqual(errors,[]);await browser.close();
- console.log('PASS: Google Calendar links per event, no scroll on iPhone 17 Pro/Pro Max, no clipping on short screens, any photo aspect fills its panel, Dallas-only fireworks wash, clickable pujan card, six selection states, exclusive Chopda sessions, both calendars offered with device-aware emphasis, cities in every title, both-event page, downloads, responsive widths, no JS errors.');
+ console.log('PASS: Google Calendar links per event, no scroll on iPhone 17 Pro/Pro Max, no clipping on short screens, any photo aspect fills its panel, Dallas-only fireworks wash, clickable pujan card, six selection states, exclusive Chopda sessions, one calendar per phone platform and both when unknown, cities in every title, both-event page, downloads, responsive widths, no JS errors.');
 })().catch(error=>{console.error(error);process.exit(1)});

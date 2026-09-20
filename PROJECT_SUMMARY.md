@@ -92,8 +92,8 @@ long title wraps between the name and the city.
 **Android cannot import `.ics` and needs its own path.** Google Calendar for
 Android has no import feature, so a downloaded file just sits in Downloads. The
 page offers per-event Google Calendar template links (`render?action=TEMPLATE`,
-one event per link, `ctz` for local times) in a sheet. Both calendars are shown
-side by side; the device only decides which button is filled in. Do not remove one path in favour of the other — each is
+one event per link, `ctz` for local times) in a sheet. An identified phone sees
+only the calendar it can use; an ambiguous agent sees both. Do not remove one path in favour of the other — each is
 the only thing that works on its platform.
 
 **The Chopda Pujan card is a normal card.** Its Morning/Evening segmented toggle

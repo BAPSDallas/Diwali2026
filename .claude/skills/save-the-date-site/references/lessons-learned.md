@@ -21,13 +21,20 @@ that opens over the page works well: it does not disturb a one-screen layout,
 and ticking off each row as it is tapped tells the visitor how far through they
 are, which matters when they are bouncing between two apps.
 
-Offer both calendars side by side, each with its brand mark, and let the device
-decide only which one is *filled in* — Apple filled on iOS and desktop, Google
-filled on Android, the other outlined. Detection should move emphasis, never
-remove a path: user-agent sniffing misfires on tablets, ChromeOS and in-app
-browsers, and neither path works on the other's platform, so hiding one can
-strand a visitor completely. Two visible buttons also answer the question
-"which one do I press?" without anyone reading a sentence.
+Show the one calendar the visitor can actually use, and name the action on the
+button: "Add to Apple Calendar", "Add to Google Calendar". A single obvious
+button beats two that make someone choose.
+
+Detect positively and fall back to showing everything. On a phone the platform is
+knowable, so iOS gets Apple and Android gets Google. Anywhere the agent is
+ambiguous — desktop, ChromeOS, in-app browsers — show both, because hiding the
+wrong one there leaves a visitor with no working path at all. The rule is: hide
+a path only when you have positively identified a device that cannot use it.
+
+iPadOS 13+ reports itself as a Mac, so the user-agent string alone will not find
+an iPad. Macs have no touchscreen, so `/Mac/.test(navigator.platform) &&
+navigator.maxTouchPoints > 0` is what identifies one. Use `> 0`, not `> 1` —
+that off-by-one silently dropped iPads into the fallback branch.
 
 iPadOS 13+ reports itself as a Mac, so `navigator.platform === 'MacIntel' &&
 navigator.maxTouchPoints > 1` is what actually identifies an iPad.
