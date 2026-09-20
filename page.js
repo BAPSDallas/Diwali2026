@@ -26,8 +26,8 @@ function railParts(event) {
 /* "9 AM – 11 AM" -> "9–11 AM" so the session segments can run larger type. */
 const compactTime = label => label.replace(/(\d+) (AM|PM) – (\d+) \2/, '$1–$3 $2');
 
-/* "BAPS Shri Swaminarayan Mandir, 4601 N State Hwy 161, Irving, TX 75038" -> street + city */
-const shortAddress = venue => addresses[venue].split(', ').slice(1, 3).join(', ');
+/* Drop only the mandir name; street, city, state and ZIP all stay. */
+const shortAddress = venue => addresses[venue].replace('BAPS Shri Swaminarayan Mandir, ', '');
 
 function makePhoto(event) {
   const photo = element('div', `event-photo ${event.id}`);

@@ -28,7 +28,7 @@ Use photos at least 1200 pixels wide when possible and keep the important subjec
 
 | Page | Photo slot | Roughly |
 | --- | --- | --- |
-| `add-calendar.html` | Tall panel down the left of each card | About 100 x 125 points, near square |
+| `add-calendar.html` | Tall panel down the left of each card | About 90 x 127 points, near square |
 | `diwali-only.html` | Wide banner across the top of each card | About 380 x 150 points, landscape |
 
 A landscape photo works on both: the banner shows it almost uncropped, and the left panel keeps the middle of the frame. Aim for under 1 MB per file for mobile loading.

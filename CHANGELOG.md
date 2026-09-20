@@ -26,3 +26,5 @@
 - Show the full date (`Tuesday, November 10, 2026`) above the time on every card.
 - Replace the cramped Chopda Pujan session grid with a two-segment Morning/Evening toggle that keeps the card the same height and shape as the others.
 - Move the Included/Optional badge onto the photo and the checkbox into the date column, and narrow the photo panel.
+- Make the date accent uniform, bolder and longer. Georgia's old-style figures gave every numeral a different height and baseline, so each card cropped differently; a lining-figure stack puts 8, 10, 14 and 31 on one cap height so they all crop identically.
+- Show the full venue address including state and ZIP on every card.
