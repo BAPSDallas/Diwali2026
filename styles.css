@@ -318,8 +318,9 @@ h2 {
 
 .date-num {
   flex: none;
-  /* Flush right, so a single digit sits where a two-digit date does. */
-  align-self: flex-end;
+  /* Centred under the date badge, so a single digit sits square beneath it
+     rather than pushed off to one side. */
+  align-self: center;
   /* Overhang the rail's bottom edge; overflow:hidden does the cropping. */
   margin-bottom: -.1em;
   /* Lining figures are the whole point of this stack: Georgia's default

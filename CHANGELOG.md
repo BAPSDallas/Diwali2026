@@ -37,6 +37,8 @@
 - Add Open Graph and Twitter Card metadata to both pages with distinct titles and dedicated 1200x630 preview images, so a shared link renders a card instead of bare text.
 - Add two 16:9 QR slides for use in a deck, with the QR verified to decode from the finished render.
 - Put the city in every displayed title (`Diwali & Annakut · Dallas`), since two events share a name and were indistinguishable on the cards and in the Google Calendar list. The subtitle drops the city it used to carry, and each title piece is kept unbreakable so a long title wraps between the name and the city rather than orphaning a word.
+- Give Chopda Pujan a tagline ("Sharda & Chopda Pujan") so every card carries one, and centre the date numeral under its badge so a single digit sits square beneath it rather than pushed to one side.
+- Remove the fireworks marker from the Dallas Annakut. The marker, its stylesheet and the generated SVG stay in place, so re-enabling it is one property on the event.
 - Set the address on two lines by structure rather than by wrapping — street then locality — with more space above it and a semibold weight, so it reads at a glance from a phone held at arm's length.
 - Tighten the date numeral's tracking so a two-digit date reads as one mark, and align every numeral flush right so a single digit sits where a double digit does.
 - Render a fixed event time in the same filled badge a selected Chopda Pujan session uses, so every card's time reads the same whether it is fixed or chosen, and hold the date numeral in from the right edge.

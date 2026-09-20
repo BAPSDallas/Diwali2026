@@ -115,7 +115,6 @@ function makeCard(event, selectable = false) {
 function makePujanCard() {
   const card = makeCard(byId('evening'));
   card.classList.add('pujan-card');
-  card.querySelector('.subtitle').remove();
 
   pujanIncluded = element('input');
   pujanIncluded.type = 'checkbox';

@@ -109,6 +109,13 @@ makes them wrap and the page stops fitting one screen. The checkbox re-enables
 pointer events for itself, and the session toggle is capped so it cannot stretch
 under the numeral.
 
+**The fireworks marker is dormant, not deleted.** No event carries the
+`fireworks` property right now, but `.has-fireworks` in the stylesheet,
+`assets/events/fireworks.svg` and the generator in the skill all remain. Setting
+`fireworks: 'assets/events/fireworks.svg'` on any event brings it back, and the
+tests count rendered markers against flagged events rather than expecting a
+fixed number.
+
 **The date lives only in the right-hand accent.** The label badge carries the
 weekday and month (`TUESDAY · NOV`) and the numeral carries the day, so the card
 body holds no written date. The Google Calendar sheet still spells the full date

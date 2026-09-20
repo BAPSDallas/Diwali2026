@@ -85,11 +85,13 @@ async function fits(page,name){
   const boxes=await page.locator('.session-choice').evaluateAll(nodes=>nodes.map(n=>({y:n.getBoundingClientRect().y,x:n.getBoundingClientRect().x})));
   assert.equal(boxes[0].y,boxes[1].y);assert(boxes[0].x<boxes[1].x);
  }
- // The fireworks wash belongs to the Dallas Annakut alone and must actually load.
- assert.equal(await page.locator('.has-fireworks').count(),1,'exactly one fireworks column');
- assert((await page.locator('.event-card:has(.has-fireworks) h2').textContent()).includes('Dallas'),'fireworks is on the Dallas card');
- const fwUrl=await page.locator('.has-fireworks').evaluate(n=>getComputedStyle(n).getPropertyValue('--fireworks').replace(/^url\(['"]?|['"]?\)$/g,'').trim());
- assert((await page.request.get(new URL(fwUrl,page.url()).href)).ok(),`fireworks image missing: ${fwUrl}`);
+ // The fireworks wash is optional decoration: however many events carry the flag,
+ // that many columns must render it, and any asset referenced must load.
+ const fwExpected=await page.evaluate(()=>DiwaliCalendar.events.filter(e=>e.fireworks).length);
+ assert.equal(await page.locator('.has-fireworks').count(),fwExpected,'fireworks columns must match flagged events');
+ for(const url of await page.locator('.has-fireworks').evaluateAll(ns=>ns.map(n=>getComputedStyle(n).getPropertyValue('--fireworks').replace(/^url\(['"]?|['"]?\)$/g,'').trim()))){
+  assert((await page.request.get(new URL(url,page.url()).href)).ok(),`fireworks asset missing: ${url}`);
+ }
  // Google Calendar path: one link per selected event, correctly formed.
  await page.locator('#gcal').click();await page.waitForSelector('#gcal-sheet:not([hidden])');
  assert.equal(await page.locator('.gcal-item').count(),selected,`sheet lists ${selected} events`);
@@ -169,5 +171,5 @@ async function fits(page,name){
  await page.setViewportSize({width:390,height:844});
  await page.screenshot({path:'/private/tmp/diwali-only.png',fullPage:true});
  assert.deepEqual(errors,[]);await browser.close();
- console.log('PASS: Google Calendar sheet styled and linked per event, no scroll on iPhone 17 Pro/Pro Max, no clipping on short screens, any photo aspect fills its panel, Dallas-only fireworks wash, clickable pujan card, six selection states, exclusive Chopda sessions, one calendar per phone platform and both when unknown, one-line titles over a layered accent, both-event page, downloads, responsive widths, no JS errors.');
+ console.log('PASS: Google Calendar sheet styled and linked per event, no scroll on iPhone 17 Pro/Pro Max, no clipping on short screens, any photo aspect fills its panel, fireworks markers match the data, clickable pujan card, six selection states, exclusive Chopda sessions, one calendar per phone platform and both when unknown, one-line titles over a layered accent, both-event page, downloads, responsive widths, no JS errors.');
 })().catch(error=>{console.error(error);process.exit(1)});
