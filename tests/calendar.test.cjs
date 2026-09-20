@@ -38,6 +38,12 @@ test('all five events have exact requested times, titles, locations and descript
   assert.equal(fs.readFileSync('Diwali_Events_Dallas_Frisco_2026.ics', 'utf8'), buildCalendar(['kdc','evening']));
   assert.equal(fs.readFileSync('Diwali_Only_2026.ics', 'utf8'), buildCalendar([]));
 });
+test('events are declared oldest first, so every surface lists them in order', () => {
+  // Declaration order is what the cards, the Google Calendar list and the VEVENT
+  // sequence all inherit. Sorting in one place would leave the others disagreeing.
+  const keys = events.map(event => event.date + event.start);
+  assert.deepEqual(keys, [...keys].sort(), 'calendar.js events must be in chronological order');
+});
 test('any fireworks marker points at a real asset and never reaches the ICS', () => {
   // The marker is optional decoration; these hold whether or not one is set.
   for (const event of events.filter(event => event.fireworks)) {

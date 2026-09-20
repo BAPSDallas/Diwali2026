@@ -109,6 +109,27 @@ makes them wrap and the page stops fitting one screen. The checkbox re-enables
 pointer events for itself, and the session toggle is capped so it cannot stretch
 under the numeral.
 
+**Chronological order comes from `calendar.js`, not from the renderer.** The
+`events` array is declared oldest first, and the cards, the Google Calendar list
+and the VEVENT sequence all inherit that order. Sorting in the renderer alone
+would have left the sheet and the `.ics` disagreeing with the page. A unit test
+asserts the array stays sorted.
+
+**A `backdrop-filter` ancestor captures fixed-position descendants.** Both
+dialogs used to sit inside `.action-bar`, which blurs its backdrop. That makes it
+the containing block for `position: fixed` children, so `inset: 0` resolved to
+the bar's own 89px rather than the viewport — the scrim dimmed only the bottom
+strip and the panel was laid out inside it. `getComputedStyle().position` still
+returned `fixed`, which is why the existing assertion passed; the test now
+measures the scrim's box against the viewport.
+
+**Help is per-device and numbered.** The dialog shows Apple steps on iPhone and
+iPad, Google steps on Android, and a two-button picker on desktop where detection
+tells us nothing. It reads the same `isIOS`/`isAndroid` result the action bar
+does, so the steps always name the button actually on screen — a browser test
+asserts step 1's bold text appears in the visible button's label. The wording
+follows ASD-STE100: one instruction per step, imperative verbs, no passive voice.
+
 **Venue colour is a token set, not a one-off.** `.event-card` declares
 `--accent`, `--accent-rgb`, `--accent-label` and `--accent-shadow`, and every
 card-level surface that carries the festival colour reads those rather than

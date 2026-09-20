@@ -155,6 +155,8 @@ Automate these. Each one corresponds to a real failure that shipped.
 | Every page has complete `og:` tags, images that exist and are under ~600 KB | Otherwise a shared link renders as bare text |
 | `.ics` output byte-matches the committed files | Data edits must regenerate them |
 | Two venues' accents differ on every surface that carries colour | A typo in a token block falls back to the inherited colour and looks deliberate |
+| A dialog scrim's *measured* box covers the viewport | A `backdrop-filter` ancestor silently makes itself the containing block; computed position still reads `fixed` |
+| Help steps name the same calendar the visible button does | The two live in different files and drift apart |
 | Computed styles, not just behaviour, on click-revealed UI | A sheet can be fully functional and completely unstyled; nothing routine ever screenshots it |
 
 Run the page in a real browser (Playwright) and capture `pageerror`. A silent JS

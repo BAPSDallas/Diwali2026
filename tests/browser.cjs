@@ -40,6 +40,33 @@ async function fits(page,name){
   assert.equal(clipped,0,`${name} clips card text on ${label}`);
  }
 }
+ // The cards are meant to read as a calendar, so their rendered order must match
+ // the event dates — not the order the ids happen to be listed in.
+ async function chronological(page,name){
+  const dates=await page.evaluate(()=>{
+   const label=c=>c.querySelector('.date-labels').textContent+' '+c.querySelector('.date-num').textContent;
+   return [...document.querySelectorAll('.event-card')].map(label);
+  });
+  const key=await page.evaluate(()=>[...document.querySelectorAll('.event-card')].map(c=>{
+   const day=c.querySelector('.date-num').textContent.padStart(2,'0');
+   const month={OCT:'10',NOV:'11'}[c.querySelector('.date-labels').textContent.split('· ')[1]];
+   return month+day;
+  }));
+  assert.deepEqual(key,[...key].sort(),`${name} cards must run oldest first, got ${dates.join(', ')}`);
+  return key;
+ }
+ // A dialog inside an element with a backdrop-filter becomes positioned against
+ // that element, not the viewport: the scrim once covered only the 89px action
+ // bar while computed position still read "fixed". Only a measured box sees it.
+ async function covers(page,id,name){
+  const box=await page.locator(id).boundingBox();
+  const view=page.viewportSize();
+  assert(box.width>=view.width-1&&box.height>=view.height-1,
+   `${name} scrim must cover the viewport, got ${box.width}x${box.height} of ${view.width}x${view.height}`);
+  const panel=await page.locator(`${id} .sheet-panel`).boundingBox();
+  const slack=Math.abs((panel.y+panel.height/2)-view.height/2);
+  assert(slack<=view.height*0.06,`${name} panel must sit centred, off by ${Math.round(slack)}px`);
+ }
  async function download(){const wait=page.waitForEvent('download');await page.locator('#download').click();return fs.readFile(await (await wait).path(),'utf8');}
  await page.goto(base+'add-calendar.html');await page.waitForSelector('.event-card');
  // A phone gets only the calendar it can use; an unknown agent gets both, because
@@ -119,8 +146,32 @@ async function fits(page,name){
  assert.equal(styled.name,'block','sheet row text would run together');
  assert(!/rgba\(0, 0, 0, 0\)/.test(styled.addBg),'Add is unstyled');
  assert(!/rgba\(0, 0, 0, 0\)/.test(styled.panelBg),'sheet panel is unstyled');
+ await covers(page,'#gcal-sheet','Google');
  await page.locator('#sheet-close').click();
  assert(await page.locator('#gcal-sheet').isHidden(),'sheet closes');
+ // Help is a dialog now, not an inline disclosure: expanding it in flow pushed
+ // the grid and broke the one-screen fit.
+ assert.equal(await page.locator('details').count(),0,'help must not be an inline disclosure');
+ assert.equal(await page.locator('#help .ico-info').count(),1,'help button needs its info icon');
+ await page.locator('#help').click();await page.waitForSelector('#help-sheet:not([hidden])');
+ await covers(page,'#help-sheet','Help');
+ assert(!/rgba\(0, 0, 0, 0\)/.test(await page.evaluate(()=>getComputedStyle(document.querySelector('#help-sheet .sheet-panel')).backgroundColor)),'help panel is unstyled');
+ // Desktop cannot be attributed to a calendar, so it gets the picker and no
+ // steps until the visitor chooses one.
+ assert(await page.locator('#help-picker').isVisible(),'desktop needs the calendar picker');
+ assert(await page.locator('#help-apple').isHidden()&&await page.locator('#help-google').isHidden(),'desktop shows no steps until a choice');
+ for(const [choice,shown,hidden] of [['apple','#help-apple','#help-google'],['google','#help-google','#help-apple']]){
+  await page.locator(`#help-picker button[data-help=${choice}]`).click();
+  assert(await page.locator(shown).isVisible(),`${choice} steps must show when chosen`);
+  assert(await page.locator(hidden).isHidden(),`only one step list at a time`);
+  assert.equal(await page.locator(`${shown} li`).count(),4,`${choice} needs four numbered steps`);
+  assert.equal(await page.locator(`#help-picker button[data-help=${choice}]`).getAttribute('aria-pressed'),'true');
+ }
+ // These links were removed; the panel is instructions only.
+ assert.equal(await page.locator('#help-sheet a').count(),0,'help panel must carry no links');
+ await page.keyboard.press('Escape');
+ assert(await page.locator('#help-sheet').isHidden(),'help closes on Escape');
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'help','focus returns to the help button');
  // Titles and addresses must each fit one line. The accent is a layer rather than
  // a column precisely so the text has the full card width; if it ever returns to
  // the flow these wrap again and the cards stop fitting one screen.
@@ -171,6 +222,8 @@ async function fits(page,name){
  for(const title of await page.locator('h2').allTextContents()){
   assert(/·\s*(Dallas|Frisco)$/.test(title.replace(/\s+/g,' ').trim()),`title missing its city: "${title}"`);
  }
+ const order=await chronological(page,'add-calendar');
+ assert.deepEqual(order,['1031','1108','1110','1114'],'all-events order is Oct 31, Nov 8, 10, 14');
  await photosFill(page,'add-calendar');
  await fits(page,'add-calendar');
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:'/private/tmp/diwali-new.png',fullPage:true});
@@ -181,10 +234,37 @@ async function fits(page,name){
  assert(photoBox.y+photoBox.height<=detailBox.y+1);
  assert(await page.locator('.event-photo img').evaluateAll(images=>images.every(i=>i.complete&&i.naturalWidth>0)));
  const text=await download();assert.equal((text.match(/BEGIN:VEVENT/g)||[]).length,2);assert(!text.includes('UID:kids'));assert(!text.includes('UID:chop'));
+ assert.deepEqual(await chronological(page,'diwali-only'),['1110','1114'],'diwali-only order is Nov 10 then 14');
+ assert.equal(await page.locator('details').count(),0,'help must not be an inline disclosure');
+ await page.locator('#help').click();await page.waitForSelector('#help-sheet:not([hidden])');
+ await covers(page,'#help-sheet','Help');
+ await page.locator('#help-close').click();
+ assert(await page.locator('#help-sheet').isHidden(),'help closes');
  await photosFill(page,'diwali-only');
  await fits(page,'diwali-only');
  await page.setViewportSize({width:390,height:844});
  await page.screenshot({path:'/private/tmp/diwali-only.png',fullPage:true});
+ // The action buttons and the help steps must name the same calendar, so both
+ // read the same detection. Exercise it with real user agents rather than
+ // trusting that two separate branches happen to agree.
+ for(const [label,ua,expect,gone] of [
+  ['iPhone','Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1','apple','google'],
+  ['Android','Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36','google','apple']]){
+  const ctx=await browser.newContext({userAgent:ua,viewport:{width:402,height:740}});
+  const phone=await ctx.newPage();const phoneErrors=[];phone.on('pageerror',e=>phoneErrors.push(e.message));
+  await phone.goto(base+'add-calendar.html');await phone.waitForSelector('.event-card');
+  assert.equal(await phone.locator(`.action-buttons.show-${expect}`).count(),1,`${label} shows only the ${expect} button`);
+  await phone.locator('#help').click();await phone.waitForSelector('#help-sheet:not([hidden])');
+  assert(await phone.locator(`#help-${expect}`).isVisible(),`${label} must get the ${expect} steps`);
+  assert(await phone.locator(`#help-${gone}`).isHidden(),`${label} must not get the ${gone} steps`);
+  assert(await phone.locator('#help-picker').isHidden(),`${label} knows its calendar, so no picker`);
+  assert.equal(await phone.locator(`#help-${expect} li`).count(),4,`${label} needs four numbered steps`);
+  const first=await phone.locator(`#help-${expect} li strong`).first().textContent();
+  const button=await phone.locator('.action-buttons button:visible span').last().textContent();
+  assert(button.includes(first),`${label} step 1 says "${first}" but the button says "${button}"`);
+  assert.deepEqual(phoneErrors,[],`${label} JS errors`);
+  await ctx.close();
+ }
  assert.deepEqual(errors,[]);await browser.close();
  console.log('PASS: Google Calendar sheet styled and linked per event, no scroll on iPhone 17 Pro/Pro Max, no clipping on short screens, any photo aspect fills its panel, fireworks markers match the data, clickable pujan card, six selection states, exclusive Chopda sessions, one calendar per phone platform and both when unknown, one-line titles over a layered accent, both-event page, downloads, responsive widths, no JS errors.');
 })().catch(error=>{console.error(error);process.exit(1)});

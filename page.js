@@ -161,8 +161,16 @@ function makePujanCard() {
   return card;
 }
 
-for (const id of ['dallas', 'frisco']) document.getElementById('included').append(makeCard(byId(id)));
-if (!diwaliOnly) document.getElementById('optional').append(makePujanCard(), makeCard(byId('kdc'), true));
+/* Cards run in the order the celebrations happen, so the page reads as a
+   calendar rather than as "the fixed ones, then the optional ones". The Chopda
+   Pujan card stands in for both of its sessions, so it is keyed by the evening
+   event — the two share a date, so either would sort to the same place. */
+const cardIds = diwaliOnly ? ['dallas', 'frisco'] : ['kdc', 'evening', 'dallas', 'frisco'];
+const cards = cardIds
+  .map(byId)
+  .sort((a, b) => a.date.localeCompare(b.date))
+  .map(event => event.id === 'evening' ? makePujanCard() : makeCard(event, !event.required));
+document.getElementById('cards').append(...cards);
 
 const ids = () => optionalInputs.filter(input => input.checked && (input.type !== 'radio' || pujanIncluded.checked)).map(input => input.value);
 const downloadIds = () => diwaliOnly ? [] : (ids().length ? ids() : ['kdc', 'evening']);
@@ -205,6 +213,23 @@ const isIOS = /iPad|iPhone|iPod/.test(ua)
 const sheet = document.getElementById('gcal-sheet');
 const sheetList = document.getElementById('gcal-list');
 
+/* Both dialogs close the same three ways — the Done button, a tap on the scrim
+   outside the panel, and Escape — and hand focus back to whatever opened them,
+   so keyboard users are not dropped at the top of the page. */
+function wireDialog(dialogId, closeId, opener) {
+  const dialog = document.getElementById(dialogId);
+  const close = () => {
+    dialog.hidden = true;
+    document.getElementById(opener()).focus();
+  };
+  document.getElementById(closeId).addEventListener('click', close);
+  dialog.addEventListener('click', event => { if (event.target === dialog) close(); });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !dialog.hidden) close();
+  });
+  return close;
+}
+
 function openSheet() {
   sheetList.replaceChildren();
   for (const event of selectedEvents(downloadIds())) {
@@ -225,15 +250,39 @@ function openSheet() {
   document.getElementById('sheet-close').focus();
 }
 
-function closeSheet() {
-  sheet.hidden = true;
-  document.getElementById(isAndroid ? 'gcal' : 'download').focus();
-}
+wireDialog('gcal-sheet', 'sheet-close', () => isAndroid ? 'gcal' : 'download');
+wireDialog('help-sheet', 'help-close', () => 'help');
 
 document.getElementById('gcal').addEventListener('click', openSheet);
-document.getElementById('sheet-close').addEventListener('click', closeSheet);
-sheet.addEventListener('click', event => { if (event.target === sheet) closeSheet(); });
-document.addEventListener('keydown', event => { if (event.key === 'Escape' && !sheet.hidden) closeSheet(); });
+/* The help steps name the button the visitor will actually see, so they follow
+   the same detection the action bar does. On a desktop we cannot know which
+   calendar they use, so both are offered and the steps wait for a choice. */
+const helpPicker = document.getElementById('help-picker');
+
+function showSteps(platform) {
+  for (const name of ['apple', 'google']) {
+    document.getElementById(`help-${name}`).hidden = name !== platform;
+  }
+  for (const button of helpPicker.querySelectorAll('button')) {
+    button.setAttribute('aria-pressed', String(button.dataset.help === platform));
+  }
+}
+
+if (isIOS) showSteps('apple');
+else if (isAndroid) showSteps('google');
+else {
+  helpPicker.hidden = false;
+  document.getElementById('help-prompt').hidden = false;
+  helpPicker.addEventListener('click', event => {
+    const button = event.target.closest('button');
+    if (button) showSteps(button.dataset.help);
+  });
+}
+
+document.getElementById('help').addEventListener('click', () => {
+  document.getElementById('help-sheet').hidden = false;
+  document.getElementById('help-close').focus();
+});
 
 /* On a phone we know which calendar the visitor has, so show only that one —
    Android cannot import .ics at all, and iPhones handle it natively. Anywhere we

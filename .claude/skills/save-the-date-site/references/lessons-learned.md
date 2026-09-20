@@ -235,6 +235,22 @@ displayed_height = container_height * size_pct
 visible_top_fraction = (displayed_height - container_height) * position_pct / displayed_height
 ```
 
+**A `backdrop-filter` ancestor captures fixed-position descendants.** A dialog
+placed inside a blurred sticky action bar had `position: fixed; inset: 0`, and
+its scrim still covered only the bar's own 89px instead of the viewport. Filters
+and backdrop-filters make an element the containing block for fixed children —
+the same trap as `transform`. `getComputedStyle().position` returns `fixed`
+either way, so an assertion on the computed value passes while the dialog is
+visibly wrong. Keep dialogs as direct children of `<body>`, and assert the
+scrim's *measured* box against the viewport.
+
+**Sort the source data, not the renderer.** Cards, a Google Calendar list and
+the VEVENT sequence all inherited the declaration order of one array. Sorting
+only where the cards are built left the other two disagreeing with the page.
+Order the array itself, assert it stays ordered in a unit test, and regenerate
+any committed `.ics` files — their byte-for-byte test will catch you if you
+forget.
+
 ## Link previews
 
 **No `og:` tags means the scraper guesses.** Apple's scraper auto-picks the
@@ -274,6 +290,25 @@ a conscious decision either way.
 a page that renders background and empty containers — which looks exactly like a
 CSS problem. Always attach a `pageerror` listener when driving a page with
 Playwright; it turns a half-hour hunt into one line of output.
+
+## Instructions for visitors
+
+**Write the steps for the device in the visitor's hand.** Generic help that
+covers every platform at once is longer and still wrong for everyone: it names
+buttons that are not on screen. Reuse the same detection the action buttons use,
+so the steps and the button always agree. Assert that agreement in a test —
+compare step 1's bold button name against the visible button's label, because
+the two live in different files and drift.
+
+**On desktop, ask instead of guessing.** A desktop user agent tells you nothing
+about which calendar someone uses. Show both choices and reveal the steps for
+whichever they pick; do not default to one, and do not show both sets at once.
+
+**ASD-STE100 is a good default for procedures.** One instruction per step, an
+imperative verb first, no passive voice, and one meaning per word. "Touch **Add
+All** in the Calendar app" beats "the events can then be added by tapping the
+Add All option". Keep the step count to about four — if a procedure needs more,
+the interface is the thing to fix.
 
 ## Process
 

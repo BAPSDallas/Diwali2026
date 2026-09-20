@@ -104,9 +104,6 @@ main {
   align-content: stretch;
 }
 
-/* Cards are direct grid children so all rows share one equal-height track. */
-#included, #optional { display: contents; }
-
 /* ---------- Card ---------- */
 
 .event-card {
@@ -433,24 +430,40 @@ h2 {
 
 .session:focus-within { outline: 3px solid #f2c46a; outline-offset: 1px; }
 
-/* ---------- Help disclosure ---------- */
+/* ---------- Help ---------- */
 
-details {
+/* A centred pill rather than a disclosure triangle: expanding help inline
+   pushed the card grid and broke the one-screen fit, so it opens as a dialog. */
+.help-row {
   flex: none;
-  font-size: 11.5px;
+  display: flex;
+  justify-content: center;
+}
+
+.help-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 4px 13px;
+  border: 1px solid rgba(255, 233, 200, .42);
+  border-radius: 999px;
+  background: rgba(58, 8, 5, .32);
   color: #ffeacb;
-  margin: 0;
-  text-shadow: 0 1px 4px rgba(40, 2, 0, .85);
-}
-
-summary {
-  padding: 4px 4px;
-  cursor: pointer;
+  font: inherit;
+  font-size: 11.5px;
   font-weight: 600;
-  min-height: 26px;
+  text-shadow: 0 1px 4px rgba(40, 2, 0, .85);
+  cursor: pointer;
 }
 
-details p { margin: 6px 4px; }
+.help-button .ico-info {
+  flex: none;
+  width: 15px;
+  height: 15px;
+}
+
+.help-button:focus-visible { outline: 3px solid #f2c46a; outline-offset: 2px; }
 
 a { color: #ffd9a0; }
 
@@ -553,13 +566,19 @@ a { color: #ffd9a0; }
 }
 
 /* Sheet listing one Google Calendar link per selected event. */
+/* Both dialogs live as direct children of <body>. They cannot sit inside
+   .action-bar: its backdrop-filter makes it the containing block for fixed
+   descendants, which pinned the scrim to the bar's own 89px instead of the
+   viewport. Computed position stays "fixed" either way, so only a measured
+   box catches it. */
 .sheet {
   position: fixed;
   inset: 0;
   z-index: 30;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
+  padding: 16px;
   background: rgba(40, 3, 0, .5);
   -webkit-backdrop-filter: blur(3px);
   backdrop-filter: blur(3px);
@@ -567,13 +586,13 @@ a { color: #ffd9a0; }
 
 .sheet-panel {
   width: 100%;
-  max-width: 560px;
-  max-height: 84svh;
+  max-width: 460px;
+  max-height: min(84svh, 640px);
   overflow-y: auto;
-  padding: 16px 16px max(16px, env(safe-area-inset-bottom));
-  border-radius: 20px 20px 0 0;
+  padding: 18px;
+  border-radius: 20px;
   background: #fffaf0;
-  box-shadow: 0 -10px 40px rgba(40, 3, 0, .4);
+  box-shadow: 0 18px 52px rgba(40, 3, 0, .45);
 }
 
 .sheet-panel h3 {
@@ -584,6 +603,71 @@ a { color: #ffd9a0; }
 }
 
 .sheet-note { margin: 4px 0 12px; font-size: 12px; color: var(--ink-soft); }
+
+/* Scoped to a class, not to `.sheet-panel p`, which would outrank .sheet-note. */
+.sheet-text {
+  margin: 9px 0 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.sheet-text strong { color: var(--ink); font-weight: 650; }
+
+/* Numbered steps, one instruction per line. The panel shows the set for the
+   device it is on; a desktop shows the picker above and neither set until the
+   visitor chooses, because there we cannot know which calendar they use. */
+.sheet-prompt {
+  margin: 13px 0 7px;
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.help-picker { display: flex; gap: 8px; margin-bottom: 4px; }
+
+.help-picker button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 10px 6px;
+  border: 1px solid var(--red);
+  border-radius: 11px;
+  background: transparent;
+  color: var(--red);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.help-picker button[aria-pressed=true] {
+  background: var(--red);
+  color: #fff;
+  font-weight: 650;
+}
+
+.help-picker .ico { flex: none; width: 17px; height: 17px; }
+
+.help-steps {
+  margin: 13px 0 0;
+  padding-left: 21px;
+  display: grid;
+  gap: 7px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+
+.help-steps::marker, .help-steps li::marker {
+  color: var(--red);
+  font-weight: 700;
+}
+
+.help-steps strong { color: var(--ink); font-weight: 650; }
 
 #gcal-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 
@@ -621,7 +705,7 @@ a { color: #ffd9a0; }
 .gcal-item.added .gcal-add { background: #5d7f4e; }
 .gcal-item.added .gcal-add::after { content: ' ✓'; }
 
-#sheet-close {
+.sheet-done {
   width: 100%;
   margin-top: 12px;
   min-height: 44px;

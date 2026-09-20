@@ -19,50 +19,6 @@ RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU
 END:STANDARD
 END:VTIMEZONE
 BEGIN:VEVENT
-UID:annakut-dallas-2026@krupesh9.github.io
-DTSTAMP:20260920T180000Z
-SEQUENCE:1
-SUMMARY:Diwali & Annakut (Nutan Varsh) 2026\, Dallas TX
-DTSTART;TZID=America/Chicago:20261110T110000
-DTEND;TZID=America/Chicago:20261110T200000
-LOCATION:BAPS Shri Swaminarayan Mandir\, 4601 N State Hwy 161\, Irving\, TX
-  75038
-DESCRIPTION:https://www.baps.org/dallas
-URL:https://www.baps.org/dallas
-BEGIN:VALARM
-TRIGGER:-P7D
-ACTION:DISPLAY
-DESCRIPTION:Event reminder
-END:VALARM
-BEGIN:VALARM
-TRIGGER:-P1D
-ACTION:DISPLAY
-DESCRIPTION:Event reminder
-END:VALARM
-END:VEVENT
-BEGIN:VEVENT
-UID:annakut-frisco-2026@krupesh9.github.io
-DTSTAMP:20260920T180000Z
-SEQUENCE:1
-SUMMARY:Diwali & Annakut (Nutan Varsh) 2026\, Frisco TX
-DTSTART;TZID=America/Chicago:20261114T110000
-DTEND;TZID=America/Chicago:20261114T200000
-LOCATION:BAPS Shri Swaminarayan Mandir\, 9190 Sam Rayburn Tollway S\, Frisc
- o\, TX 75035
-DESCRIPTION:https://www.baps.org/dallas
-URL:https://www.baps.org/dallas
-BEGIN:VALARM
-TRIGGER:-P7D
-ACTION:DISPLAY
-DESCRIPTION:Event reminder
-END:VALARM
-BEGIN:VALARM
-TRIGGER:-P1D
-ACTION:DISPLAY
-DESCRIPTION:Event reminder
-END:VALARM
-END:VEVENT
-BEGIN:VEVENT
 UID:kids-diwali-kdc-2026@krupesh9.github.io
 DTSTAMP:20260920T180000Z
 SEQUENCE:1
@@ -93,6 +49,50 @@ DTSTART;TZID=America/Chicago:20261108T170000
 DTEND;TZID=America/Chicago:20261108T190000
 LOCATION:BAPS Shri Swaminarayan Mandir\, 4601 N State Hwy 161\, Irving\, TX
   75038
+DESCRIPTION:https://www.baps.org/dallas
+URL:https://www.baps.org/dallas
+BEGIN:VALARM
+TRIGGER:-P7D
+ACTION:DISPLAY
+DESCRIPTION:Event reminder
+END:VALARM
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Event reminder
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:annakut-dallas-2026@krupesh9.github.io
+DTSTAMP:20260920T180000Z
+SEQUENCE:1
+SUMMARY:Diwali & Annakut (Nutan Varsh) 2026\, Dallas TX
+DTSTART;TZID=America/Chicago:20261110T110000
+DTEND;TZID=America/Chicago:20261110T200000
+LOCATION:BAPS Shri Swaminarayan Mandir\, 4601 N State Hwy 161\, Irving\, TX
+  75038
+DESCRIPTION:https://www.baps.org/dallas
+URL:https://www.baps.org/dallas
+BEGIN:VALARM
+TRIGGER:-P7D
+ACTION:DISPLAY
+DESCRIPTION:Event reminder
+END:VALARM
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Event reminder
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:annakut-frisco-2026@krupesh9.github.io
+DTSTAMP:20260920T180000Z
+SEQUENCE:1
+SUMMARY:Diwali & Annakut (Nutan Varsh) 2026\, Frisco TX
+DTSTART;TZID=America/Chicago:20261114T110000
+DTEND;TZID=America/Chicago:20261114T200000
+LOCATION:BAPS Shri Swaminarayan Mandir\, 9190 Sam Rayburn Tollway S\, Frisc
+ o\, TX 75035
 DESCRIPTION:https://www.baps.org/dallas
 URL:https://www.baps.org/dallas
 BEGIN:VALARM
