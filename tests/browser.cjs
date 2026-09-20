@@ -77,6 +77,11 @@ async function fits(page,name){
   const boxes=await page.locator('.session-choice').evaluateAll(nodes=>nodes.map(n=>({y:n.getBoundingClientRect().y,x:n.getBoundingClientRect().x})));
   assert.equal(boxes[0].y,boxes[1].y);assert(boxes[0].x<boxes[1].x);
  }
+ // The fireworks wash belongs to the Dallas Annakut alone and must actually load.
+ assert.equal(await page.locator('.has-fireworks').count(),1,'exactly one fireworks column');
+ assert((await page.locator('.event-card:has(.has-fireworks) .subtitle').textContent()).includes('Dallas'),'fireworks is on the Dallas card');
+ const fwUrl=await page.locator('.has-fireworks').evaluate(n=>getComputedStyle(n).getPropertyValue('--fireworks').replace(/^url\(['"]?|['"]?\)$/g,'').trim());
+ assert((await page.request.get(new URL(fwUrl,page.url()).href)).ok(),`fireworks image missing: ${fwUrl}`);
  await photosFill(page,'add-calendar');
  await fits(page,'add-calendar');
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:'/private/tmp/diwali-new.png',fullPage:true});
@@ -92,5 +97,5 @@ async function fits(page,name){
  await page.setViewportSize({width:390,height:844});
  await page.screenshot({path:'/private/tmp/diwali-only.png',fullPage:true});
  assert.deepEqual(errors,[]);await browser.close();
- console.log('PASS: no scroll on iPhone 17 Pro/Pro Max, no clipping on short screens, any photo aspect fills its panel, clickable pujan card, six selection states, exclusive Chopda sessions, single dynamic button, both-event page, downloads, responsive widths, no JS errors.');
+ console.log('PASS: no scroll on iPhone 17 Pro/Pro Max, no clipping on short screens, any photo aspect fills its panel, Dallas-only fireworks wash, clickable pujan card, six selection states, exclusive Chopda sessions, single dynamic button, both-event page, downloads, responsive widths, no JS errors.');
 })().catch(error=>{console.error(error);process.exit(1)});

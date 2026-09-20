@@ -58,6 +58,10 @@ function makePhoto(event) {
 function makeDateRail(event) {
   const { weekday, month, day } = railParts(event);
   const rail = element('div', 'date-rail');
+  if (event.fireworks) {
+    rail.classList.add('has-fireworks');
+    rail.style.setProperty('--fireworks', `url('${event.fireworks}')`);
+  }
   const labels = element('div', 'date-labels', `${month} · ${weekday}`);
   labels.setAttribute('aria-hidden', 'true');
   const numeral = element('strong', 'date-num', day);

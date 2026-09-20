@@ -258,6 +258,22 @@ h2 {
   cursor: pointer;
 }
 
+/* The one celebration with a fireworks finale gets a burst washed in behind its
+   date column. Generated vector rather than a photo crop: it stays crisp at any
+   density, weighs 10 KB, already falls off at its own edges so it needs no mask,
+   and its palette is tuned to the card instead of fighting it. */
+.has-fireworks::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--fireworks) 58% 30% / 155% auto no-repeat;
+  opacity: .85;
+  pointer-events: none;
+}
+
+.date-num { position: relative; z-index: 1; }
+
 .date-labels {
   flex: none;
   z-index: 2;

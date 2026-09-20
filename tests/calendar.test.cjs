@@ -38,6 +38,13 @@ test('all five events have exact requested times, titles, locations and descript
   assert.equal(fs.readFileSync('Diwali_Events_Dallas_Frisco_2026.ics', 'utf8'), buildCalendar(['kdc','evening']));
   assert.equal(fs.readFileSync('Diwali_Only_2026.ics', 'utf8'), buildCalendar([]));
 });
+test('only the Dallas Annakut is flagged for fireworks, and the flag stays out of the ICS', () => {
+  const flagged = events.filter(event => event.fireworks);
+  assert.deepEqual(flagged.map(event => event.id), ['dallas']);
+  for (const event of flagged) assert(fs.existsSync(event.fireworks), `missing ${event.fireworks}`);
+  assert(!buildCalendar(['kdc', 'evening']).toLowerCase().includes('firework'));
+});
+
 test('every event photo referenced by calendar.js exists on disk', () => {
   // Photos get swapped by hand, so a renamed file must fail here rather than
   // silently 404 and fall back to the placeholder motif on the live page.
