@@ -15,17 +15,18 @@
 
 .card-main { flex: none; }
 
-.event-body { padding: 9px 12px 11px; gap: 2px; }
+.event-body { padding: 9px 12px 14px; gap: 2px; }
 
 h2 { font-size: clamp(19px, 5.6vw, 24px); }
 
 .subtitle { font-size: 12px; }
 
+/* Same three-group rhythm as add-calendar, scaled to this page's larger type. */
 .event-time { font-size: 14px; margin-top: 3px; }
 
-.address { font-size: 10.5px; margin-top: 4px; }
+.address { font-size: 10.5px; margin-top: 10px; }
 
-.event-date { font-size: 12.5px; }
+.event-date { font-size: 12.5px; margin-top: 9px; }
 
 .date-rail { flex-basis: 116px; }
 

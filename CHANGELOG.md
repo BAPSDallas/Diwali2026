@@ -30,3 +30,6 @@
 - Show the full venue address including state and ZIP on every card, with the city/state/ZIP tail joined by non-breaking spaces so a wrapped address breaks after the street.
 - Put the month and weekday on one line directly above the date numeral with nominal letter spacing, anchor the pair to the bottom of the card, and enlarge the numeral.
 - Rewrite PROJECT_SUMMARY.md around the current project, keeping the original handoff as an appendix.
+- Open up the card text into three groups (title and subtitle, date and time, address) by moving the dead space that vertical centring left above and below the block, and add padding under the address. Same rhythm on both pages.
+- Make the whole Chopda Pujan card include or remove the event like the Kids Diwali card, keeping any chosen session and falling back to evening.
+- Cover photo swaps in the tests: any resolution or aspect ratio must fill its panel with no layout shift or overflow.

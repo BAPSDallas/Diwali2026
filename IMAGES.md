@@ -26,12 +26,20 @@ Replace the files in this project's `assets/events` folder. Refresh the local pr
 
 Use photos at least 1200 pixels wide when possible and keep the important subject near the centre. Both pages crop automatically with `object-fit: cover`, so avoid putting important faces or text near an edge.
 
-| Page | Photo slot | Roughly |
-| --- | --- | --- |
-| `add-calendar.html` | Tall panel down the left of each card | About 90 x 127 points, near square |
-| `diwali-only.html` | Wide banner across the top of each card | About 380 x 150 points, landscape |
+**Any resolution and any shape works.** The panels are a fixed size and the photo is
+scaled to fill them with `object-fit: cover`, so nothing is stretched, letterboxed or
+able to shift the layout. Tested from 120 x 80 up to 4000 x 1000 and 800 x 2400.
 
-A landscape photo works on both: the banner shows it almost uncropped, and the left panel keeps the middle of the frame. Aim for under 1 MB per file for mobile loading.
+What you control is the *crop*, because the two panels are very different shapes:
+
+| Page | Photo slot | Measured on an iPhone 17 Pro | Effect |
+| --- | --- | --- | --- |
+| `add-calendar.html` | Tall panel down the left of each card | 76 x 126, taller than wide | A landscape photo is cropped hard on the left and right; only the middle third survives |
+| `diwali-only.html` | Wide banner across the top of each card | 378 x 118, about 3.2:1 | A landscape photo is cropped top and bottom; roughly the middle half survives |
+
+So: **keep the subject centred in the frame** and leave room around it. A face near an
+edge will be cut on one page or the other. Aim for under 1 MB per file for mobile
+loading.
 
 A small "Included" or "Optional" chip sits over the top-left corner of every photo, so leave that corner free of important detail.
 

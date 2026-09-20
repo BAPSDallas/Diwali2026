@@ -109,6 +109,7 @@ function makePujanCard() {
   const toggle = element('div', 'session-toggle');
   toggle.setAttribute('role', 'radiogroup');
   toggle.setAttribute('aria-label', 'Chopda Pujan session');
+  const sessions = [];
   for (const id of ['morning', 'evening']) {
     const event = byId(id);
     const choice = element('label', 'session session-choice');
@@ -120,11 +121,25 @@ function makePujanCard() {
     input.setAttribute('aria-label', `${id === 'evening' ? 'Evening' : 'Morning'} Chopda Pujan, ${event.timeLabel}`);
     input.addEventListener('change', () => { pujanIncluded.checked = true; updateSelection(); });
     optionalInputs.push(input);
+    sessions.push(input);
     choice.append(input, element('strong', '', id === 'evening' ? 'Evening' : 'Morning'), element('span', '', compactTime(event.timeLabel)));
     toggle.append(choice);
   }
 
   card.querySelector('.event-time').replaceWith(toggle);
+
+  /* Tapping anywhere else on the card includes or removes Chopda Pujan, the way
+     the Kids Diwali card behaves. An already-chosen session is kept; evening is
+     the fallback. Taps on the session toggle or the checkbox handle themselves. */
+  card.addEventListener('click', event => {
+    if (event.target === pujanIncluded || event.target.closest('.session-toggle')) return;
+    pujanIncluded.checked = !pujanIncluded.checked;
+    if (pujanIncluded.checked && !sessions.some(input => input.checked)) {
+      sessions.find(input => input.value === 'evening').checked = true;
+    }
+    updateSelection();
+  });
+
   return card;
 }
 
