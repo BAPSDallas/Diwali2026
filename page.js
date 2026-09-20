@@ -3,85 +3,171 @@ const { events, addresses, selectedEvents, buildCalendar } = DiwaliCalendar;
 const diwaliOnly = document.body.dataset.scope === 'diwali';
 const optionalInputs = [];
 let pujanIncluded;
+
 const byId = id => events.find(event => event.id === id);
+
 function element(tag, className, text) {
-  const node = document.createElement(tag); node.className = className;
+  const node = document.createElement(tag);
+  if (className) node.className = className;
   if (text) node.textContent = text;
   return node;
 }
+
+/* "Tuesday, November 10" + "20261110" -> { weekday: 'TUE', month: 'NOV', day: '10' } */
+function railParts(event) {
+  const [weekday, monthAndDay] = event.dateLabel.split(', ');
+  return {
+    weekday: weekday.slice(0, 3).toUpperCase(),
+    month: monthAndDay.split(' ')[0].slice(0, 3).toUpperCase(),
+    day: String(Number(event.date.slice(6)))
+  };
+}
+
+/* "9 AM – 11 AM" -> "9–11 AM" so the session segments can run larger type. */
+const compactTime = label => label.replace(/(\d+) (AM|PM) – (\d+) \2/, '$1–$3 $2');
+
+/* "BAPS Shri Swaminarayan Mandir, 4601 N State Hwy 161, Irving, TX 75038" -> street + city */
+const shortAddress = venue => addresses[venue].split(', ').slice(1, 3).join(', ');
+
+function makePhoto(event) {
+  const photo = element('div', `event-photo ${event.id}`);
+  photo.append(element('span', 'badge', event.required ? '✓ Included' : 'Optional'));
+  if (event.image) {
+    const image = element('img');
+    image.src = event.image;
+    image.alt = '';
+    image.addEventListener('error', () => {
+      image.remove();
+      photo.append(element('span', 'photo-motif', '✦'));
+    });
+    photo.append(image);
+  } else {
+    photo.append(element('span', 'photo-motif', '✦'));
+  }
+  return photo;
+}
+
+/* Month and weekday pin to the top; the numeral is an oversized layer that
+   rises from the bottom and is deliberately cropped by the card edge. */
+function makeDateRail(event) {
+  const { weekday, month, day } = railParts(event);
+  const rail = element('div', 'date-rail');
+  const labels = element('div', 'date-labels');
+  labels.setAttribute('aria-hidden', 'true');
+  labels.append(element('span', '', month), element('span', '', weekday));
+  const numeral = element('strong', 'date-num', day);
+  numeral.setAttribute('aria-hidden', 'true');
+  rail.append(labels, numeral);
+  return rail;
+}
+
 function makeCard(event, selectable = false) {
   const card = element(selectable ? 'label' : 'article', `event-card${event.required ? ' included' : ''}`);
-  const photo = element('div', `event-photo ${event.id}`); photo.setAttribute('aria-hidden','true');
-  if (event.image) {
-    const image = element('img'); image.src = event.image; image.alt = ''; image.loading = 'lazy'; image.addEventListener('error', () => { image.remove(); photo.append(element('span','photo-motif','✦')); }); photo.append(image);
-  } else photo.append(element('span','photo-motif','✦'));
-  const content = element('div','event-content');
-  const top = element('div','card-top'); top.append(element('span','badge',event.required ? '✓ Included' : 'Optional'));
+  const body = element('div', 'event-body');
+  body.append(element('h2', '', event.name), element('p', 'subtitle', event.subtitle));
+  body.append(element('p', 'event-date', `${event.dateLabel}, 2026`));
+  body.append(element('p', 'event-time', event.timeLabel));
+  body.append(element('p', 'address', shortAddress(event.venue)));
+
+  const rail = makeDateRail(event);
   if (selectable) {
-    const input = element('input'); input.type = 'checkbox'; input.value = event.id;
-    input.setAttribute('aria-label',`Include ${event.name}, ${event.subtitle}`);
-    optionalInputs.push(input); top.append(input); input.addEventListener('change',updateSelection);
+    const input = element('input');
+    input.type = 'checkbox';
+    input.value = event.id;
+    input.setAttribute('aria-label', `Include ${event.name}, ${event.subtitle}, ${event.dateLabel}`);
+    optionalInputs.push(input);
+    input.addEventListener('change', updateSelection);
+    rail.prepend(input);
   }
-  content.append(top,element('h2','',event.name),element('p','subtitle',event.subtitle));
-  const date = event.dateLabel.replace('Tuesday, November','Tue, Nov').replace('Saturday, November','Sat, Nov').replace('Sunday, November','Sun, Nov').replace('Saturday, October','Sat, Oct');
-  content.append(element('p','event-date',date),element('p','event-time',event.timeLabel));
-  content.append(element('p','address',addresses[event.venue].replace('BAPS Shri Swaminarayan Mandir, ','')));
-  card.append(photo,content);
-  {
-    const accent = element('div','date-accent'); accent.setAttribute('aria-hidden','true');
-    accent.append(element('span','',date.replace(/ \d+$/,'').toUpperCase()),element('strong','',String(Number(event.date.slice(-2)))));
-    card.append(accent);
-  }
+
+  const main = element('div', 'card-main');
+  main.append(body, rail);
+  card.append(makePhoto(event), main);
   return card;
 }
-for (const id of ['dallas','frisco']) document.getElementById('included').append(makeCard(byId(id)));
-if (!diwaliOnly) {
+
+/* The Chopda Pujan card keeps the shared silhouette; the time line becomes a
+   two-segment session picker so the card stays the same height as the others. */
+function makePujanCard() {
   const card = makeCard(byId('evening'));
   card.classList.add('pujan-card');
-  card.querySelector('.subtitle').textContent = 'Dallas TX';
-  pujanIncluded = element('input'); pujanIncluded.type = 'checkbox'; pujanIncluded.id = 'pujan-included'; pujanIncluded.checked = true;
-  pujanIncluded.setAttribute('aria-label','Include Chopda Pujan');
-  pujanIncluded.addEventListener('change',updateSelection);
-  card.querySelector('.card-top').append(pujanIncluded);
-  card.querySelector('.event-time').remove();
-  const choices = element('div','pujan-choices'); choices.setAttribute('role','radiogroup'); choices.setAttribute('aria-label','Chopda Pujan session');
-  for (const id of ['morning','evening']) {
+  card.querySelector('.subtitle').remove();
+
+  pujanIncluded = element('input');
+  pujanIncluded.type = 'checkbox';
+  pujanIncluded.id = 'pujan-included';
+  pujanIncluded.checked = true;
+  pujanIncluded.setAttribute('aria-label', 'Include Chopda Pujan');
+  pujanIncluded.addEventListener('change', updateSelection);
+  card.querySelector('.date-rail').prepend(pujanIncluded);
+
+  const toggle = element('div', 'session-toggle');
+  toggle.setAttribute('role', 'radiogroup');
+  toggle.setAttribute('aria-label', 'Chopda Pujan session');
+  for (const id of ['morning', 'evening']) {
     const event = byId(id);
-    const label = element('label','session-choice');
-    const input = element('input'); input.type = 'radio'; input.name = 'pujan'; input.value = id; input.checked = id === 'evening';
-    input.setAttribute('aria-label',`${id === 'evening' ? 'Evening' : 'Morning'} Chopda Pujan, ${event.timeLabel}`);
-    input.addEventListener('change',()=>{pujanIncluded.checked=true;updateSelection();}); optionalInputs.push(input);
-    label.append(input,element('strong','',id === 'evening' ? 'Evening' : 'Morning'),element('span','',event.timeLabel));
-    label.append(element('small','',id === 'evening' ? '' : 'Time tentative'));
-    choices.append(label);
+    const choice = element('label', 'session session-choice');
+    const input = element('input');
+    input.type = 'radio';
+    input.name = 'pujan';
+    input.value = id;
+    input.checked = id === 'evening';
+    input.setAttribute('aria-label', `${id === 'evening' ? 'Evening' : 'Morning'} Chopda Pujan, ${event.timeLabel}`);
+    input.addEventListener('change', () => { pujanIncluded.checked = true; updateSelection(); });
+    optionalInputs.push(input);
+    choice.append(input, element('strong', '', id === 'evening' ? 'Evening' : 'Morning'), element('span', '', compactTime(event.timeLabel)));
+    toggle.append(choice);
   }
-  card.querySelector('.event-content').insertBefore(choices,card.querySelector('.address'));
-  document.getElementById('optional').append(card,makeCard(byId('kdc'),true));
+
+  card.querySelector('.event-time').replaceWith(toggle);
+  return card;
 }
-const ids = () => optionalInputs.filter(input=>input.checked && (input.type !== 'radio' || pujanIncluded.checked)).map(input=>input.value);
-const downloadIds = () => diwaliOnly ? [] : (ids().length ? ids() : ['kdc','evening']);
+
+for (const id of ['dallas', 'frisco']) document.getElementById('included').append(makeCard(byId(id)));
+if (!diwaliOnly) document.getElementById('optional').append(makePujanCard(), makeCard(byId('kdc'), true));
+
+const ids = () => optionalInputs.filter(input => input.checked && (input.type !== 'radio' || pujanIncluded.checked)).map(input => input.value);
+const downloadIds = () => diwaliOnly ? [] : (ids().length ? ids() : ['kdc', 'evening']);
+
 function updateSelection() {
   for (const input of optionalInputs) {
-    if (input.type === 'radio') input.closest('.session-choice').classList.toggle('selected',input.checked);
-    else input.closest('.event-card').classList.toggle('selected',input.checked);
+    if (input.type === 'radio') input.closest('.session').classList.toggle('selected', input.checked);
+    else input.closest('.event-card').classList.toggle('selected', input.checked);
   }
-  if (pujanIncluded) pujanIncluded.closest('.event-card').classList.toggle('selected',pujanIncluded.checked);
+  if (pujanIncluded) pujanIncluded.closest('.event-card').classList.toggle('selected', pujanIncluded.checked);
   const hasChoice = ids().length > 0;
   document.getElementById('download-label').textContent = hasChoice ? 'Add selected events' : 'Add all events';
-  document.getElementById('selection-count').textContent = diwaliOnly ? '2 events included' : hasChoice ? `${selectedEvents(downloadIds()).length} events selected` : '4 events · evening pujan included';
-  const clear = document.getElementById('clear'); if (clear) clear.hidden = !hasChoice;
+  document.getElementById('selection-count').textContent = diwaliOnly
+    ? '2 events included'
+    : hasChoice ? `${selectedEvents(downloadIds()).length} events selected` : '4 events · evening pujan included';
+  const clear = document.getElementById('clear');
+  if (clear) clear.hidden = !hasChoice;
   document.getElementById('download-status').textContent = '';
 }
+
 const clear = document.getElementById('clear');
-if (clear) clear.addEventListener('click',()=>{optionalInputs.forEach(input=>{input.checked=input.value==='evening';});if(pujanIncluded)pujanIncluded.checked=false;updateSelection();});
-document.getElementById('download').disabled=false;
-document.getElementById('download').addEventListener('click',()=>{
+if (clear) clear.addEventListener('click', () => {
+  optionalInputs.forEach(input => { input.checked = input.value === 'evening'; });
+  if (pujanIncluded) pujanIncluded.checked = false;
+  updateSelection();
+});
+
+document.getElementById('download').disabled = false;
+document.getElementById('download').addEventListener('click', () => {
   try {
     const selection = downloadIds();
-    const url = URL.createObjectURL(new Blob([buildCalendar(selection)],{type:'text/calendar;charset=utf-8'}));
-    const link = element('a'); link.href=url; link.download=`Diwali_2026_${selectedEvents(selection).length}_Events.ics`;
-    document.body.append(link); link.click(); link.remove(); setTimeout(()=>URL.revokeObjectURL(url),60000);
-    document.getElementById('download-status').textContent='Open the downloaded file to finish adding your events.';
-  } catch(error) {document.getElementById('download-status').textContent='Download could not start. Please try Safari or Chrome.';}
+    const url = URL.createObjectURL(new Blob([buildCalendar(selection)], { type: 'text/calendar;charset=utf-8' }));
+    const link = element('a');
+    link.href = url;
+    link.download = `Diwali_2026_${selectedEvents(selection).length}_Events.ics`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    document.getElementById('download-status').textContent = 'Open the downloaded file to finish adding your events.';
+  } catch (error) {
+    document.getElementById('download-status').textContent = 'Download could not start. Please try Safari or Chrome.';
+  }
 });
+
 updateSelection();

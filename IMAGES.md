@@ -24,6 +24,15 @@ Replace the files in this project's `assets/events` folder. Refresh the local pr
 
 ## Photo framing
 
-Use photos at least 1200 pixels wide when possible and keep the important subject near the center. The two-event page uses wide photo panels; the full page uses narrow vertical panels. Both crop automatically to fill their space, so avoid putting important text or faces near the edges. Aim for under 1 MB per file for mobile loading.
+Use photos at least 1200 pixels wide when possible and keep the important subject near the centre. Both pages crop automatically with `object-fit: cover`, so avoid putting important faces or text near an edge.
+
+| Page | Photo slot | Roughly |
+| --- | --- | --- |
+| `add-calendar.html` | Tall panel down the left of each card | About 100 x 125 points, near square |
+| `diwali-only.html` | Wide banner across the top of each card | About 380 x 150 points, landscape |
+
+A landscape photo works on both: the banner shows it almost uncropped, and the left panel keeps the middle of the frame. Aim for under 1 MB per file for mobile loading.
+
+A small "Included" or "Optional" chip sits over the top-left corner of every photo, so leave that corner free of important detail.
 
 For precise crop adjustments, `object-position` can be customized in CSS later. The included files are decorative placeholders until real photos are provided.

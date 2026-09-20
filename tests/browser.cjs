@@ -5,6 +5,8 @@ const assert=require('node:assert/strict'),fs=require('node:fs/promises');
  const page=await browser.newPage({viewport:{width:390,height:844}});
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  const base=process.env.SITE_URL||'http://127.0.0.1:8765/';
+// Safari's visible content height on iPhone 17 Pro / Pro Max, plus a tighter guard band.
+const PHONES=[['17 Pro',402,740],['17 Pro Max',440,820],['17 Pro, toolbars expanded',402,700]];
  async function download(){const wait=page.waitForEvent('download');await page.locator('#download').click();return fs.readFile(await (await wait).path(),'utf8');}
  await page.goto(base+'add-calendar.html');await page.waitForSelector('.event-card');
  assert.equal(await page.locator('.action-buttons button').count(),1);
@@ -33,15 +35,26 @@ const assert=require('node:assert/strict'),fs=require('node:fs/promises');
   const boxes=await page.locator('.session-choice').evaluateAll(nodes=>nodes.map(n=>({y:n.getBoundingClientRect().y,x:n.getBoundingClientRect().x})));
   assert.equal(boxes[0].y,boxes[1].y);assert(boxes[0].x<boxes[1].x);
  }
+ for(const [label,width,height] of PHONES){
+  await page.setViewportSize({width,height});
+  const over=await page.evaluate(()=>document.documentElement.scrollHeight-innerHeight);
+  assert(over<=0,`add-calendar scrolls on ${label}: ${over}px over`);
+ }
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:'/private/tmp/diwali-new.png',fullPage:true});
  await page.goto(base+'diwali-only.html');await page.waitForSelector('.event-card');
  assert.equal(await page.locator('.event-card').count(),2);assert.equal(await page.locator('input').count(),0);
  const photoBox=await page.locator('.event-photo').first().boundingBox();
- const detailBox=await page.locator('.event-content').first().boundingBox();
+ const detailBox=await page.locator('.event-body').first().boundingBox();
  assert(photoBox.y+photoBox.height<=detailBox.y+1);
  assert(await page.locator('.event-photo img').evaluateAll(images=>images.every(i=>i.complete&&i.naturalWidth>0)));
  const text=await download();assert.equal((text.match(/BEGIN:VEVENT/g)||[]).length,2);assert(!text.includes('UID:kids'));assert(!text.includes('UID:chop'));
+ for(const [label,width,height] of PHONES){
+  await page.setViewportSize({width,height});
+  const over=await page.evaluate(()=>document.documentElement.scrollHeight-innerHeight);
+  assert(over<=0,`diwali-only scrolls on ${label}: ${over}px over`);
+ }
+ await page.setViewportSize({width:390,height:844});
  await page.screenshot({path:'/private/tmp/diwali-only.png',fullPage:true});
  assert.deepEqual(errors,[]);await browser.close();
- console.log('PASS: six selection states, exclusive Chopda sessions, single dynamic button, both-event page, downloads, responsive widths, no JS errors.');
+ console.log('PASS: no scroll on iPhone 17 Pro/Pro Max, six selection states, exclusive Chopda sessions, single dynamic button, both-event page, downloads, responsive widths, no JS errors.');
 })().catch(error=>{console.error(error);process.exit(1)});
