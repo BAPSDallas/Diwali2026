@@ -47,6 +47,29 @@ setTimeout(() => URL.revokeObjectURL(url), 60000);
 iOS then shows a normal *import* flow. If you ever find yourself "simplifying" a
 button into a direct link to an `.ics`, you have reintroduced the original bug.
 
+**And an `.ics` file alone does not serve Android at all.** Google Calendar's
+Android app has no import function — it never has. A downloaded `.ics` lands in
+Downloads and the visitor is left to find it and guess which app opens it; on a
+phone with no Samsung Calendar, nothing does. So every one of these sites needs
+a second path: a per-event Google Calendar template link, which opens the app
+prefilled so the visitor only taps Save.
+
+```js
+new URLSearchParams({
+  action: 'TEMPLATE', text: title,
+  dates: `${date}T${start}/${date}T${end}`,   // local wall time, no Z
+  ctz: 'America/Chicago',                     // ctz makes the times local
+  location: address, details: url,
+})
+// -> https://calendar.google.com/calendar/render?<params>
+```
+
+The template form carries **one event per link** — there is no multi-event
+variant — so n events genuinely means n taps. Present them as a list rather than
+pretending one button can do it. Lead with the Google list on Android and the
+`.ics` on everything else, but keep both reachable on every platform so a
+user-agent misread never strands anyone.
+
 ## Interview first
 
 Do not start building until you have these. Ask in one batch, not one at a time.

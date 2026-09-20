@@ -26,6 +26,14 @@ All dates are in 2026 and times are America/Chicago. Event dates are retained fr
 
 Every event includes its full address, a description containing only `https://www.baps.org/dallas`, and reminders one week and one day beforehand.
 
+## Two ways to add events
+
+iPhone and desktop get a single `.ics` file built in the browser and imported in one step.
+
+Android gets a list of per-event Google Calendar links instead, because Google Calendar's Android app has no `.ics` import — a downloaded file simply sits in Downloads. Each link opens Google Calendar prefilled so the visitor taps Save. Google's template URL carries one event per link, so this is deliberately a list rather than a single button.
+
+The page leads with whichever path suits the device but keeps both reachable everywhere, so a user-agent misread never leaves someone without a working option.
+
 Dallas events: BAPS Shri Swaminarayan Mandir, 4601 N State Hwy 161, Irving, TX 75038. This matches the address on the official [BAPS Dallas site](https://www.baps.org/Dallas).
 
 Frisco: BAPS Shri Swaminarayan Mandir, 9190 Sam Rayburn Tollway S, Frisco, TX 75035, retained from the supplied event file; organizer confirmation remains recommended.

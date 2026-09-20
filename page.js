@@ -1,5 +1,5 @@
 'use strict';
-const { events, addresses, selectedEvents, buildCalendar } = DiwaliCalendar;
+const { events, addresses, selectedEvents, buildCalendar, googleCalendarUrl } = DiwaliCalendar;
 const diwaliOnly = document.body.dataset.scope === 'diwali';
 const optionalInputs = [];
 let pujanIncluded;
@@ -160,7 +160,10 @@ function updateSelection() {
   }
   if (pujanIncluded) pujanIncluded.closest('.event-card').classList.toggle('selected', pujanIncluded.checked);
   const hasChoice = ids().length > 0;
-  document.getElementById('download-label').textContent = hasChoice ? 'Add selected events' : 'Add all events';
+  // On Android the .ics is the fallback, so name it for what it is.
+  document.getElementById('download-label').textContent = isAndroid
+    ? 'Download .ics file'
+    : hasChoice ? 'Add selected events' : 'Add all events';
   document.getElementById('selection-count').textContent = diwaliOnly
     ? '2 events included'
     : hasChoice ? `${selectedEvents(downloadIds()).length} events selected` : '4 events · evening pujan included';
@@ -175,6 +178,48 @@ if (clear) clear.addEventListener('click', () => {
   if (pujanIncluded) pujanIncluded.checked = false;
   updateSelection();
 });
+
+/* Android downloads the .ics into Downloads and leaves the visitor to find and
+   open it, because Google Calendar's Android app cannot import .ics at all. So
+   Android gets the Google Calendar list as the primary action and the file as
+   the fallback; everyone else gets the reverse. Both paths stay reachable on
+   every platform, so a wrong guess never strands anyone. */
+const isAndroid = /Android/i.test(navigator.userAgent);
+const sheet = document.getElementById('gcal-sheet');
+const sheetList = document.getElementById('gcal-list');
+
+function openSheet() {
+  sheetList.replaceChildren();
+  for (const event of selectedEvents(downloadIds())) {
+    const item = element('li', 'gcal-item');
+    const text = element('div', '');
+    // Two events share the name "Diwali & Annakut", so the venue has to be here.
+    text.append(element('strong', '', event.name), element('span', '', event.subtitle),
+                element('span', 'gcal-when', `${event.dateLabel} · ${event.timeLabel}`));
+    const link = element('a', 'gcal-add', 'Add');
+    link.href = googleCalendarUrl(event);
+    link.target = '_blank';
+    link.rel = 'noopener';
+    // Tick it off so the visitor can see how far through the list they are.
+    link.addEventListener('click', () => item.classList.add('added'));
+    item.append(text, link);
+    sheetList.append(item);
+  }
+  sheet.hidden = false;
+  document.getElementById('sheet-close').focus();
+}
+
+function closeSheet() {
+  sheet.hidden = true;
+  document.getElementById(isAndroid ? 'gcal' : 'download').focus();
+}
+
+document.getElementById('gcal').addEventListener('click', openSheet);
+document.getElementById('sheet-close').addEventListener('click', closeSheet);
+sheet.addEventListener('click', event => { if (event.target === sheet) closeSheet(); });
+document.addEventListener('keydown', event => { if (event.key === 'Escape' && !sheet.hidden) closeSheet(); });
+
+if (isAndroid) document.querySelector('.action-buttons').classList.add('android');
 
 document.getElementById('download').disabled = false;
 document.getElementById('download').addEventListener('click', () => {

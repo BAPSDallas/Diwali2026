@@ -11,7 +11,8 @@
     { id: 'morning', uid: 'chopda-pujan-morning-dallas-2026@bapsdallas.github.io', title: 'Chopda Pujan (Morning) 2026, Dallas TX', name: 'Chopda Pujan', subtitle: 'Morning · Dallas TX', date: '20261108', start: '090000', end: '110000', dateLabel: 'Sunday, November 8', timeLabel: '9 AM – 11 AM', tentative: true, venue: 'dallas', required: false, image: 'assets/events/chopda-pujan.png' },
     { id: 'evening', uid: 'chopra-pujan-dallas-2026@krupesh9.github.io', title: 'Chopda Pujan (Evening) 2026, Dallas TX', name: 'Chopda Pujan', subtitle: 'Evening · Dallas TX', date: '20261108', start: '170000', end: '190000', dateLabel: 'Sunday, November 8', timeLabel: '5 PM – 7 PM', venue: 'dallas', required: false, image: 'assets/events/chopda-pujan.png' }
   ];
-  const timezone = ['BEGIN:VTIMEZONE', 'TZID:America/Chicago', 'BEGIN:DAYLIGHT', 'DTSTART:19700308T020000', 'TZOFFSETFROM:-0600', 'TZOFFSETTO:-0500', 'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU', 'END:DAYLIGHT', 'BEGIN:STANDARD', 'DTSTART:19701101T020000', 'TZOFFSETFROM:-0500', 'TZOFFSETTO:-0600', 'RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU', 'END:STANDARD', 'END:VTIMEZONE'];
+  const TZID = 'America/Chicago';
+  const timezone = ['BEGIN:VTIMEZONE', `TZID:${TZID}`, 'BEGIN:DAYLIGHT', 'DTSTART:19700308T020000', 'TZOFFSETFROM:-0600', 'TZOFFSETTO:-0500', 'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU', 'END:DAYLIGHT', 'BEGIN:STANDARD', 'DTSTART:19701101T020000', 'TZOFFSETFROM:-0500', 'TZOFFSETTO:-0600', 'RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU', 'END:STANDARD', 'END:VTIMEZONE'];
   const escapeText = text => text.replace(/\\/g, '\\\\').replace(/\r?\n/g, '\\n').replace(/;/g, '\\;').replace(/,/g, '\\,');
   function fold(line) {
     let result = '', length = 0;
@@ -30,13 +31,29 @@
   function buildCalendar(ids = []) {
     const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//BAPS Dallas//Diwali 2026//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', ...timezone];
     for (const event of selectedEvents(ids)) {
-      lines.push('BEGIN:VEVENT', `UID:${event.uid}`, 'DTSTAMP:20260920T180000Z', 'SEQUENCE:1', `SUMMARY:${escapeText(event.title)}`, `DTSTART;TZID=America/Chicago:${event.date}T${event.start}`, `DTEND;TZID=America/Chicago:${event.date}T${event.end}`, `LOCATION:${escapeText(addresses[event.venue])}`, 'DESCRIPTION:https://www.baps.org/dallas', 'URL:https://www.baps.org/dallas');
+      lines.push('BEGIN:VEVENT', `UID:${event.uid}`, 'DTSTAMP:20260920T180000Z', 'SEQUENCE:1', `SUMMARY:${escapeText(event.title)}`, `DTSTART;TZID=${TZID}:${event.date}T${event.start}`, `DTEND;TZID=${TZID}:${event.date}T${event.end}`, `LOCATION:${escapeText(addresses[event.venue])}`, 'DESCRIPTION:https://www.baps.org/dallas', 'URL:https://www.baps.org/dallas');
       for (const days of [7, 1]) lines.push('BEGIN:VALARM', `TRIGGER:-P${days}D`, 'ACTION:DISPLAY', 'DESCRIPTION:Event reminder', 'END:VALARM');
       lines.push('END:VEVENT');
     }
     return [...lines, 'END:VCALENDAR'].map(fold).join('\r\n') + '\r\n';
   }
-  const api = { events, addresses, selectedEvents, buildCalendar };
+  /* Google Calendar for Android has no .ics import — a downloaded file just sits
+     in Downloads. This link opens Google Calendar with the event prefilled so
+     the visitor only has to tap Save. It carries exactly one event; Google's
+     template form has no multi-event variant, which is why the UI lists them. */
+  function googleCalendarUrl(event) {
+    const params = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: event.title,
+      dates: `${event.date}T${event.start}/${event.date}T${event.end}`,
+      ctz: TZID,
+      location: addresses[event.venue],
+      details: 'https://www.baps.org/dallas'
+    });
+    return `https://calendar.google.com/calendar/render?${params}`;
+  }
+
+  const api = { events, addresses, selectedEvents, buildCalendar, googleCalendarUrl };
   if (typeof module !== 'undefined') module.exports = api;
   else root.DiwaliCalendar = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -84,6 +84,13 @@ per-breakpoint tuning.
 **Addresses join the city, state and ZIP with non-breaking spaces** so an address too
 long for one line breaks after the street the way a postal address reads.
 
+**Android cannot import `.ics` and needs its own path.** Google Calendar for
+Android has no import feature, so a downloaded file just sits in Downloads. The
+page offers per-event Google Calendar template links (`render?action=TEMPLATE`,
+one event per link, `ctz` for local times) in a sheet, led on Android and
+available everywhere. Do not remove one path in favour of the other — each is
+the only thing that works on its platform.
+
 **The Chopda Pujan card is a normal card.** Its Morning/Evening segmented toggle
 occupies the same slot the time line uses on the other cards, so it keeps the shared
 height and silhouette instead of becoming a special case.

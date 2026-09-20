@@ -42,7 +42,11 @@ async function fits(page,name){
 }
  async function download(){const wait=page.waitForEvent('download');await page.locator('#download').click();return fs.readFile(await (await wait).path(),'utf8');}
  await page.goto(base+'add-calendar.html');await page.waitForSelector('.event-card');
- assert.equal(await page.locator('.action-buttons button').count(),1);
+ // Two actions now: the .ics file and the Google Calendar list. Off Android the
+ // file leads (44px tall) and the Google path is a secondary link.
+ assert.equal(await page.locator('.action-buttons button').count(),2);
+ assert((await page.locator('#download').boundingBox()).height>=44,'.ics is primary off Android');
+ assert(await page.locator('#gcal').isVisible(),'Google Calendar path reachable off Android');
  assert(await page.locator('#pujan-included').isChecked());
  assert(await page.locator('input[value=evening]').isChecked());
  const initial=await download();assert.equal((initial.match(/BEGIN:VEVENT/g)||[]).length,3);
@@ -71,6 +75,8 @@ async function fits(page,name){
  assert.deepEqual(await pujan(),{i:true,m:false},'session tap must not toggle the card');
  await page.locator('.pujan-card h2').click();await page.locator('.pujan-card h2').click();
  assert(await page.locator('input[value=evening]').isChecked(),'evening is the fallback session');
+ const selected=Number(((await page.locator('#selection-count').textContent()).match(/^(\d+)/)||[])[1]);
+ assert(selected>0,'expected a non-zero selection count');
  for(const width of [320,390,778,1280]){
   await page.setViewportSize({width,height:863});
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`overflow ${width}`);
@@ -82,6 +88,19 @@ async function fits(page,name){
  assert((await page.locator('.event-card:has(.has-fireworks) .subtitle').textContent()).includes('Dallas'),'fireworks is on the Dallas card');
  const fwUrl=await page.locator('.has-fireworks').evaluate(n=>getComputedStyle(n).getPropertyValue('--fireworks').replace(/^url\(['"]?|['"]?\)$/g,'').trim());
  assert((await page.request.get(new URL(fwUrl,page.url()).href)).ok(),`fireworks image missing: ${fwUrl}`);
+ // Google Calendar path: one link per selected event, correctly formed.
+ await page.locator('#gcal').click();await page.waitForSelector('#gcal-sheet:not([hidden])');
+ assert.equal(await page.locator('.gcal-item').count(),selected,`sheet lists ${selected} events`);
+ for(const href of await page.locator('.gcal-add').evaluateAll(a=>a.map(x=>x.href))){
+  const u=new URL(href);
+  assert.equal(u.host,'calendar.google.com');
+  assert.equal(u.searchParams.get('action'),'TEMPLATE');
+  assert.equal(u.searchParams.get('ctz'),'America/Chicago');
+  assert(/^\d{8}T\d{6}\/\d{8}T\d{6}$/.test(u.searchParams.get('dates')),`bad dates: ${u.searchParams.get('dates')}`);
+  assert(u.searchParams.get('location'),'location missing');
+ }
+ await page.locator('#sheet-close').click();
+ assert(await page.locator('#gcal-sheet').isHidden(),'sheet closes');
  await photosFill(page,'add-calendar');
  await fits(page,'add-calendar');
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:'/private/tmp/diwali-new.png',fullPage:true});
@@ -97,5 +116,5 @@ async function fits(page,name){
  await page.setViewportSize({width:390,height:844});
  await page.screenshot({path:'/private/tmp/diwali-only.png',fullPage:true});
  assert.deepEqual(errors,[]);await browser.close();
- console.log('PASS: no scroll on iPhone 17 Pro/Pro Max, no clipping on short screens, any photo aspect fills its panel, Dallas-only fireworks wash, clickable pujan card, six selection states, exclusive Chopda sessions, single dynamic button, both-event page, downloads, responsive widths, no JS errors.');
+ console.log('PASS: Google Calendar links per event, no scroll on iPhone 17 Pro/Pro Max, no clipping on short screens, any photo aspect fills its panel, Dallas-only fireworks wash, clickable pujan card, six selection states, exclusive Chopda sessions, both calendar paths reachable, both-event page, downloads, responsive widths, no JS errors.');
 })().catch(error=>{console.error(error);process.exit(1)});

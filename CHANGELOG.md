@@ -36,4 +36,5 @@
 - Mark the Dallas Annakut as the celebration with a fireworks finale, using a generated vector burst washed in behind its date column rather than a photo crop: 13 KB instead of 1.4 MB, crisp at any density, and framed without dragging the mandir roofline into view.
 - Add Open Graph and Twitter Card metadata to both pages with distinct titles and dedicated 1200x630 preview images, so a shared link renders a card instead of bare text.
 - Add two 16:9 QR slides for use in a deck, with the QR verified to decode from the finished render.
+- Add a Google Calendar path for Android, which cannot import .ics at all: a sheet listing one prefilled `render?action=TEMPLATE` link per selected event. Android leads with it and falls back to the file; every other platform leads with the file and can still reach the list.
 - Add `.claude/skills/save-the-date-site/`, a reusable skill capturing the workflow, layout recipes, ICS rules, bundled scripts, and lessons learned from building this site.

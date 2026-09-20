@@ -9,6 +9,23 @@ one of these sites. They are grouped by where they bite.
 because it shapes the whole architecture. Land on an HTML page; build the file
 in-browser from a Blob.
 
+**Android needs a completely separate path from iOS.** An `.ics` download is the
+right answer on iOS and a dead end on Android, because Google Calendar for
+Android cannot import `.ics` at all. Symptom as reported by a user: "Android is
+just downloading the file." Do not try to fix this with a different MIME type, a
+`webcal://` scheme or an intent URL — the app simply has no import feature.
+
+Use Google's `render?action=TEMPLATE` link, one per event, which opens Google
+Calendar prefilled. Because it is one event per link, design for a list. A sheet
+that opens over the page works well: it does not disturb a one-screen layout,
+and ticking off each row as it is tapped tells the visitor how far through they
+are, which matters when they are bouncing between two apps.
+
+Detect Android with a plain `/Android/i.test(navigator.userAgent)` to decide
+which path *leads*, but never to decide which path *exists*. User-agent sniffing
+misfires on tablets, ChromeOS and in-app browsers, and the cost of a wrong guess
+should be a slightly odd button order, not a visitor with no way to add anything.
+
 **iOS Safari ignores `background-attachment: fixed`.** Use a real fixed layer:
 
 ```css
