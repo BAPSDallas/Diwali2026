@@ -257,6 +257,23 @@ would have done.
 **Budget the space arithmetically first.** Header + n × card + gaps + toolbar
 against the real viewport height tells you in seconds whether a design fits.
 
+**Behavioural tests pass while a component is completely unstyled.** A whole
+block of sheet CSS was deleted by an unrelated edit — a text-range replacement
+that silently swallowed the block sitting between its two anchors — and every
+assertion still passed: the element count was right, the links were right, the
+open/close state was right. The panel rendered as a bare bulleted list with the
+text running together, and nobody noticed until a user sent a screenshot.
+
+Two defences. Assert a few computed styles for any component you care about
+(`position`, `display`, a background that is not transparent) — it is three
+lines and it catches the entire class. And when replacing a range of a file by
+index, print what you are about to delete, or anchor on a unique short string
+rather than a span between two markers.
+
+**Screenshot conditionally-rendered UI.** Anything behind a click — sheets,
+dialogs, empty states, error states — never appears in routine screenshots, so
+it rots invisibly. Drive the interaction and capture it too.
+
 **Screenshot and look.** A wrapping badge, an orphaned ZIP, a numeral clipped on
 its right edge, and an entirely blank template were all invisible in the code.
 

@@ -101,6 +101,22 @@ async function fits(page,name){
   assert(/^\d{8}T\d{6}\/\d{8}T\d{6}$/.test(u.searchParams.get('dates')),`bad dates: ${u.searchParams.get('dates')}`);
   assert(u.searchParams.get('location'),'location missing');
  }
+ // The sheet only exists after a click, so it never appears in routine
+ // screenshots. These assert its stylesheet actually applies: a whole block of
+ // sheet CSS was once deleted by an unrelated edit and every behavioural test
+ // above still passed while the panel rendered as a bare bulleted list.
+ const styled=await page.evaluate(()=>{
+  const css=(sel,prop)=>getComputedStyle(document.querySelector(sel))[prop];
+  return {overlay:css('.sheet','position'),panelBg:css('.sheet-panel','backgroundColor'),
+   bullets:css('#gcal-list','listStyleType'),row:css('.gcal-item','display'),
+   addBg:css('.gcal-add','backgroundColor'),name:css('.gcal-item strong','display')};
+ });
+ assert.equal(styled.overlay,'fixed','sheet must overlay the page, not sit in flow');
+ assert.equal(styled.bullets,'none','sheet list is unstyled');
+ assert.equal(styled.row,'flex','sheet rows are unstyled');
+ assert.equal(styled.name,'block','sheet row text would run together');
+ assert(!/rgba\(0, 0, 0, 0\)/.test(styled.addBg),'Add is unstyled');
+ assert(!/rgba\(0, 0, 0, 0\)/.test(styled.panelBg),'sheet panel is unstyled');
  await page.locator('#sheet-close').click();
  assert(await page.locator('#gcal-sheet').isHidden(),'sheet closes');
  for(const title of await page.locator('h2').allTextContents()){
@@ -121,5 +137,5 @@ async function fits(page,name){
  await page.setViewportSize({width:390,height:844});
  await page.screenshot({path:'/private/tmp/diwali-only.png',fullPage:true});
  assert.deepEqual(errors,[]);await browser.close();
- console.log('PASS: Google Calendar links per event, no scroll on iPhone 17 Pro/Pro Max, no clipping on short screens, any photo aspect fills its panel, Dallas-only fireworks wash, clickable pujan card, six selection states, exclusive Chopda sessions, one calendar per phone platform and both when unknown, cities in every title, both-event page, downloads, responsive widths, no JS errors.');
+ console.log('PASS: Google Calendar sheet styled and linked per event, no scroll on iPhone 17 Pro/Pro Max, no clipping on short screens, any photo aspect fills its panel, Dallas-only fireworks wash, clickable pujan card, six selection states, exclusive Chopda sessions, one calendar per phone platform and both when unknown, cities in every title, both-event page, downloads, responsive widths, no JS errors.');
 })().catch(error=>{console.error(error);process.exit(1)});
