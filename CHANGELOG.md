@@ -7,3 +7,6 @@
 - Correct Chopda Pujan spelling, split morning/evening sessions, and update all event times.
 - Generate selection-specific calendars with full locations, BAPS link descriptions, and unchanged reminder intervals.
 - Add photo placeholders, a persistent calendar action, QR download, and selection/browser tests.
+
+- Compact glass-style revision: transparent logo, thumbnail cards, less padding, removed heading copy, and street-only displayed addresses.
+- Prioritize evening Chopda Pujan, rename Kids Diwali Celebration, move morning last, and add separate selected/all download controls.

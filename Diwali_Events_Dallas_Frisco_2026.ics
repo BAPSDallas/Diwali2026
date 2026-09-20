@@ -66,7 +66,7 @@ BEGIN:VEVENT
 UID:kids-diwali-kdc-2026@krupesh9.github.io
 DTSTAMP:20260920T180000Z
 SEQUENCE:1
-SUMMARY:Kids Diwali (KDC) 2026\, Dallas TX
+SUMMARY:Kids Diwali Celebration (KDC) 2026\, Dallas TX
 DTSTART;TZID=America/Chicago:20261031T100000
 DTEND;TZID=America/Chicago:20261031T180000
 LOCATION:BAPS Shri Swaminarayan Mandir\, 4601 N State Hwy 161\, Irving\, TX
