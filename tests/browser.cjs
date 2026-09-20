@@ -124,11 +124,14 @@ async function fits(page,name){
  // the flow these wrap again and the cards stop fitting one screen.
  for(const width of [320,375,402,440]){
   await page.setViewportSize({width,height:740});
-  const wrapped=await page.evaluate(()=>{
+  const shape=await page.evaluate(()=>{
    const lines=n=>Math.round(n.getBoundingClientRect().height/parseFloat(getComputedStyle(n).lineHeight));
-   return [...document.querySelectorAll('h2, .address')].filter(n=>lines(n)>1).map(n=>n.textContent.trim());
+   return {titles:[...document.querySelectorAll('h2')].filter(n=>lines(n)>1).map(n=>n.textContent.trim()),
+           addresses:[...document.querySelectorAll('.address')].map(lines)};
   });
-  assert.deepEqual(wrapped,[],`wrapped onto two lines at ${width}px`);
+  assert.deepEqual(shape.titles,[],`title wrapped onto two lines at ${width}px`);
+  // Street and locality are separate spans, so this is two lines at every width.
+  assert(shape.addresses.every(n=>n===2),`address not two lines at ${width}px: ${shape.addresses}`);
   const layered=await page.evaluate(()=>getComputedStyle(document.querySelector('.date-rail')).position);
   assert.equal(layered,'absolute',`date accent must stay a layer at ${width}px`);
  }

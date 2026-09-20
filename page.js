@@ -41,13 +41,14 @@ function railParts(event) {
 /* "9 AM – 11 AM" -> "9–11 AM" so the session segments can run larger type. */
 const compactTime = label => label.replace(/(\d+) (AM|PM) – (\d+) \2/, '$1–$3 $2');
 
-/* Drop only the mandir name; street, city, state and ZIP all stay. The
-   city/state/ZIP tail is joined with non-breaking spaces so an address too long
-   for one line breaks after the street, the way a postal address reads, rather
-   than mid-street or with the ZIP orphaned. */
-function shortAddress(venue) {
+/* Drop only the mandir name; street, city, state and ZIP all stay. Street and
+   locality are separate lines rather than one string left to wrap, so every card
+   breaks in the same place at every width, the way a postal address reads. */
+function addressNode(venue) {
   const [, street, city, stateZip] = addresses[venue].split(', ');
-  return `${street}, ${`${city}, ${stateZip}`.replace(/ /g, '\u00a0')}`;
+  const node = element('p', 'address');
+  node.append(element('span', '', `${street},`), element('span', '', `${city}, ${stateZip}`));
+  return node;
 }
 
 function makePhoto(event) {
@@ -90,7 +91,7 @@ function makeCard(event, selectable = false) {
   const body = element('div', 'event-body');
   body.append(titleNode(event), element('p', 'subtitle', subtitleOf(event)));
   body.append(element('p', 'event-time', event.timeLabel));
-  body.append(element('p', 'address', shortAddress(event.venue)));
+  body.append(addressNode(event.venue));
 
   const rail = makeDateRail(event);
   if (selectable) {

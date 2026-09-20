@@ -232,10 +232,13 @@ h2 {
 
 .address {
   font-size: 9.5px;
+  font-weight: 600;
   color: var(--ink-soft);
-  margin: 6px 0 0;
-  line-height: 1.25;
+  margin: 11px 0 0;
+  line-height: 1.35;
 }
+
+.address span { display: block; }
 
 /* ---------- Date accent ----------
    Month and weekday sit at the top. The numeral is an oversized layer rising
@@ -261,8 +264,7 @@ h2 {
   align-items: center;
   /* Bottom-anchored: the label line rides directly on top of the numeral. */
   justify-content: flex-end;
-  /* Hold the numeral in from the right edge rather than against it. */
-  padding: 0 15px 0 0;
+  padding: 0 4px 0 0;
   overflow: hidden;
   color: var(--red);
   text-align: center;
@@ -316,6 +318,8 @@ h2 {
 
 .date-num {
   flex: none;
+  /* Flush right, so a single digit sits where a two-digit date does. */
+  align-self: flex-end;
   /* Overhang the rail's bottom edge; overflow:hidden does the cropping. */
   margin-bottom: -.1em;
   /* Lining figures are the whole point of this stack: Georgia's default
@@ -329,6 +333,9 @@ h2 {
   font-weight: 600;
   font-size: clamp(46px, 13vw, 76px);
   font-size: min(100cqh, 94cqw);
+  /* Default tracking leaves a gap between the digits at this size, so "10"
+     reads as two marks instead of one date. */
+  letter-spacing: -.06em;
   line-height: .78;
   opacity: .5;
   text-shadow: 0 1px 0 rgba(255, 255, 255, .4);
