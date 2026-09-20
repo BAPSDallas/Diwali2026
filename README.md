@@ -36,7 +36,7 @@ Frisco: BAPS Shri Swaminarayan Mandir, 9190 Sam Rayburn Tollway S, Frisco, TX 75
 - `page.js` renders cards and handles selection and download.
 - `styles.css` supplies the responsive layout, artwork framing, and photo placeholders.
 - `assets/diwali-logo.png` and `assets/festival-background.png` preserve the supplied originals. `assets/diwali-logo-transparent.png` is the extracted transparent logo used over the glass-style page.
-- Set an event's `image` in `calendar.js` to a relative path such as `assets/kdc.jpg` when photos arrive. The page automatically replaces that card's decorative photo placeholder.
+- Replace the named PNGs in `assets/events/` to change photos on both pages without code edits. See [IMAGES.md](IMAGES.md) for filenames and publishing instructions.
 - `index.html` redirects the site root to `add-calendar.html`.
 - `PROJECT_SUMMARY.md` records the original handoff and has superseded event information. This README and calendar.js describe the current requirements.
 
@@ -69,7 +69,7 @@ The button downloads a local `.ics` file and never opens a subscription URL. Act
 
 ## Compact page revision
 
-Removed the introductory text and section headings. Cards use small photo thumbnails, reduced spacing, and street-only display addresses; exported calendars retain the full venue locations. Chopda Pujan offers evening/morning choices side by side, followed by Kids Diwali Celebration. Both Annakut events remain mandatory; all optional inputs start unchecked. With no optional choice, Add all events downloads Dallas, Frisco, KDC, and evening Chopda (four events); the summary discloses this default. With any optional choice, Add selected events downloads only the required events plus those choices. Clear optional resets to the default.
+Removed the introductory text and section headings. Cards use small photo thumbnails, reduced spacing, and street-only display addresses; exported calendars retain the full venue locations. Chopda Pujan offers evening/morning choices side by side, followed by Kids Diwali Celebration. Both Annakut events remain mandatory; Chopda starts included with evening selected; KDC starts unchecked. Morning is the left-hand session choice and evening is on the right. A square checkbox controls whether Chopda is included. With no optional choice, Add all events downloads Dallas, Frisco, KDC, and evening Chopda (four events); the summary discloses this default. With any optional choice, Add selected events downloads only the required events plus those choices. Clear optional resets to the default.
 
 Transparent logo produced with the built-in imagegen tool using the supplied logo as the edit target. Prompt: remove the cream background to genuine alpha transparency while preserving the lamp, ornamentation, colors, composition, and exact BAPS DIWALI 2026 text.
 
@@ -81,4 +81,6 @@ Transparent logo produced with the built-in imagegen tool using the supplied log
 - Diwali-only QR: `Diwali_2026_Two_Events_QR.png`.
 - Diwali-only calendar: `Diwali_Only_2026.ics` (exactly Dallas and Frisco).
 
-The two-event page keeps the previous compact design via `diwali-only.css`, while the full page has edge-to-edge photos, faded date accents, and stronger glass styling. Both use shared event data and rendering. For conflicting programmatic pujan inputs, the generator keeps morning and excludes evening; the UI uses a radio group to prevent the conflict.
+The two-event page uses photo-on-top cards via `diwali-only.css`, while the full page has edge-to-edge photos, faded date accents, and stronger glass styling. Both use shared event data and rendering. For conflicting programmatic pujan inputs, the generator keeps morning and excludes evening; the UI uses a radio group to prevent the conflict.
+
+Latest visual update: uniform compact card heights on the full page, larger and clearer date accents on both pages, and photo-first cards on the Diwali-only page. Session selectors are radio controls styled as a two-part choice; inclusion uses the same square checkbox as KDC.

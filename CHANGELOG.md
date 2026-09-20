@@ -14,3 +14,7 @@
 - Add exclusive morning/evening Chopda options in one row and a single dynamic calendar button.
 - Add edge-to-edge photo slots, faded date accents, and stronger glass styling.
 - Publish a separate two-event Diwali page, calendar, and QR using the previous design.
+
+- Restore photo-first two-event cards, enlarge date accents, and align main-page card heights.
+- Add a square Chopda inclusion checkbox with evening selected by default, and put morning before evening.
+- Add shared replaceable PNG photo files and image-update instructions.

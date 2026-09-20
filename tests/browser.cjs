@@ -8,9 +8,13 @@ const assert=require('node:assert/strict'),fs=require('node:fs/promises');
  async function download(){const wait=page.waitForEvent('download');await page.locator('#download').click();return fs.readFile(await (await wait).path(),'utf8');}
  await page.goto(base+'add-calendar.html');await page.waitForSelector('.event-card');
  assert.equal(await page.locator('.action-buttons button').count(),1);
+ assert(await page.locator('#pujan-included').isChecked());
+ assert(await page.locator('input[value=evening]').isChecked());
+ const initial=await download();assert.equal((initial.match(/BEGIN:VEVENT/g)||[]).length,3);
+ assert.deepEqual(await page.locator('input[name=pujan]').evaluateAll(nodes=>nodes.map(n=>n.value)),['morning','evening']);
  for(const session of [null,'evening','morning']) for(const kids of [false,true]){
   if(await page.locator('#clear').isVisible()) await page.locator('#clear').click();
-  if(session)await page.locator(`input[value=${session}]`).check();
+  if(session){await page.locator('#pujan-included').check();await page.locator(`.session-choice:has(input[value=${session}])`).click();}
   if(kids)await page.locator('input[value=kdc]').check();
   const hasChoice=Boolean(session||kids);
   assert.equal(await page.locator('#download-label').textContent(),hasChoice?'Add selected events':'Add all events');
@@ -20,7 +24,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs/promises');
   assert.equal(text.includes('UID:chopra-pujan'),session==='evening'||!hasChoice);
   assert.equal(text.includes('UID:kids-diwali'),kids||!hasChoice);
  }
- await page.locator('input[value=evening]').check();await page.locator('input[value=morning]').check();
+ await page.locator('.session-choice:has(input[value=evening])').click();await page.locator('.session-choice:has(input[value=morning])').click();
  assert.equal(await page.locator('input[name=pujan]:checked').count(),1);
  assert(!(await page.locator('input[value=evening]').isChecked()));
  for(const width of [320,390,778,1280]){
@@ -32,6 +36,10 @@ const assert=require('node:assert/strict'),fs=require('node:fs/promises');
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:'/private/tmp/diwali-new.png',fullPage:true});
  await page.goto(base+'diwali-only.html');await page.waitForSelector('.event-card');
  assert.equal(await page.locator('.event-card').count(),2);assert.equal(await page.locator('input').count(),0);
+ const photoBox=await page.locator('.event-photo').first().boundingBox();
+ const detailBox=await page.locator('.event-content').first().boundingBox();
+ assert(photoBox.y+photoBox.height<=detailBox.y+1);
+ assert(await page.locator('.event-photo img').evaluateAll(images=>images.every(i=>i.complete&&i.naturalWidth>0)));
  const text=await download();assert.equal((text.match(/BEGIN:VEVENT/g)||[]).length,2);assert(!text.includes('UID:kids'));assert(!text.includes('UID:chop'));
  await page.screenshot({path:'/private/tmp/diwali-only.png',fullPage:true});
  assert.deepEqual(errors,[]);await browser.close();
