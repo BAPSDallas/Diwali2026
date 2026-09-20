@@ -84,6 +84,11 @@ per-breakpoint tuning.
 **Addresses join the city, state and ZIP with non-breaking spaces** so an address too
 long for one line breaks after the street the way a postal address reads.
 
+**Every title carries its city.** Two events are both called "Diwali & Annakut";
+`cities` in `calendar.js` maps venue to a short label that `titleOf` appends, and
+the subtitle no longer repeats it. Each title piece is `white-space: nowrap` so a
+long title wraps between the name and the city.
+
 **Android cannot import `.ics` and needs its own path.** Google Calendar for
 Android has no import feature, so a downloaded file just sits in Downloads. The
 page offers per-event Google Calendar template links (`render?action=TEMPLATE`,

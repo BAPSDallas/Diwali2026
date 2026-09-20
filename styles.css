@@ -67,7 +67,7 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: clamp(58px, 8.8svh, 92px);
+  height: clamp(54px, 8.2svh, 88px);
   padding: 3px 22px;
   border: 1px solid var(--glass-edge);
   border-radius: 20px;
@@ -195,8 +195,9 @@ h2 {
   font-size: clamp(15px, 4.4vw, 19px);
   line-height: 1.1;
   margin: 0;
-  text-wrap: balance;
 }
+
+.title-name, .title-city { white-space: nowrap; }
 
 .subtitle {
   font-size: 10.5px;
@@ -208,7 +209,7 @@ h2 {
   font-size: 11.5px;
   font-weight: 600;
   color: var(--ink-soft);
-  margin: 7px 0 0;
+  margin: 6px 0 0;
 }
 
 .event-time {
@@ -220,7 +221,7 @@ h2 {
 .address {
   font-size: 9.5px;
   color: var(--ink-soft);
-  margin: 8px 0 0;
+  margin: 6px 0 0;
   line-height: 1.25;
 }
 
@@ -452,45 +453,20 @@ a { color: #ffd9a0; }
   cursor: pointer;
 }
 
-/* Google Calendar path. On Android it leads and the .ics file follows; on
-   everything else the .ics leads. Whichever is secondary shrinks to a link so
-   the action bar keeps its height either way. */
-#gcal {
-  flex: none;
-  background: transparent;
-  border-color: transparent;
-  color: var(--red);
+/* One primary action, chosen by platform: Android cannot import .ics, everything
+   else can. The other path stays one tap away as a quiet link below. */
+.action-bar.android #download,
+.action-bar.file-first #gcal { display: none; }
+
+.alt-path {
+  display: block;
+  margin: 7px 0 0;
   font-size: 11.5px;
   font-weight: 600;
-  min-height: 0;
-  padding: 4px 2px;
-  text-decoration: underline;
-}
-
-.action-buttons.android #gcal {
-  flex: 1;
-  order: -1;
-  background: var(--red);
-  border-color: var(--red);
-  color: #fff;
-  font-size: 13.5px;
-  min-height: 44px;
-  padding: 10px 8px;
-  text-decoration: none;
-}
-
-.action-buttons.android #download {
-  flex: none;
-  background: transparent;
-  border-color: transparent;
+  text-align: center;
   color: var(--red);
-  font-size: 11.5px;
-  min-height: 0;
-  padding: 4px 2px;
-  text-decoration: underline;
+  cursor: pointer;
 }
-
-.action-buttons.android #download svg { display: none; }
 
 /* Sheet listing one Google Calendar link per selected event. */
 .sheet {

@@ -32,7 +32,9 @@ iPhone and desktop get a single `.ics` file built in the browser and imported in
 
 Android gets a list of per-event Google Calendar links instead, because Google Calendar's Android app has no `.ics` import — a downloaded file simply sits in Downloads. Each link opens Google Calendar prefilled so the visitor taps Save. Google's template URL carries one event per link, so this is deliberately a list rather than a single button.
 
-The page leads with whichever path suits the device but keeps both reachable everywhere, so a user-agent misread never leaves someone without a working option.
+The page shows only the action that works on the visitor's device and keeps the other one tap away behind a link, so a user-agent misread costs an extra tap rather than leaving someone stuck. iPadOS reports itself as a Mac, so iPad detection uses `maxTouchPoints` rather than the user-agent string alone.
+
+Every displayed title carries its city — `Diwali & Annakut · Dallas` and `Diwali & Annakut · Frisco` — because the two share a name and are otherwise indistinguishable, both on the cards and in the Google Calendar list.
 
 Dallas events: BAPS Shri Swaminarayan Mandir, 4601 N State Hwy 161, Irving, TX 75038. This matches the address on the official [BAPS Dallas site](https://www.baps.org/Dallas).
 

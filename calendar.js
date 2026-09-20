@@ -4,6 +4,9 @@
     dallas: 'BAPS Shri Swaminarayan Mandir, 4601 N State Hwy 161, Irving, TX 75038',
     frisco: 'BAPS Shri Swaminarayan Mandir, 9190 Sam Rayburn Tollway S, Frisco, TX 75035'
   };
+  // Short city label per venue, used in every displayed title. Two events share
+  // the name "Diwali & Annakut", so the city is what tells them apart.
+  const cities = { dallas: 'Dallas', frisco: 'Frisco' };
   const events = [
     { id: 'dallas', uid: 'annakut-dallas-2026@krupesh9.github.io', title: 'Diwali & Annakut (Nutan Varsh) 2026, Dallas TX', name: 'Diwali & Annakut', subtitle: 'Nutan Varsh · Dallas TX', date: '20261110', start: '110000', end: '200000', dateLabel: 'Tuesday, November 10', timeLabel: '11 AM – 8 PM', venue: 'dallas', required: true, fireworks: 'assets/events/fireworks.svg', image: 'assets/events/dallas.png' },
     { id: 'frisco', uid: 'annakut-frisco-2026@krupesh9.github.io', title: 'Diwali & Annakut (Nutan Varsh) 2026, Frisco TX', name: 'Diwali & Annakut', subtitle: 'Nutan Varsh · Frisco TX', date: '20261114', start: '110000', end: '200000', dateLabel: 'Saturday, November 14', timeLabel: '11 AM – 8 PM', venue: 'frisco', required: true, image: 'assets/events/frisco.png' },
@@ -53,7 +56,7 @@
     return `https://calendar.google.com/calendar/render?${params}`;
   }
 
-  const api = { events, addresses, selectedEvents, buildCalendar, googleCalendarUrl };
+  const api = { events, addresses, cities, selectedEvents, buildCalendar, googleCalendarUrl };
   if (typeof module !== 'undefined') module.exports = api;
   else root.DiwaliCalendar = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

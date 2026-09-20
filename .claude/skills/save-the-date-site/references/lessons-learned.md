@@ -22,9 +22,15 @@ and ticking off each row as it is tapped tells the visitor how far through they
 are, which matters when they are bouncing between two apps.
 
 Detect Android with a plain `/Android/i.test(navigator.userAgent)` to decide
-which path *leads*, but never to decide which path *exists*. User-agent sniffing
-misfires on tablets, ChromeOS and in-app browsers, and the cost of a wrong guess
-should be a slightly odd button order, not a visitor with no way to add anything.
+which action is *shown*, but never to decide which one *exists*. Show one button
+— the one that works on this device — and put the other behind a quiet text link
+underneath, worded for the case that would need it ("On Android? Add via Google
+Calendar"). User-agent sniffing misfires on tablets, ChromeOS and in-app
+browsers, and the cost of a wrong guess should be one extra tap, not a visitor
+with no way to add anything.
+
+iPadOS 13+ reports itself as a Mac, so `navigator.platform === 'MacIntel' &&
+navigator.maxTouchPoints > 1` is what actually identifies an iPad.
 
 **iOS Safari ignores `background-attachment: fixed`.** Use a real fixed layer:
 
@@ -125,6 +131,18 @@ Clamp on `cqw` too, or a two-digit numeral overflows its column horizontally.
 `container-type: size` implies `contain: size layout style`, which also makes the
 element a containing block for absolutely positioned children — convenient, but
 remember its contents can no longer influence its size.
+
+**Control where a title wraps, or it will orphan a word.** "Diwali & Annakut ·
+Dallas" broke as "Diwali &" / "Annakut · Dallas". Wrapping each piece in its own
+`white-space: nowrap` span forces the break to land between the name and the
+city. `text-wrap: balance` made it worse here — balancing line lengths is the
+wrong objective when one specific break point is the readable one.
+
+**When several events share a name, put the distinguishing detail in the title.**
+Two cards both reading "Diwali & Annakut" are indistinguishable at a glance and,
+worse, indistinguishable in a list of calendar links. Carry a short label (the
+city) in a lookup keyed by venue and append it to every displayed title, then
+strip it from the subtitle so the two do not repeat each other.
 
 **Non-breaking spaces control where an address breaks.** Join the city/state/ZIP
 tail so a long address wraps after the street instead of orphaning the ZIP:

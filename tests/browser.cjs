@@ -42,11 +42,12 @@ async function fits(page,name){
 }
  async function download(){const wait=page.waitForEvent('download');await page.locator('#download').click();return fs.readFile(await (await wait).path(),'utf8');}
  await page.goto(base+'add-calendar.html');await page.waitForSelector('.event-card');
- // Two actions now: the .ics file and the Google Calendar list. Off Android the
- // file leads (44px tall) and the Google path is a secondary link.
- assert.equal(await page.locator('.action-buttons button').count(),2);
- assert((await page.locator('#download').boundingBox()).height>=44,'.ics is primary off Android');
- assert(await page.locator('#gcal').isVisible(),'Google Calendar path reachable off Android');
+ // Exactly one action is shown, chosen by platform. Off Android that is the .ics
+ // file; the Google Calendar list stays one tap away behind the alt link.
+ assert.equal(await page.locator('.action-buttons button').count(),2,'both buttons exist in the DOM');
+ assert(await page.locator('#download').isVisible(),'.ics is the shown action off Android');
+ assert(!(await page.locator('#gcal').isVisible()),'Google button hidden off Android');
+ assert(await page.locator('#alt-path').isVisible(),'alt path always reachable');
  assert(await page.locator('#pujan-included').isChecked());
  assert(await page.locator('input[value=evening]').isChecked());
  const initial=await download();assert.equal((initial.match(/BEGIN:VEVENT/g)||[]).length,3);
@@ -85,11 +86,11 @@ async function fits(page,name){
  }
  // The fireworks wash belongs to the Dallas Annakut alone and must actually load.
  assert.equal(await page.locator('.has-fireworks').count(),1,'exactly one fireworks column');
- assert((await page.locator('.event-card:has(.has-fireworks) .subtitle').textContent()).includes('Dallas'),'fireworks is on the Dallas card');
+ assert((await page.locator('.event-card:has(.has-fireworks) h2').textContent()).includes('Dallas'),'fireworks is on the Dallas card');
  const fwUrl=await page.locator('.has-fireworks').evaluate(n=>getComputedStyle(n).getPropertyValue('--fireworks').replace(/^url\(['"]?|['"]?\)$/g,'').trim());
  assert((await page.request.get(new URL(fwUrl,page.url()).href)).ok(),`fireworks image missing: ${fwUrl}`);
  // Google Calendar path: one link per selected event, correctly formed.
- await page.locator('#gcal').click();await page.waitForSelector('#gcal-sheet:not([hidden])');
+ await page.locator('#alt-path').click();await page.waitForSelector('#gcal-sheet:not([hidden])');
  assert.equal(await page.locator('.gcal-item').count(),selected,`sheet lists ${selected} events`);
  for(const href of await page.locator('.gcal-add').evaluateAll(a=>a.map(x=>x.href))){
   const u=new URL(href);
@@ -101,6 +102,9 @@ async function fits(page,name){
  }
  await page.locator('#sheet-close').click();
  assert(await page.locator('#gcal-sheet').isHidden(),'sheet closes');
+ for(const title of await page.locator('h2').allTextContents()){
+  assert(/·\s*(Dallas|Frisco)$/.test(title.replace(/\s+/g,' ').trim()),`title missing its city: "${title}"`);
+ }
  await photosFill(page,'add-calendar');
  await fits(page,'add-calendar');
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:'/private/tmp/diwali-new.png',fullPage:true});
@@ -116,5 +120,5 @@ async function fits(page,name){
  await page.setViewportSize({width:390,height:844});
  await page.screenshot({path:'/private/tmp/diwali-only.png',fullPage:true});
  assert.deepEqual(errors,[]);await browser.close();
- console.log('PASS: Google Calendar links per event, no scroll on iPhone 17 Pro/Pro Max, no clipping on short screens, any photo aspect fills its panel, Dallas-only fireworks wash, clickable pujan card, six selection states, exclusive Chopda sessions, both calendar paths reachable, both-event page, downloads, responsive widths, no JS errors.');
+ console.log('PASS: Google Calendar links per event, no scroll on iPhone 17 Pro/Pro Max, no clipping on short screens, any photo aspect fills its panel, Dallas-only fireworks wash, clickable pujan card, six selection states, exclusive Chopda sessions, one platform-appropriate action plus a fallback, cities in every title, both-event page, downloads, responsive widths, no JS errors.');
 })().catch(error=>{console.error(error);process.exit(1)});

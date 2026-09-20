@@ -1,10 +1,25 @@
 'use strict';
-const { events, addresses, selectedEvents, buildCalendar, googleCalendarUrl } = DiwaliCalendar;
+const { events, addresses, cities, selectedEvents, buildCalendar, googleCalendarUrl } = DiwaliCalendar;
 const diwaliOnly = document.body.dataset.scope === 'diwali';
 const optionalInputs = [];
 let pujanIncluded;
 
 const byId = id => events.find(event => event.id === id);
+
+/* Every displayed title carries its city. The subtitle then drops the trailing
+   ", Dallas TX" it used to end with, so the two do not repeat each other. */
+const titleOf = event => `${event.name} · ${cities[event.venue]}`;
+
+/* Build the title as two unbreakable pieces so a long one wraps between the
+   name and the city, rather than orphaning a word like "Diwali &". */
+function titleNode(event) {
+  const h2 = element('h2');
+  h2.append(element('span', 'title-name', event.name),
+            ' ',
+            element('span', 'title-city', `· ${cities[event.venue]}`));
+  return h2;
+}
+const subtitleOf = event => event.subtitle.replace(/ · (?:Dallas|Frisco) TX$/, '');
 
 function element(tag, className, text) {
   const node = document.createElement(tag);
@@ -73,7 +88,7 @@ function makeDateRail(event) {
 function makeCard(event, selectable = false) {
   const card = element(selectable ? 'label' : 'article', `event-card${event.required ? ' included' : ''}`);
   const body = element('div', 'event-body');
-  body.append(element('h2', '', event.name), element('p', 'subtitle', event.subtitle));
+  body.append(titleNode(event), element('p', 'subtitle', subtitleOf(event)));
   body.append(element('p', 'event-date', `${event.dateLabel}, 2026`));
   body.append(element('p', 'event-time', event.timeLabel));
   body.append(element('p', 'address', shortAddress(event.venue)));
@@ -184,7 +199,10 @@ if (clear) clear.addEventListener('click', () => {
    Android gets the Google Calendar list as the primary action and the file as
    the fallback; everyone else gets the reverse. Both paths stay reachable on
    every platform, so a wrong guess never strands anyone. */
-const isAndroid = /Android/i.test(navigator.userAgent);
+const ua = navigator.userAgent;
+const isAndroid = /Android/i.test(ua);
+// iPadOS 13+ reports itself as a Mac, so the touch check is what catches iPads.
+const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const sheet = document.getElementById('gcal-sheet');
 const sheetList = document.getElementById('gcal-list');
 
@@ -193,8 +211,7 @@ function openSheet() {
   for (const event of selectedEvents(downloadIds())) {
     const item = element('li', 'gcal-item');
     const text = element('div', '');
-    // Two events share the name "Diwali & Annakut", so the venue has to be here.
-    text.append(element('strong', '', event.name), element('span', '', event.subtitle),
+    text.append(element('strong', '', titleOf(event)), element('span', '', subtitleOf(event)),
                 element('span', 'gcal-when', `${event.dateLabel} · ${event.timeLabel}`));
     const link = element('a', 'gcal-add', 'Add');
     link.href = googleCalendarUrl(event);
@@ -219,7 +236,20 @@ document.getElementById('sheet-close').addEventListener('click', closeSheet);
 sheet.addEventListener('click', event => { if (event.target === sheet) closeSheet(); });
 document.addEventListener('keydown', event => { if (event.key === 'Escape' && !sheet.hidden) closeSheet(); });
 
-if (isAndroid) document.querySelector('.action-buttons').classList.add('android');
+/* Show the one action that works on this device, and keep the other reachable as
+   a quiet link underneath. Detection picks the default; it never removes a path,
+   because a misread on a tablet or an in-app browser would otherwise leave
+   someone with no way to add anything. */
+const bar = document.querySelector('.action-bar');
+bar.classList.add(isAndroid ? 'android' : 'file-first');
+document.getElementById('alt-path').textContent = isAndroid
+  ? 'Prefer a calendar file? Download .ics'
+  : isIOS ? 'On Android? Add via Google Calendar'
+  : 'Add to Google Calendar instead';
+document.getElementById('alt-path').addEventListener('click', event => {
+  event.preventDefault();
+  if (isAndroid) document.getElementById('download').click(); else openSheet();
+});
 
 document.getElementById('download').disabled = false;
 document.getElementById('download').addEventListener('click', () => {
