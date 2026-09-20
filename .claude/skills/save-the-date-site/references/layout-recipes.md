@@ -80,8 +80,14 @@ An oversized numeral in a full-height right column, cropped by the card edge.
   font-size: clamp(46px, 13vw, 76px);       /* fallback first */
   font-size: min(100cqh, 94cqw);            /* then container units */
   line-height: .78; opacity: .5;
+  align-self: center;                       /* see the single-digit note below */
 }
 ```
+
+**Centre the numeral, do not align it to an edge.** Dates run 1–31, so some cards
+show one digit and some two. Aligned flush to either edge, a lone "8" sits visibly
+off-centre under its label badge while "14" fills the column. Centring costs
+nothing for two digits and fixes one.
 
 **Trap:** Georgia's old-style figures make each numeral crop to a different
 height. **Trap:** clamp on `cqw` as well as `cqh`, or two digits overflow the
@@ -96,9 +102,18 @@ behind the text:
 .card-main  { position: relative; }
 .event-body { position: relative; z-index: 1; }
 .date-rail  { position: absolute; top: 0; right: 0; bottom: 0; width: 104px;
-              z-index: 0; pointer-events: none; container-type: size; }
-.date-rail input { pointer-events: auto; }   /* re-enable for controls */
+              pointer-events: none; container-type: size; }
+/* Controls inside the accent must re-enable pointer events AND lift themselves
+   above the body, since the accent itself deliberately has no z-index. */
+.date-rail input { position: absolute; z-index: 2; pointer-events: auto; }
 ```
+
+**Trap: do not put `z-index: 0` on the accent.** It is the obvious way to push it
+behind the body, and it works visually — but it creates a stacking context, and
+every descendant is then trapped below the body's `z-index: 1` no matter what
+they declare. A checkbox inside the accent becomes unclickable: visible, focusable
+by keyboard, dead to taps. Leave the accent with no `z-index` at all — its
+content paints under the positioned body anyway — and lift only the controls.
 
 The text lines are short and left-aligned, so they never actually reach the
 numeral; only full-width children need capping (`max-width: calc(100% - 96px)`)

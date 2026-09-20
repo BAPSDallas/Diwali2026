@@ -82,6 +82,10 @@ timezone, venue name and full address. Then:
 - Are any times provisional? Say so on the page or leave it out — do not invent.
 - Does any single event need a marker the others do not (fireworks, livestream,
   childcare)? Model it as a property on the event, never as "the first card".
+- **Do two events share a display name?** Common in multi-venue series. They need
+  the distinguishing detail in the title *and* their own accent colour — text
+  alone is too slow to scan. Ask whether the brand has a second colour, or pick
+  the complement of the primary one.
 
 **Branding**
 - Logo file. Crucially: **does it have its own background plate, and is there a
@@ -150,6 +154,8 @@ Automate these. Each one corresponds to a real failure that shipped.
 | Both QR codes decode to the expected URL, from the *finished* slide | Downscaling a QR can destroy module alignment |
 | Every page has complete `og:` tags, images that exist and are under ~600 KB | Otherwise a shared link renders as bare text |
 | `.ics` output byte-matches the committed files | Data edits must regenerate them |
+| Two venues' accents differ on every surface that carries colour | A typo in a token block falls back to the inherited colour and looks deliberate |
+| Computed styles, not just behaviour, on click-revealed UI | A sheet can be fully functional and completely unstyled; nothing routine ever screenshots it |
 
 Run the page in a real browser (Playwright) and capture `pageerror`. A silent JS
 exception renders a page that looks like a CSS problem and wastes an hour.

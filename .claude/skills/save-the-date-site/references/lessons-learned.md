@@ -151,16 +151,44 @@ worse, indistinguishable in a list of calendar links. Carry a short label (the
 city) in a lookup keyed by venue and append it to every displayed title, then
 strip it from the subtitle so the two do not repeat each other.
 
-**Non-breaking spaces control where an address breaks.** Join the city/state/ZIP
-tail so a long address wraps after the street instead of orphaning the ZIP:
+**Then give the duplicate its own colour, because text is slower than colour.**
+Appending the city fixed the ambiguity but not the speed: two cards with the
+same silhouette and the same palette still have to be *read* to be told apart.
+Putting one venue on the complementary half of the palette — peacock teal
+against maroon — separates them before either is read. Three things this
+depends on:
+
+- Commit the whole card. One teal element among maroon reads as a mistake; the
+  time badge, date numeral, label badge, card tint and border all move together.
+- Pick the complement, not a neighbouring shade. Teal against maroon reads as a
+  different place. Orange against maroon reads as a rendering bug.
+- Hold a tinted glass card more opaque than a neutral one. At the alpha that
+  looks right for cream, a teal wash let the maroon backdrop through and went
+  olive — visibly muddy next to the clean cream cards.
+
+The recipe — accent tokens on the card so a venue restates its palette in one
+block — is in `layout-recipes.md`. Test it by comparing computed styles across
+venues, because a typo in the token block falls back to the inherited accent and
+looks deliberate rather than broken.
+
+**Break an address by structure, not by wrapping.** Street on one line,
+locality on the next, as two block-level spans:
 
 ```js
 const [, street, city, stateZip] = full.split(', ');
-return `${street}, ${`${city}, ${stateZip}`.replace(/ /g, ' ')}`;
+node.append(element('span', '', `${street},`), element('span', '', `${city}, ${stateZip}`));
+```
+```css
+.address span { display: block; }
 ```
 
-`text-wrap: balance` is not a substitute — it balanced line lengths and split
-"Tollway S" across lines.
+Every card then breaks in the same place at every width, the way a postal address
+reads. Two weaker approaches came first and both drifted: non-breaking spaces in
+the city/state/ZIP tail kept the ZIP attached to its city but left the break
+point at the mercy of the container width, and `text-wrap: balance` made it worse
+— balancing line lengths split "Tollway S" across lines. When one specific break
+point is the readable one, force it rather than expressing a preference and
+hoping.
 
 ## Images
 
