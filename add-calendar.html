@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#74120e">
+  <meta name="description" content="Celebrate Diwali 2026 with BAPS Dallas and Frisco. Choose your events and add them to your calendar.">
+  <title>Diwali 2026 · Dallas &amp; Frisco</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="calendar.js" defer></script>
+  <script src="page.js" defer></script>
+</head>
+<body>
+  <main>
+    <header class="hero">
+      <img class="logo" src="assets/diwali-logo.png" width="1254" height="1254" alt="BAPS Diwali 2026">
+      <p class="eyebrow">DALLAS &amp; FRISCO</p>
+      <h1>A season of light.<br>A time to come together.</h1>
+      <p>Celebrate with us. Choose your events<br class="wide-only"> and keep the dates close.</p>
+    </header>
+    <div class="content">
+      <section aria-labelledby="included-title">
+        <div class="section-heading"><span class="step">01</span><div><h2 id="included-title">Two celebrations, included</h2><p>These events are always added to your calendar.</p></div></div>
+        <div id="included" class="cards"></div>
+      </section>
+      <section aria-labelledby="optional-title">
+        <div class="section-heading"><span class="step">02</span><div><h2 id="optional-title">Make it your celebration</h2><p>Add any of these three optional events.</p></div></div>
+        <button type="button" id="select-all" class="text-button">Select all optional events</button>
+        <div id="optional" class="cards"></div>
+      </section>
+      <p class="calendar-note">All times are local to Dallas &amp; Frisco (Central Time). Each event includes reminders 1 week and 1 day before.</p>
+      <details><summary>How to add your events</summary><p>Tap “Add to calendar” to download your selected events. Open the downloaded file with your calendar app and confirm the import.</p><p>On iPhone, check Safari’s Downloads if the file does not open automatically. Calendar support varies by device. For Google Calendar, you can import the downloaded file using Google Calendar on a computer.</p></details>
+      <footer><a href="https://www.baps.org/dallas">BAPS Shri Swaminarayan Mandir</a><p>Celebrate light. Share joy.</p><a class="qr-link" href="Diwali_Events_2026_Add_All_QR.png" download>Download the event-page QR code</a></footer>
+    </div>
+    <noscript><p class="no-script">Please enable JavaScript to choose events, or <a href="Diwali_Events_Dallas_Frisco_2026.ics" download>download all five events</a>.</p></noscript>
+  </main>
+  <div class="action-bar"><div class="action-inner"><div><strong id="selection-count" aria-live="polite">2 events included</strong><span>Your Diwali calendar</span></div><button id="download" type="button" disabled>Add to calendar <span aria-hidden="true">↓</span></button></div><p id="download-status" role="status"></p></div>
+</body>
+</html>
