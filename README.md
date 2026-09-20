@@ -10,7 +10,7 @@ QR destination: https://bapsdallas.github.io/Diwali2026/add-calendar.html
 
 GitHub Pages should publish from `main`, folder `/ (root)` using **Settings → Pages → Deploy from a branch**. `.nojekyll` keeps deployment static. No build system, framework, server, or external JavaScript dependencies are needed.
 
-Repository write access is confirmed. Enabling GitHub Pages requires the repository owner to configure the main branch and root folder in Settings → Pages. Verify the page at the QR destination after publishing, before distributing the QR.
+GitHub Pages is configured to publish main from the root folder. The site and QR destination use the URL above.
 
 ## Events
 
