@@ -121,6 +121,12 @@ Hide the inputs with `position:absolute; inset:0; opacity:0` so the whole segmen
 is the tap target and focus still works, and give `.session:focus-within` a
 visible outline. Aim for a 36px minimum segment height.
 
+Give a card whose time is *fixed* the same filled badge the selected segment
+uses. A chosen time and a given time are both settled, so styling them alike is
+what makes a mixed set of cards read as one family — an outlined badge next to a
+filled one implies a choice that is not there. Assert the two match in a test;
+the rules live apart and drift.
+
 If the card as a whole is also selectable, make the card click toggle inclusion
 and ignore clicks originating inside the toggle or on the checkbox:
 

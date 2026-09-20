@@ -139,7 +139,15 @@ async function fits(page,name){
  for(const label of await page.locator('.date-labels').allTextContents()){
   assert(/^(MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY) · [A-Z]{3}$/.test(label),`bad date badge: "${label}"`);
  }
- assert(await page.locator('.event-time').first().evaluate(n=>getComputedStyle(n).borderTopWidth!=='0px'),'time should render as a badge');
+ // A fixed time and a chosen session are both "selected", so they must render
+ // identically; the two rules live apart and would otherwise drift.
+ const badges=await page.evaluate(()=>{
+  const g=sel=>{const c=getComputedStyle(document.querySelector(sel));
+   return [c.backgroundColor,c.color,c.borderRadius,Math.round(document.querySelector(sel).getBoundingClientRect().height)].join('|');};
+  return {fixed:g('.event-time'),selected:g('.session.selected'),unselected:g('.session:not(.selected)')};
+ });
+ assert.equal(badges.fixed,badges.selected,'fixed time must match a selected session badge');
+ assert.notEqual(badges.fixed,badges.unselected,'selected and unselected must stay distinguishable');
  for(const title of await page.locator('h2').allTextContents()){
   assert(/·\s*(Dallas|Frisco)$/.test(title.replace(/\s+/g,' ').trim()),`title missing its city: "${title}"`);
  }

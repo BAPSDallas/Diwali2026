@@ -212,14 +212,20 @@ h2 {
 
 /* The time reads as a badge, matching the Chopda Pujan session segments so the
    four cards share one visual language whether the time is fixed or chosen. */
+/* A fixed time is an already-chosen time, so it wears the same filled badge the
+   selected Chopda Pujan session does — same fill, height and radius. */
 .event-time {
   align-self: flex-start;
+  display: flex;
+  align-items: center;
+  min-height: 36px;
   margin: 7px 0 0;
-  padding: 4px 10px;
-  border: 1px solid rgba(140, 29, 22, .4);
+  padding: 4px 14px;
+  border: 1px solid var(--red);
   border-radius: 9px;
-  background: rgba(255, 255, 255, .5);
-  color: var(--red);
+  background: var(--red);
+  box-shadow: 0 2px 6px rgba(92, 12, 6, .35);
+  color: #fff6e6;
   font-size: 12.5px;
   font-weight: 700;
 }
@@ -255,7 +261,8 @@ h2 {
   align-items: center;
   /* Bottom-anchored: the label line rides directly on top of the numeral. */
   justify-content: flex-end;
-  padding: 0 4px 0 0;
+  /* Hold the numeral in from the right edge rather than against it. */
+  padding: 0 15px 0 0;
   overflow: hidden;
   color: var(--red);
   text-align: center;
