@@ -1,6 +1,6 @@
 # Diwali 2026 Calendar
 
-Mobile-first BAPS Dallas and Frisco event selection page. Two Annakut celebrations are always included. Kids Diwali and the two Chopda Pujan sessions can be selected independently. The download is generated from those choices, with eight possible combinations.
+Mobile-first BAPS Dallas and Frisco event selection page. Two Annakut celebrations are always included. Kids Diwali is optional. Chopda Pujan offers mutually exclusive evening/morning sessions in one row. A single calendar button adapts to the choices.
 
 ## Site and publishing
 
@@ -40,10 +40,10 @@ Frisco: BAPS Shri Swaminarayan Mandir, 9190 Sam Rayburn Tollway S, Frisco, TX 75
 - `index.html` redirects the site root to `add-calendar.html`.
 - `PROJECT_SUMMARY.md` records the original handoff and has superseded event information. This README and calendar.js describe the current requirements.
 
-After changing event data, regenerate the standalone all-five-events calendar:
+After changing event data, regenerate the standalone default calendar:
 
 ```sh
-node -e "const fs=require('fs'); const c=require('./calendar.js'); fs.writeFileSync('Diwali_Events_Dallas_Frisco_2026.ics',c.buildCalendar(c.events.map(e=>e.id)));"
+node -e "const fs=require('fs'); const c=require('./calendar.js'); fs.writeFileSync('Diwali_Events_Dallas_Frisco_2026.ics',c.buildCalendar(['kdc','evening']));"
 ```
 
 Existing event UIDs are retained where possible, including the former pujan UID now assigned to the evening session. Its internal spelling is intentionally preserved for identity; displayed titles say Chopda. Importing again may still create duplicates depending on the calendar app. Old personal-site URLs in UIDs are identifiers, not download destinations.
@@ -57,7 +57,7 @@ python3 -m http.server 8765 --bind 127.0.0.1
 node tests/browser.cjs
 ```
 
-Automated tests cover all eight combinations, mandatory event inclusion, exact times and addresses, unique identities, descriptions, reminders, UTF-8 line folding, CRLF calendar format, actual browser downloads, card clicks, Add all events / Clear optional, and layout overflow at 320/390/768/1280px.
+Automated tests cover all six valid selection states, mandatory event inclusion, exact times and addresses, unique identities, descriptions, reminders, UTF-8 line folding, CRLF calendar format, actual browser downloads, card clicks, the dynamic download button and clearing optional choices, and layout overflow at 320/390/768/1280px.
 
 The button downloads a local `.ics` file and never opens a subscription URL. Actual import/Add All behavior needs testing on a physical iPhone and Android device. Google Calendar users may need to import the file on a computer. The page provides brief import guidance without claiming that a download has already added events to a calendar.
 
@@ -69,6 +69,16 @@ The button downloads a local `.ics` file and never opens a subscription URL. Act
 
 ## Compact page revision
 
-Removed the introductory text and section headings. Cards use small photo thumbnails, reduced spacing, and street-only display addresses; exported calendars retain the full venue locations. Optional card order is evening Chopda Pujan, Kids Diwali Celebration, then morning Chopda Pujan. Both Annakut events remain mandatory; all optional events start unchecked. The bottom bar offers Add selected, Add all events, and Clear optional.
+Removed the introductory text and section headings. Cards use small photo thumbnails, reduced spacing, and street-only display addresses; exported calendars retain the full venue locations. Chopda Pujan offers evening/morning choices side by side, followed by Kids Diwali Celebration. Both Annakut events remain mandatory; all optional inputs start unchecked. With no optional choice, Add all events downloads Dallas, Frisco, KDC, and evening Chopda (four events); the summary discloses this default. With any optional choice, Add selected events downloads only the required events plus those choices. Clear optional resets to the default.
 
 Transparent logo produced with the built-in imagegen tool using the supplied logo as the edit target. Prompt: remove the cream background to genuine alpha transparency while preserving the lamp, ornamentation, colors, composition, and exact BAPS DIWALI 2026 text.
+
+## Two-event page and QR
+
+- Full page: https://bapsdallas.github.io/Diwali2026/add-calendar.html
+- Full-page QR: `Diwali_Events_2026_Add_All_QR.png` (unchanged destination).
+- Diwali-only page: https://bapsdallas.github.io/Diwali2026/diwali-only.html
+- Diwali-only QR: `Diwali_2026_Two_Events_QR.png`.
+- Diwali-only calendar: `Diwali_Only_2026.ics` (exactly Dallas and Frisco).
+
+The two-event page keeps the previous compact design via `diwali-only.css`, while the full page has edge-to-edge photos, faded date accents, and stronger glass styling. Both use shared event data and rendering. For conflicting programmatic pujan inputs, the generator keeps morning and excludes evening; the UI uses a radio group to prevent the conflict.

@@ -23,7 +23,9 @@
     return result;
   }
   function selectedEvents(ids = []) {
-    return events.filter(event => event.required || ids.includes(event.id));
+    // Morning wins for conflicting programmatic input; the UI permits only one session.
+    const chosen = ids.includes('morning') ? ids.filter(id => id !== 'evening') : ids;
+    return events.filter(event => event.required || chosen.includes(event.id));
   }
   function buildCalendar(ids = []) {
     const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//BAPS Dallas//Diwali 2026//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', ...timezone];
