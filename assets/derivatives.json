@@ -1,0 +1,60 @@
+{
+  "events/dallas.png": {
+    "sha": "4006f7310255f5c1",
+    "outputs": [
+      "dallas-640.webp",
+      "dallas-640.jpg",
+      "dallas-1024.webp",
+      "dallas-1024.jpg",
+      "dallas-1199.webp",
+      "dallas-1199.jpg"
+    ]
+  },
+  "events/frisco.png": {
+    "sha": "5d697d2d87a9702f",
+    "outputs": [
+      "frisco-640.webp",
+      "frisco-640.jpg",
+      "frisco-1024.webp",
+      "frisco-1024.jpg",
+      "frisco-1199.webp",
+      "frisco-1199.jpg"
+    ]
+  },
+  "events/kids-diwali.png": {
+    "sha": "11498388aed1078e",
+    "outputs": [
+      "kids-diwali-640.webp",
+      "kids-diwali-640.jpg",
+      "kids-diwali-1024.webp",
+      "kids-diwali-1024.jpg",
+      "kids-diwali-1600.webp",
+      "kids-diwali-1600.jpg"
+    ]
+  },
+  "events/chopda-pujan.png": {
+    "sha": "819cbd579a9ee6e7",
+    "outputs": [
+      "chopda-pujan-640.webp",
+      "chopda-pujan-640.jpg",
+      "chopda-pujan-1024.webp",
+      "chopda-pujan-1024.jpg",
+      "chopda-pujan-1582.webp",
+      "chopda-pujan-1582.jpg"
+    ]
+  },
+  "festival-background.png": {
+    "sha": "0dd0dc9dff3924b4",
+    "outputs": [
+      "festival-background.webp",
+      "festival-background.jpg"
+    ]
+  },
+  "diwali-logo-transparent.png": {
+    "sha": "1b8ed08437717c72",
+    "outputs": [
+      "diwali-logo-360.webp",
+      "diwali-logo-360.png"
+    ]
+  }
+}

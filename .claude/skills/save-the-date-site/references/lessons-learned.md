@@ -207,6 +207,36 @@ substitutes a placeholder, and the page looks fine-but-wrong. Add a test:
 for (const event of events) if (event.image) assert(fs.existsSync(event.image));
 ```
 
+**The size that matters is the size it is drawn at, not the size it is.** A
+4.6 MB, 2248×1416 PNG sat in a 76×126 CSS px panel. Even at 3× that is 227×377 —
+the download was about 37× the pixels that could ever appear. Measure the panel
+in the browser first (`getBoundingClientRect()` × devicePixelRatio), then derive
+variants to fit. Encoded at quality 90 the result is visually indistinguishable,
+and the page fell from 10.16 MB to 667 KB.
+
+**`srcset` chooses on width even when the crop is driven by height.** With
+`object-fit: cover` on a narrow tall panel, the *height* sets how big the source
+must be — but candidate selection only ever looks at the element's layout width.
+Offering a 320w variant meant a 2× phone chose it and then stretched it
+vertically. Work out the width that satisfies the height requirement and make
+that the floor; generate nothing smaller.
+
+**Never advertise a variant you did not generate.** Masters have different
+ceilings, so `photo-1600.webp` may exist for one photo and 404 for another. The
+first symptom was two blank cards on one page only. Generate the per-photo width
+list alongside the files and inline it; a hand-kept list will drift.
+
+**Wrapping an `<img>` in `<picture>` can break its size.** `<picture>` is an
+inline box, so an `<img>` styled `height: 100%` suddenly has nothing to resolve
+against and falls back to intrinsic size. A 360px logo overflowed an 88px pill
+and read as a crop. Give the wrapper the height, and assert the rendered box
+still fits inside its container.
+
+**A derivative pipeline needs a staleness check or it will silently rot.**
+Someone replaces a photo, the page keeps loading the old variants, and nothing
+fails. Record each master's hash next to its outputs and assert it in the test
+suite — the failure should name the file and print the command to run.
+
 **PNG is the wrong format for photographs.** Four event photos came in at 11.5 MB
 total as PNG; the same images at 1200px wide as quality-82 JPEG were 1.1 MB. On a
 page people reach by scanning a QR code on mobile data, that difference matters.

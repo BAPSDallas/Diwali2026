@@ -222,6 +222,15 @@ async function fits(page,name){
  for(const title of await page.locator('h2').allTextContents()){
   assert(/·\s*(Dallas|Frisco)$/.test(title.replace(/\s+/g,' ').trim()),`title missing its city: "${title}"`);
  }
+ // The logo sits in a fixed-height pill; a wrapper that breaks the percentage
+ // height chain lets it overflow at intrinsic size, which looks like a crop.
+ const logo=await page.evaluate(()=>{
+  const hero=document.querySelector('.hero').getBoundingClientRect();
+  const img=document.querySelector('.logo').getBoundingClientRect();
+  return {fits:img.height<=hero.height+1&&img.width<=hero.width+1,
+          img:Math.round(img.height),hero:Math.round(hero.height)};
+ });
+ assert(logo.fits,`logo overflows its pill: ${logo.img}px in ${logo.hero}px`);
  const order=await chronological(page,'add-calendar');
  assert.deepEqual(order,['1031','1108','1110','1114'],'all-events order is Oct 31, Nov 8, 10, 14');
  await photosFill(page,'add-calendar');
@@ -263,6 +272,21 @@ async function fits(page,name){
   const button=await phone.locator('.action-buttons button:visible span').last().textContent();
   assert(button.includes(first),`${label} step 1 says "${first}" but the button says "${button}"`);
   assert.deepEqual(phoneErrors,[],`${label} JS errors`);
+  await ctx.close();
+ }
+ // A weight ceiling, so a future full-size asset cannot quietly land back in
+ // the page. These are the measured figures plus headroom, not aspirations.
+ for(const [name,dpr,ceiling] of [['add-calendar',3,800],['diwali-only',3,1200]]){
+  const ctx=await browser.newContext({viewport:{width:402,height:740},deviceScaleFactor:dpr,serviceWorkers:'block'});
+  const weighed=await ctx.newPage();const seen=new Map();
+  weighed.on('requestfinished',async req=>{try{seen.set(req.url(),(await (await req.response()).body()).length)}catch(e){}});
+  await weighed.goto(base+name+'.html',{waitUntil:'networkidle'});await weighed.waitForTimeout(400);
+  const kb=[...seen.values()].reduce((a,b)=>a+b,0)/1024;
+  assert(kb<ceiling,`${name} @${dpr}x is ${kb.toFixed(0)} KB, over the ${ceiling} KB budget`);
+  // Nothing should be pulling a multi-megabyte master into the page.
+  for(const [url,size] of seen){
+   assert(size<450*1024,`${url.split('/').pop()} is ${(size/1024).toFixed(0)} KB — a master, not a derivative?`);
+  }
   await ctx.close();
  }
  assert.deepEqual(errors,[]);await browser.close();

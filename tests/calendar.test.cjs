@@ -38,6 +38,36 @@ test('all five events have exact requested times, titles, locations and descript
   assert.equal(fs.readFileSync('Diwali_Events_Dallas_Frisco_2026.ics', 'utf8'), buildCalendar(['kdc','evening']));
   assert.equal(fs.readFileSync('Diwali_Only_2026.ics', 'utf8'), buildCalendar([]));
 });
+test('image derivatives are current for every master', () => {
+  // The whole point of the manifest is that replacing a photo cannot silently
+  // ship the old variants — or none at all. This fails loudly with the command
+  // to run. Skipped only where Pillow is unavailable, never quietly passed.
+  const probe = require('node:child_process').spawnSync('python3', ['-c', 'import PIL']);
+  if (probe.status !== 0) {
+    console.log('  (skipped: Pillow not installed — run pip install Pillow)');
+    return;
+  }
+  const result = require('node:child_process').spawnSync(
+    'python3', ['scripts/optimise_images.py', '--check'], { encoding: 'utf8' });
+  assert.equal(result.status, 0, `image variants are stale:\n${result.stdout}`);
+});
+test('every page advertises only photo widths that exist on disk', () => {
+  // A width in the inlined map with no file behind it is a 404 and an empty
+  // card. This is the check that catches a hand-edited map or a half-run build.
+  for (const page of ['add-calendar.html', 'diwali-only.html']) {
+    const html = fs.readFileSync(page, 'utf8');
+    const map = JSON.parse(html.match(/window\.PHOTO_WIDTHS=(\{.*?\});/)[1]);
+    for (const event of events.filter(e => e.image && map[e.id])) {
+      const base = event.image.replace(/\.[a-z]+$/, '');
+      for (const width of map[event.id]) {
+        for (const ext of ['webp', 'jpg']) {
+          assert(fs.existsSync(`${base}-${width}.${ext}`),
+            `${page} advertises ${base}-${width}.${ext}, which does not exist`);
+        }
+      }
+    }
+  }
+});
 test('events are declared oldest first, so every surface lists them in order', () => {
   // Declaration order is what the cards, the Google Calendar list and the VEVENT
   // sequence all inherit. Sorting in one place would leave the others disagreeing.

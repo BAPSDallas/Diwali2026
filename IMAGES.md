@@ -9,11 +9,39 @@ Both pages load the same four files. No HTML or JavaScript editing is needed.
 | `chopda-pujan.png` | Chopda Pujan, shared by morning and evening |
 | `kids-diwali.png` | Kids Diwali Celebration |
 
+## After replacing any photo, rebuild the variants
+
+**This step is required.** The pages do not load the file you replace. They load
+smaller derivatives generated from it, because sending a 4.6 MB photo into a
+92-pixel-wide panel is most of a slow phone's page load and none of its quality.
+
+```sh
+python3 scripts/optimise_images.py
+```
+
+That reads `assets/images.json`, rewrites every derivative, regenerates the
+blurred placeholders in `lqip.css`, and updates the width list inlined in both
+pages. Commit everything it changes along with your new photo.
+
+If you forget, the test suite fails and names the file:
+
+```
+stale: events/dallas.png has changed since the variants were built
+Run: python3 scripts/optimise_images.py
+```
+
+It needs Pillow once: `python3 -m pip install Pillow`.
+
+If you replace a photo through the GitHub web interface and cannot run the
+script, say so — the derivatives have to be rebuilt by someone before the new
+photo appears.
+
 ## Update directly on GitHub
 
 1. Open https://github.com/BAPSDallas/Diwali2026/tree/main/assets/events
 2. Export your photos as PNG and give them the exact lowercase filenames above. Do not merely rename a JPG extension to PNG.
 3. Choose **Add file → Upload files**, upload the replacements, and commit to `main`.
+3. Rebuild the derivatives (see above) — uploading the master alone does not change what the pages load.
 4. Wait for GitHub Pages to finish deploying, then refresh the page. If an old photo persists, refresh without cache or try a private browser window.
 
 The QR codes stay the same. Both pages pick up each deployed replacement automatically.

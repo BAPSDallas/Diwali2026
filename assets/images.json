@@ -1,0 +1,11 @@
+{
+  "_comment": "Masters are the source of truth. Replace any file here, then run: python3 scripts/optimise_images.py",
+  "photos": {
+    "dallas": "events/dallas.png",
+    "frisco": "events/frisco.png",
+    "kdc": "events/kids-diwali.png",
+    "evening": "events/chopda-pujan.png"
+  },
+  "background": "festival-background.png",
+  "logo": "diwali-logo-transparent.png"
+}

@@ -109,6 +109,26 @@ makes them wrap and the page stops fitting one screen. The checkbox re-enables
 pointer events for itself, and the session toggle is capped so it cannot stretch
 under the numeral.
 
+**The pages never load the photo masters.** `scripts/optimise_images.py` derives
+sized variants from everything listed in `assets/images.json`, and the pages
+reference only those. This is not a quality trade: a 2248x1416 master drawn into
+a 76x126 CSS px panel sends about 37x more pixels than a 3x screen can show, and
+the browser discards the rest after paying to download them. Variants are encoded
+at quality 90 and the background keeps every one of its pixels — only its format
+changes. The four-card page went from 10.16 MB to 667 KB.
+
+**Re-run the script after replacing any master.** A unit test runs it with
+`--check` and fails with the offending filename if a master's hash no longer
+matches its recorded derivatives, so a replaced photo cannot ship without them.
+
+**srcset picks on width, but these panels crop on height.** The narrow card
+panel needs ~228px across and ~377px down at 3x. Because candidate selection only
+considers the element's layout width, a 320px variant would be chosen on a 2x
+phone and then stretched vertically to fill the panel. That is why nothing below
+640px is generated, and why `optimise_images.py` never upscales past a master's
+own width — a width that does not exist on disk is a 404 and an empty card. The
+per-photo width list is inlined into each page by the script for that reason.
+
 **Chronological order comes from `calendar.js`, not from the renderer.** The
 `events` array is declared oldest first, and the cards, the Google Calendar list
 and the VEVENT sequence all inherit that order. Sorting in the renderer alone

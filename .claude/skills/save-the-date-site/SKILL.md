@@ -87,6 +87,12 @@ timezone, venue name and full address. Then:
   alone is too slow to scan. Ask whether the brand has a second colour, or pick
   the complement of the primary one.
 
+**Photos** — these arrive late and almost always as multi-megabyte originals.
+- Establish from the start that the originals are *masters*: they get committed,
+  but the pages load derivatives generated from them, and a replacement is not
+  live until the derivatives are rebuilt. Say this before the first photo lands,
+  not after someone uploads one through the GitHub web UI and it does not change.
+
 **Branding**
 - Logo file. Crucially: **does it have its own background plate, and is there a
   transparent version?** A logo that is dark artwork on a cream plate will vanish
@@ -130,6 +136,10 @@ the pages disagreed in a way nobody could see in either file alone.
 
 ### Scripts you do not need to rewrite
 
+- `scripts/optimise_images.py` — **run this on every photo the client supplies,
+  and again every time one is replaced.** Derives sized WebP + JPEG variants,
+  blurred inline placeholders, and the per-photo width list the page needs. See
+  "Photos arrive at the wrong size" below.
 - `scripts/make_preview_images.py` — derives 1200×630 link-card images from
   event photos.
 - `scripts/make_fireworks_svg.py` — generates a vector firework burst. Adapt the
@@ -140,6 +150,47 @@ the pages disagreed in a way nobody could see in either file alone.
   silently rendered nothing.
 - `scripts/decode_qr.cjs` — decodes a QR from any PNG. Run it on the source code
   *and* on the finished slide.
+
+## Photos arrive at the wrong size
+
+Every one of these projects receives full-resolution originals for panels a few
+hundred pixels wide. On the project this skill came from, one 4.6 MB PNG was
+being drawn into a 76×126 CSS px panel — about 37× more pixels than a 3× screen
+can show. The four-card page weighed 10.16 MB; the same page, visually identical,
+now weighs 667 KB.
+
+Say plainly that this is not a quality trade, because "optimise the images" sounds
+like one and clients push back. You are not compressing harder; you are not
+sending pixels that can never be drawn. Encode at quality 90, keep the masters in
+the repo, and where an image genuinely is displayed at full size — a full-bleed
+background — change only its format and keep every pixel.
+
+`scripts/optimise_images.py` does all of it from an `assets/images.json`
+manifest, and `--check` verifies the derivatives match the masters' hashes. Wire
+that check into the test suite: a photo replaced without a rebuild is the single
+most likely way this regresses, and it regresses silently.
+
+Three traps worth knowing before you write the markup:
+
+- **`srcset` selects on width; a cover-cropped panel can be driven by height.**
+  A narrow tall panel needing 228×377 device px will pick a 320w candidate on a
+  2× phone — then upscale it vertically. Set a floor width that satisfies the
+  *height* requirement and do not generate anything below it.
+- **Never advertise a width you did not generate.** Masters have different
+  ceilings, so the width list is per photo, not global. A missing candidate is a
+  404 and an empty card. Generate the list; do not hand-maintain it.
+- **`<picture>` is an inline box.** Wrapping an existing `<img>` that relied on
+  `height: 100%` breaks the percentage chain and the image renders at intrinsic
+  size. Give the wrapper the height, and assert the rendered box still fits.
+
+For perceived speed, inline a ~20px blurred preview per photo as a data URI in a
+generated stylesheet keyed by the same class the card already carries. It costs
+no request, paints with the first stylesheet, and the real photo fades over it.
+Do not lazy-load anything on the first screen — these cards *are* the content.
+
+A service worker is worth it here: visitors often return at the venue with no
+signal. Network-first for pages and code so a redeploy is never masked, cache-
+first for images since their filenames carry their width.
 
 ## Verification that actually catches things
 
@@ -154,6 +205,9 @@ Automate these. Each one corresponds to a real failure that shipped.
 | Both QR codes decode to the expected URL, from the *finished* slide | Downscaling a QR can destroy module alignment |
 | Every page has complete `og:` tags, images that exist and are under ~600 KB | Otherwise a shared link renders as bare text |
 | `.ics` output byte-matches the committed files | Data edits must regenerate them |
+| `optimise_images.py --check` passes | A replaced photo otherwise ships with stale or missing variants, silently |
+| Total page weight stays under a stated budget, per DPR | Catches a full-size asset creeping back in |
+| No single response exceeds ~450 KB | A master has been referenced instead of a derivative |
 | Two venues' accents differ on every surface that carries colour | A typo in a token block falls back to the inherited colour and looks deliberate |
 | A dialog scrim's *measured* box covers the viewport | A `backdrop-filter` ancestor silently makes itself the containing block; computed position still reads `fixed` |
 | Help steps name the same calendar the visible button does | The two live in different files and drift apart |

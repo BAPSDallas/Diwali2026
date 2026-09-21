@@ -41,7 +41,7 @@ body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background: #6f110d url('assets/festival-background.png') center top / cover no-repeat;
+  background: #6f110d url('assets/festival-background.jpg') center top / cover no-repeat;
   z-index: -1;
 }
 
@@ -55,6 +55,15 @@ main {
   display: flex;
   flex-direction: column;
   gap: var(--gap);
+}
+
+/* Same pixels as the JPEG above, about half the bytes. Browsers that cannot
+   decode WebP never see this rule and keep the JPEG. */
+@supports (background-image: image-set(url('assets/festival-background.webp') type('image/webp'))) {
+  body::before {
+    background-image: image-set(url('assets/festival-background.webp') type('image/webp'),
+                                url('assets/festival-background.jpg') type('image/jpeg'));
+  }
 }
 
 /* ---------- Hero ---------- */
@@ -75,6 +84,14 @@ main {
   -webkit-backdrop-filter: var(--glass-blur);
   backdrop-filter: var(--glass-blur);
   box-shadow: var(--glass-shadow);
+}
+
+/* <picture> is an inline box, so a percentage height on the <img> inside it has
+   nothing to resolve against and the image falls back to its intrinsic size,
+   overflowing the pill. Giving the wrapper the height restores the chain. */
+.hero picture {
+  display: block;
+  height: 100%;
 }
 
 .logo {
@@ -168,6 +185,11 @@ label.event-card,
   overflow: hidden;
 }
 
+.event-photo picture {
+  position: absolute;
+  inset: 0;
+}
+
 .event-photo img {
   position: absolute;
   inset: 0;
@@ -175,7 +197,20 @@ label.event-card,
   height: 100%;
   object-fit: cover;
   display: block;
+  /* Fades over the blurred placeholder rather than replacing it abruptly. */
+  opacity: 0;
+  transition: opacity .25s ease;
 }
+
+.event-photo.loaded img { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .event-photo img { transition: none; }
+}
+
+/* lqip.css sets a blurred data-URI preview per event on top of this gradient.
+   Scaled up from ~20px, so it reads as the photo's colours, not its detail. */
+.event-photo { background-size: cover; background-position: center; }
 
 .photo-motif { font-size: 26px; }
 

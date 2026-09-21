@@ -17,14 +17,19 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Annakut at BAPS Shri Swaminarayan Mandir, Frisco">
   <meta name="twitter:card" content="summary_large_image">
+  <link rel="preload" as="image" href="assets/festival-background.webp" type="image/webp">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="lqip.css">
+  <!-- photo-widths:start -->
+  <script>window.PHOTO_WIDTHS={"dallas":[640,1024,1199],"evening":[640,1024,1582],"frisco":[640,1024,1199],"kdc":[640,1024,1600]};</script>
+  <!-- photo-widths:end -->
   <script src="calendar.js" defer></script>
   <script src="page.js" defer></script>
 </head>
 <body>
   <main>
     <header class="hero">
-      <img class="logo" src="assets/diwali-logo-transparent.png" width="1254" height="1254" alt="BAPS Diwali 2026">
+      <picture><source type="image/webp" srcset="assets/diwali-logo-360.webp"><img class="logo" src="assets/diwali-logo-360.png" width="360" height="360" alt="BAPS Diwali 2026" fetchpriority="high" decoding="async"></picture>
     </header>
     <div class="content">
       <div class="cards" id="cards" aria-label="Diwali 2026 events"></div>
@@ -73,5 +78,12 @@
       <button class="sheet-done" id="help-close" type="button">Done</button>
     </div>
   </div>
+  <script>
+    /* A second visit works with no connection at all — useful at a mandir with
+       no signal. Registered after load so it never competes with the page. */
+    if ('serviceWorker' in navigator) {
+      addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    }
+  </script>
 </body>
 </html>

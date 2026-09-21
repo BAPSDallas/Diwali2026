@@ -51,18 +51,57 @@ function addressNode(venue) {
   return node;
 }
 
+/* Which variants exist, per photo — inlined into the page by
+   scripts/optimise_images.py, because each master has its own ceiling and
+   advertising a width that was never generated is a 404 and an empty card.
+
+   Nothing below 640 is generated on purpose: srcset picks a candidate from the
+   element's WIDTH alone, but these panels are cover-cropped and the narrow one
+   is driven by its HEIGHT. A 320px candidate would be chosen on a 2x phone and
+   then stretched vertically to fill the panel. */
+const photoWidths = id => (window.PHOTO_WIDTHS || {})[id] || [1024];
+
+/* One file per width, per format. The browser takes the first <source> it can
+   decode, so WebP leads and the JPEG carries older devices. */
+function sourceSet(base, extension, widths) {
+  return widths.map(width => `${base}-${width}.${extension} ${width}w`).join(', ');
+}
+
+/* The narrow card panel is ~92px wide whatever the viewport; the banner on the
+   two-event page runs the full card. Telling the browser the real display width
+   is what lets it skip the large files on the four-card page. */
+const PHOTO_SIZES = diwaliOnly ? '(max-width: 560px) 100vw, 538px' : '92px';
+
 function makePhoto(event) {
   const photo = element('div', `event-photo ${event.id}`);
   photo.append(element('span', 'badge', event.required ? 'Included' : 'Optional'));
   if (event.image) {
+    const base = event.image.replace(/\.[a-z]+$/, '');
+    const widths = photoWidths(event.id);
+    const picture = element('picture');
+    const webp = element('source');
+    webp.type = 'image/webp';
+    webp.sizes = PHOTO_SIZES;
+    webp.srcset = sourceSet(base, 'webp', widths);
     const image = element('img');
-    image.src = event.image;
+    /* sizes before srcset: the selection is made when srcset is assigned, and
+       a sizes value arriving afterwards does not always trigger a re-pick. */
+    image.sizes = PHOTO_SIZES;
+    image.srcset = sourceSet(base, 'jpg', widths);
+    image.src = `${base}-${widths[0]}.jpg`;
     image.alt = '';
+    image.decoding = 'async';
+    /* The cards are all on the first screen, so none of this is below the fold;
+       lazy-loading them would only delay what the visitor came to read. The
+       blurred placeholder in lqip.css is what fills the gap meanwhile. */
+    image.loading = 'eager';
+    image.addEventListener('load', () => photo.classList.add('loaded'));
     image.addEventListener('error', () => {
-      image.remove();
+      picture.remove();
       photo.append(element('span', 'photo-motif', '✦'));
     });
-    photo.append(image);
+    picture.append(webp, image);
+    photo.append(picture);
   } else {
     photo.append(element('span', 'photo-motif', '✦'));
   }
