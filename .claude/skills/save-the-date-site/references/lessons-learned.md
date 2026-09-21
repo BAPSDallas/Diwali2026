@@ -321,6 +321,31 @@ a page that renders background and empty containers — which looks exactly like
 CSS problem. Always attach a `pageerror` listener when driving a page with
 Playwright; it turns a half-hour hunt into one line of output.
 
+**Inline page scripts share globals with your classic scripts.** An inline
+`<script>` in `<head>` declaring `var sheet` collided with `const sheet` in
+page.js — same crash, same blank page, and it looked like the new feature simply
+had no effect. Wrap any inline snippet in `(function () { ... })()`. This is the
+same trap as `const top` above, one step removed: the two declarations are in
+different files, so neither looks wrong on its own.
+
+## Overriding a stylesheet
+
+**Win on specificity, not on source order, when the override is conditional.**
+A preview theme appended its stylesheet from a script, relying on being later in
+the cascade. It worked visually but the base rule was still live for as long as
+that file took to download — long enough for the browser to start fetching the
+very background image the theme existed to avoid. The fetch appeared in some
+runs and not others, which is the tell. Putting a class on `<html>` before the
+stylesheets parse, and prefixing the override's selectors with it, makes the
+result independent of load order and of timing.
+
+**A stylesheet appended by a script lands where the parser is, not at the end.**
+An inline script in `<head>` runs while the rest of `<head>` is still unparsed,
+so `document.head.appendChild(link)` inserts *before* the stylesheets below it.
+The override then loses the cascade and silently does nothing — which reads as
+"the CSS is wrong" rather than "the order is wrong". Check
+`[...document.styleSheets].map(s => s.href)` before debugging the rules.
+
 ## Instructions for visitors
 
 **Write the steps for the device in the visitor's hand.** Generic help that
