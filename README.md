@@ -58,6 +58,7 @@ Dallas events: BAPS Shri Swaminarayan Mandir, 4601 N State Hwy 161, Irving, TX 7
 | `Diwali_2026_Two_Events_QR.png` | QR to `diwali-only.html` (now the same all-events page) |
 | `Diwali_2026_All_Events_Slide.png` | 16:9 slide, 3840x2160, all-events QR |
 | `Diwali_2026_Diwali_Only_Slide.png` | 16:9 slide, 3840x2160, second QR |
+| `Diwali_2026_Events_Slide.png` | 16:9 celebration slide, 3840x2160: header, all three event cards (built from `calendar.js`), mandir band. Rendered from `_events_slide.html` |
 | `Diwali_2026_How_To_Add_Slide.png` | 16:9 how-to slide, 3840x2160: Step 1 scan, Step 2 tap Add to Calendar; all-events QR |
 | `Diwali_2026_How_To_Add_Slide_Second_QR.png` | Same slide with the second (`diwali-only.html`) QR |
 | `assets/preview-*.jpg` | 1200x630 link-preview cards referenced by `og:image` |

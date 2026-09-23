@@ -2,6 +2,7 @@
 
 ## 2026-09-23
 
+- Add `Diwali_2026_Events_Slide.png`, a celebration slide with every event card (from `calendar.js`), lanterns, diyas and marigolds.
 - Times: Kids Diwali 10 AM – 5 PM; Chopda Pujan 1 5 – 6 PM, Chopda Pujan 2 6:30 – 7:30 PM; Annakut 12 PM – 8:30 PM. SEQUENCE 3 so imported copies update.
 - Rename the card to "Sharda (Chopda) Pujan" with "Followed by Mahaprasad" beneath (also in the calendar description); sessions stack as labelled rows.
 - "BAPS Shri Swaminarayan Mandir" above every address. Logo badge trimmed slightly to make room.

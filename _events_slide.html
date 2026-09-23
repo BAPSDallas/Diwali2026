@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Diwali 2026 events — slide</title>
+<!-- 16:9 celebration slide listing every event. Render at 1920x1080 @2x.
+     Cards are built from calendar.js, so names, times and dates always match
+     the site. Diyas are cropped from assets/festival-background.png. -->
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { position: relative; width: 1920px; height: 1080px; overflow: hidden;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; color: #3f1a0c;
+    background: radial-gradient(ellipse 70% 60% at 50% 18%, #fffdf6 0%, #fbeedd 55%, #f3dcc0 100%); }
+  .serif { font-family: Georgia, 'Times New Roman', serif; }
+
+  /* Faint mandala rings behind the header corners. */
+  .mandala { position: absolute; width: 520px; height: 520px; opacity: .13; }
+  .mandala.l { left: -170px; top: -170px; } .mandala.r { right: -170px; top: -170px; }
+
+  /* ---------- Header ---------- */
+  .badge-logo { position: absolute; left: 340px; top: 34px; width: 244px; height: 244px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: radial-gradient(circle at 50% 40%, #fff6ef, #f6dcd0);
+    border: 3px solid #e6b86a; box-shadow: 0 10px 30px rgba(120,40,10,.22), inset 0 0 0 8px rgba(255,255,255,.6); }
+  .badge-logo img { width: 84%; height: auto; }
+  .head { position: absolute; left: 600px; right: 290px; top: 26px; text-align: center; }
+  .join { font-size: 50px; font-style: italic; color: #7a160f; }
+  h1 { margin-top: 2px; font-size: 124px; line-height: .95; white-space: nowrap; font-weight: 700; letter-spacing: .01em;
+    background: linear-gradient(180deg, #a3231a, #5e0c07); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .flank { display: inline-block; vertical-align: middle; width: 56px; height: 28px; margin: 0 14px 20px; }
+  .tag { margin-top: 12px; font-size: 32px; font-weight: 700; letter-spacing: .2em; color: #3f1a0c; }
+  .tag b { color: #c28a2c; margin: 0 22px; }
+  .rule { position: absolute; left: 560px; right: 560px; top: 296px; height: 20px; }
+
+  /* Hanging lanterns */
+  .lantern { position: absolute; top: 0; }
+
+  /* ---------- Event cards ---------- */
+  .cards { position: absolute; left: 24px; right: 24px; top: 322px; height: 362px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .card { position: relative; display: flex; gap: 18px; padding: 16px; border-radius: 22px;
+    background: linear-gradient(160deg, #fff7f2, #f9e2d8);
+    border: 3px solid #e5b56a; box-shadow: 0 12px 30px rgba(90,20,6,.28), inset 0 0 0 2px rgba(255,255,255,.7); }
+  .photo { position: relative; flex: none; width: 150px; border-radius: 14px; overflow: hidden; }
+  .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .chip { position: absolute; top: 10px; left: 10px; padding: 4px 12px; border-radius: 999px;
+    background: #fffaf2; font-size: 14px; font-weight: 800; letter-spacing: .08em; color: #7a4a14; }
+  .body { position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .tick { position: absolute; top: 0; right: 0; width: 38px; height: 38px; border-radius: 8px;
+    background: #8c1d16; display: grid; place-items: center; }
+  h2 { padding-right: 46px; font-size: 33px; line-height: 1.02; font-weight: 700; color: #7a160f; }
+  .sub { margin-top: 5px; font-size: 21px; color: #4a2a14; }
+  /* Lower half: times and address on the left, the date in its own column. */
+  .lower { flex: 1; min-height: 0; display: flex; gap: 10px; margin-top: 10px; }
+  .left { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .times { display: flex; flex-direction: column; gap: 7px; align-items: flex-start; }
+  .time { display: flex; align-items: center; gap: 10px; padding: 7px 16px; border-radius: 12px;
+    background: #8c1d16; color: #fff6e6; font-size: 24px; font-weight: 800; white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(92,12,6,.3); }
+  .time.two { padding: 4px 14px; font-size: 20px; line-height: 1.1; }
+  .time.two span { display: flex; flex-direction: column; }
+  .time.two small { font-size: 11px; letter-spacing: .08em; font-weight: 700; opacity: .85; }
+  .addr { margin-top: auto; display: flex; gap: 7px; font-size: 14px; line-height: 1.3; font-weight: 600; color: #3f1a0c; }
+  .addr b { display: block; font-weight: 800; }
+  .date { flex: none; width: 132px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+  .pill { padding: 5px 10px; border-radius: 999px; background: #fffaf2; border: 1px solid #ecc9a6;
+    font-size: 12.5px; font-weight: 800; letter-spacing: .03em; color: #7a160f; text-align: center; line-height: 1.25; white-space: nowrap; }
+  .num { font-size: 100px; line-height: .9; margin-bottom: -8px; font-weight: 700; color: #7a160f; }
+
+  /* ---------- Band ---------- */
+  .band { position: absolute; left: 0; right: 0; top: 704px; bottom: 0; overflow: hidden;
+    background: radial-gradient(ellipse 60% 90% at 50% 35%, #9a2419 0%, #6e0f0a 60%, #4a0805 100%);
+    border-top: 4px solid #d9a24c; }
+  .frame { position: absolute; left: 50%; top: 20px; transform: translateX(-50%); width: 1120px; height: 160px; }
+  .band-title { position: absolute; left: 0; right: 0; top: 38px; text-align: center; color: #fff4e2; font-size: 58px; font-weight: 700; }
+  .band-when { position: absolute; left: 0; right: 0; top: 114px; text-align: center; color: #f3c35f; font-size: 38px; font-weight: 800; letter-spacing: .04em; }
+  .band-note { position: absolute; left: 0; right: 0; top: 214px; text-align: center; color: #fbe9d0; font-size: 32px; font-style: italic; line-height: 1.3; }
+  .diya { position: absolute; bottom: 30px; width: 330px; height: auto;
+    -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 55%, #000 55%, transparent 100%);
+            mask-image: radial-gradient(ellipse 60% 60% at 50% 55%, #000 55%, transparent 100%); }
+  .diya.l { left: 150px; } .diya.r { right: 150px; }
+  .marigolds { position: absolute; bottom: -20px; width: 300px; height: 190px; }
+  .marigolds.l { left: -40px; } .marigolds.r { right: -40px; transform: scaleX(-1); }
+</style></head>
+<body>
+  <svg class="mandala l" viewBox="-100 -100 200 200" id="m1"></svg>
+  <svg class="mandala r" viewBox="-100 -100 200 200" id="m2"></svg>
+
+  <svg class="lantern" style="left:60px" width="200" height="330" viewBox="0 0 200 330" id="lan1"></svg>
+  <svg class="lantern" style="left:170px" width="140" height="230" viewBox="0 0 200 330" id="lan2"></svg>
+  <svg class="lantern" style="right:170px" width="140" height="230" viewBox="0 0 200 330" id="lan3"></svg>
+  <svg class="lantern" style="right:60px" width="200" height="330" viewBox="0 0 200 330" id="lan4"></svg>
+
+  <div class="badge-logo"><img src="assets/diwali-logo-transparent.png" alt=""></div>
+  <div class="head">
+    <div class="join serif">Join us for a joyous celebration of</div>
+    <h1 class="serif"><svg class="flank" viewBox="0 0 70 34"><path d="M2 17 H40 M40 17 C50 5 62 5 68 17 C62 29 50 29 40 17 Z M22 17 C26 9 32 8 36 12" fill="none" stroke="#c28a2c" stroke-width="3" stroke-linecap="round"/></svg>DIWALI 2026<svg class="flank" viewBox="0 0 70 34" style="transform:scaleX(-1)"><path d="M2 17 H40 M40 17 C50 5 62 5 68 17 C62 29 50 29 40 17 Z M22 17 C26 9 32 8 36 12" fill="none" stroke="#c28a2c" stroke-width="3" stroke-linecap="round"/></svg></h1>
+    <div class="tag">FAITH<b>✦</b>FAMILY<b>✦</b>TOGETHERNESS</div>
+  </div>
+  <svg class="rule" viewBox="0 0 800 20" preserveAspectRatio="none"><line x1="0" y1="10" x2="360" y2="10" stroke="#c28a2c" stroke-width="2"/><line x1="440" y1="10" x2="800" y2="10" stroke="#c28a2c" stroke-width="2"/><circle cx="400" cy="10" r="7" fill="none" stroke="#c28a2c" stroke-width="2.5"/><circle cx="378" cy="10" r="3.5" fill="#c28a2c"/><circle cx="422" cy="10" r="3.5" fill="#c28a2c"/></svg>
+
+  <div class="cards" id="cards"></div>
+
+  <div class="band">
+    <svg class="frame" viewBox="0 0 1120 160"><path d="M60 8 H1060 L1106 80 L1060 152 H60 L14 80 Z" fill="rgba(60,4,2,.35)" stroke="#d9a24c" stroke-width="3"/><path d="M72 18 H1048 L1090 80 L1048 142 H72 L30 80 Z" fill="none" stroke="rgba(217,162,76,.55)" stroke-width="1.5"/></svg>
+    <div class="band-title serif">BAPS Shri Swaminarayan Mandir</div>
+    <div class="band-when">IRVING, TX  |  OCT 31 – NOV 10, 2026</div>
+    <div class="band-note serif">Let’s come together to celebrate the Festival of Lights<br>with devotion, joy and unity!</div>
+    <img class="diya l" src="assets/slides/diya-left.png" alt="">
+    <img class="diya r" src="assets/slides/diya-right.png" alt="">
+    <svg class="marigolds l" viewBox="0 0 300 190" id="mg1"></svg>
+    <svg class="marigolds r" viewBox="0 0 300 190" id="mg2"></svg>
+  </div>
+
+<script src="calendar.js"></script>
+<script>
+const NS = 'http://www.w3.org/2000/svg';
+const el = (tag, attrs, parent) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); parent.append(n); return n; };
+
+// Mandala: concentric rings of petals.
+for (const id of ['m1', 'm2']) {
+  const g = document.getElementById(id);
+  for (const [r, n, len] of [[30, 12, 14], [55, 18, 18], [80, 24, 16]]) {
+    el('circle', { r, fill: 'none', stroke: '#b8872e', 'stroke-width': 1.2 }, g);
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2, x = Math.cos(a) * r, y = Math.sin(a) * r;
+      el('ellipse', { cx: x, cy: y, rx: len / 3, ry: len / 1.3, transform: `rotate(${a * 180 / Math.PI + 90} ${x} ${y})`, fill: 'none', stroke: '#b8872e', 'stroke-width': 1 }, g);
+    }
+  }
+}
+
+// Hanging lantern: chain, cap, glowing body, tassel.
+for (const id of ['lan1', 'lan2', 'lan3', 'lan4']) {
+  const g = document.getElementById(id);
+  const d = el('defs', {}, g);
+  const glow = el('radialGradient', { id: id + 'g', cx: '50%', cy: '55%', r: '55%' }, d);
+  el('stop', { offset: '0%', 'stop-color': '#ffe79a' }, glow); el('stop', { offset: '55%', 'stop-color': '#f39a2a' }, glow); el('stop', { offset: '100%', 'stop-color': '#b3341a' }, glow);
+  el('line', { x1: 100, y1: 0, x2: 100, y2: 110, stroke: '#b8872e', 'stroke-width': 3, 'stroke-dasharray': '6 4' }, g);
+  el('path', { d: 'M70 110 Q100 92 130 110 L124 124 H76 Z', fill: '#8c1d16', stroke: '#d9a24c', 'stroke-width': 3 }, g);
+  el('path', { d: 'M76 124 C40 150 40 222 76 246 H124 C160 222 160 150 124 124 Z', fill: `url(#${id}g)`, stroke: '#d9a24c', 'stroke-width': 4 }, g);
+  el('path', { d: 'M100 150 C88 170 88 188 100 196 C112 188 112 170 100 150 Z', fill: '#fff6d0', opacity: .9 }, g);
+  for (const x of [68, 100, 132]) el('path', { d: `M${x} 136 Q${x + (100 - x) * .1} 185 ${x} 236`, fill: 'none', stroke: '#8c1d16', 'stroke-width': 2, opacity: .45 }, g);
+  el('path', { d: 'M78 246 H122 L112 262 H88 Z', fill: '#8c1d16', stroke: '#d9a24c', 'stroke-width': 3 }, g);
+  el('circle', { cx: 100, cy: 274, r: 9, fill: '#2f8a4a', stroke: '#d9a24c', 'stroke-width': 2 }, g);
+  el('path', { d: 'M100 283 L92 322 M100 283 L100 326 M100 283 L108 322', stroke: '#d9a24c', 'stroke-width': 3, 'stroke-linecap': 'round' }, g);
+}
+
+// Marigold cluster: layered petal rings in orange and gold, with leaves.
+for (const id of ['mg1', 'mg2']) {
+  const g = document.getElementById(id);
+  const flowers = [[70, 120, 58, '#f39a1e'], [175, 140, 52, '#ffc021'], [120, 60, 44, '#e8791a'], [240, 90, 40, '#f5b62a'], [30, 50, 36, '#ffd24a']];
+  for (const [cx, cy, r] of flowers) el('ellipse', { cx: cx + r * .7, cy: cy + r * .5, rx: r * .7, ry: r * .28, fill: '#2f7d3c', transform: `rotate(-25 ${cx} ${cy})` }, g);
+  for (const [cx, cy, r, c] of flowers) {
+    for (const [rr, n, shade] of [[r, 22, 0], [r * .72, 16, 1], [r * .45, 12, 2]]) {
+      for (let i = 0; i < n; i++) {
+        const a = (i / n) * Math.PI * 2 + shade;
+        el('ellipse', { cx: cx + Math.cos(a) * rr * .6, cy: cy + Math.sin(a) * rr * .6, rx: rr * .42, ry: rr * .2,
+          transform: `rotate(${a * 180 / Math.PI} ${cx + Math.cos(a) * rr * .6} ${cy + Math.sin(a) * rr * .6})`,
+          fill: c, stroke: 'rgba(120,40,0,.35)', 'stroke-width': .8, opacity: 1 - shade * .08 }, g);
+      }
+    }
+    el('circle', { cx, cy, r: r * .16, fill: '#b85a0c' }, g);
+  }
+}
+
+// Event cards, straight from calendar.js.
+const { events, addresses } = DiwaliCalendar;
+const byId = id => events.find(e => e.id === id);
+const clock = '<svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 7v5.5l3.5 2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+const pin = '<svg width="22" height="28" viewBox="0 0 24 30" style="flex:none;margin-top:2px"><path d="M12 1C6 1 2 5.5 2 11c0 7.5 10 18 10 18s10-10.5 10-18C22 5.5 18 1 12 1z" fill="#8c1d16"/><circle cx="12" cy="11" r="4" fill="#fff"/></svg>';
+const tick = '<svg width="24" height="24" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const html = [];
+for (const [ids, chip] of [[['kdc'], 'OPTIONAL'], [['morning', 'evening'], 'OPTIONAL'], [['dallas'], 'INCLUDED']]) {
+  const e = byId(ids[0]);
+  const [mandir, street, city, zip] = addresses[e.venue].split(', ');
+  const [weekday, monthDay] = e.dateLabel.split(', ');
+  const times = ids.map(id => byId(id)).map(s => ids.length > 1
+    ? `<div class="time two">${clock}<span><small>${s.session.toUpperCase()}</small>${s.timeLabel}</span></div>`
+    : `<div class="time">${clock}${s.timeLabel}</div>`).join('');
+  html.push(`<div class="card">
+    <div class="photo"><img src="${e.image.replace(/\.png$/, '-640.jpg')}" alt=""><span class="chip">${chip}</span></div>
+    <div class="body">
+      <span class="tick">${tick}</span>
+      <h2 class="serif">${e.name}<br>Dallas</h2>
+      <div class="sub">${e.subtitle.replace(/ · Dallas TX$/, '')}</div>
+      <div class="lower">
+        <div class="left">
+          <div class="times">${times}</div>
+          <div class="addr">${pin}<div><b>${mandir}</b>${street},<br>${city}, ${zip}</div></div>
+        </div>
+        <div class="date"><span class="pill">${weekday.toUpperCase()} · ${monthDay.split(' ')[0].slice(0, 3).toUpperCase()}<br>${monthDay.toUpperCase().replace(/^[A-Z]+ /, '')}, 2026</span>
+          <span class="num serif">${Number(e.date.slice(6))}</span></div>
+      </div>
+    </div></div>`);
+}
+document.getElementById('cards').innerHTML = html.join('');
+</script>
+</body></html>
