@@ -1,6 +1,6 @@
 # Diwali 2026 Calendar
 
-Mobile-first BAPS Dallas event selection page. The Diwali & Annakut celebration is always included. Kids Diwali is optional. Chopda Pujan offers two mutually exclusive evening sessions (early 4–6 PM, late 6–8 PM) in one row. A single calendar button adapts to the choices.
+Mobile-first BAPS Dallas event selection page. The Diwali & Annakut celebration is always included. Kids Diwali and Chopda Pujan are optional but selected by default. Chopda Pujan offers two mutually exclusive sessions, labelled only by time (4 PM – 6 PM and 6 PM – 8 PM, the latter by default), in one row. A single calendar button adapts to the choices.
 
 ## Site and publishing
 
@@ -55,9 +55,9 @@ Dallas events: BAPS Shri Swaminarayan Mandir, 4601 N State Hwy 161, Irving, TX 7
 | File | What it is |
 | --- | --- |
 | `Diwali_Events_2026_Add_All_QR.png` | QR to `add-calendar.html` |
-| `Diwali_2026_Two_Events_QR.png` | QR to `diwali-only.html` |
+| `Diwali_2026_Two_Events_QR.png` | QR to `diwali-only.html` (now the same all-events page) |
 | `Diwali_2026_All_Events_Slide.png` | 16:9 slide, 3840x2160, all-events QR |
-| `Diwali_2026_Diwali_Only_Slide.png` | 16:9 slide, 3840x2160, Diwali-only QR |
+| `Diwali_2026_Diwali_Only_Slide.png` | 16:9 slide, 3840x2160, second QR |
 | `assets/preview-*.jpg` | 1200x630 link-preview cards referenced by `og:image` |
 
 Slides are rendered from `_flyer.html` with Playwright; the skill's
@@ -98,14 +98,14 @@ Removed the introductory text and section headings. Cards use small photo thumbn
 
 Transparent logo produced with the built-in imagegen tool using the supplied logo as the edit target. Prompt: remove the cream background to genuine alpha transparency while preserving the lamp, ornamentation, colors, composition, and exact BAPS DIWALI 2026 text.
 
-## Two-event page and QR
+## Pages and QR codes
 
 - Full page: https://bapsdallas.github.io/Diwali2026/add-calendar.html
 - Full-page QR: `Diwali_Events_2026_Add_All_QR.png` (unchanged destination).
-- Diwali-only page: https://bapsdallas.github.io/Diwali2026/diwali-only.html
-- Diwali-only QR: `Diwali_2026_Two_Events_QR.png`.
-- Diwali-only calendar: `Diwali_Only_2026.ics` (the Dallas Diwali & Annakut only).
+- Second page: https://bapsdallas.github.io/Diwali2026/diwali-only.html — since 2026-09-22 it shows every event, identical to the full page apart from its link-preview tags. The URL is kept so the printed second QR still works.
+- Second QR: `Diwali_2026_Two_Events_QR.png` (unchanged).
+- `Diwali_Only_2026.ics` is no longer linked from either page; it is kept, holding just the Dallas Diwali & Annakut, for anyone with a direct link.
 
-The two-event page uses photo-on-top cards via `diwali-only.css`, while the full page has edge-to-edge photos, faded date accents, and stronger glass styling. Both use shared event data and rendering. For conflicting programmatic pujan inputs, the generator keeps the 4 PM session and excludes the 6 PM one; the UI uses a radio group to prevent the conflict.
+Both pages use the same markup, stylesheet, event data and rendering. For conflicting programmatic pujan inputs, the generator keeps the 4 PM session and excludes the 6 PM one; the UI uses a radio group to prevent the conflict.
 
-Latest visual update: uniform compact card heights on the full page, larger and clearer date accents on both pages, and photo-first cards on the Diwali-only page. Session selectors are radio controls styled as a two-part choice; inclusion uses the same square checkbox as KDC.
+Latest visual update: uniform compact card heights on the full page, and larger, clearer date accents. Session selectors are radio controls styled as a two-part choice; inclusion uses the same square checkbox as KDC.

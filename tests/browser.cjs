@@ -77,7 +77,8 @@ async function fits(page,name){
  assert.equal(await page.locator('#download-label').textContent(),'Add to Apple Calendar');
  assert(await page.locator('#pujan-included').isChecked());
  assert(await page.locator('input[value=evening]').isChecked());
- const initial=await download();assert.equal((initial.match(/BEGIN:VEVENT/g)||[]).length,2);
+ assert(await page.locator('input[value=kdc]').isChecked(),'Kids Diwali is selected by default');
+ const initial=await download();assert.equal((initial.match(/BEGIN:VEVENT/g)||[]).length,3);
  assert.deepEqual(await page.locator('input[name=pujan]').evaluateAll(nodes=>nodes.map(n=>n.value)),['morning','evening']);
  for(const session of [null,'evening','morning']) for(const kids of [false,true]){
   if(await page.locator('#clear').isVisible()) await page.locator('#clear').click();
@@ -85,7 +86,7 @@ async function fits(page,name){
   if(kids)await page.locator('input[value=kdc]').check();
   const hasChoice=Boolean(session||kids);
   assert.equal(await page.locator('#download-label').textContent(),'Add to Apple Calendar');
-  assert.match(await page.locator('#selection-count').textContent(),hasChoice?/^\d+ events selected$/:/^3 events · 6–8 PM pujan included$/);
+  assert.match(await page.locator('#selection-count').textContent(),hasChoice?/^\d+ events selected$/:/^3 events · 6 PM – 8 PM pujan included$/);
   const text=await download();
   assert.equal((text.match(/BEGIN:VEVENT/g)||[]).length,hasChoice?1+Number(Boolean(session))+Number(kids):3);
   assert.equal(text.includes('UID:chopda-pujan-morning'),session==='morning');
@@ -106,8 +107,10 @@ async function fits(page,name){
  assert(await page.locator('input[value=evening]').isChecked(),'the late session is the fallback');
  const selected=Number(((await page.locator('#selection-count').textContent()).match(/^(\d+)/)||[])[1]);
  assert(selected>0,'expected a non-zero selection count');
- for(const width of [320,390,778,1280]){
+ for(const width of [320,345,361,375,390,402,440,778,1280]){
   await page.setViewportSize({width,height:863});
+  // The full "4 PM – 6 PM" must fit its segment, not be clipped by it.
+  assert(await page.locator('.session span').evaluateAll(ns=>ns.every(n=>{const box=n.parentElement.getBoundingClientRect(),t=n.getBoundingClientRect();return t.left>=box.left&&t.right<=box.right;})),`session time clipped at ${width}px`);
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`overflow ${width}`);
   const boxes=await page.locator('.session-choice').evaluateAll(nodes=>nodes.map(n=>({y:n.getBoundingClientRect().y,x:n.getBoundingClientRect().x})));
   assert.equal(boxes[0].y,boxes[1].y);assert(boxes[0].x<boxes[1].x);
@@ -222,14 +225,13 @@ async function fits(page,name){
  await photosFill(page,'add-calendar');
  await fits(page,'add-calendar');
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:'/private/tmp/diwali-new.png',fullPage:true});
+ // The second QR's page now carries every event, exactly like the first.
  await page.goto(base+'diwali-only.html');await page.waitForSelector('.event-card');
- assert.equal(await page.locator('.event-card').count(),1);assert.equal(await page.locator('input').count(),0);
- const photoBox=await page.locator('.event-photo').first().boundingBox();
- const detailBox=await page.locator('.event-body').first().boundingBox();
- assert(photoBox.y+photoBox.height<=detailBox.y+1);
- assert(await page.locator('.event-photo img').evaluateAll(images=>images.every(i=>i.complete&&i.naturalWidth>0)));
- const text=await download();assert.equal((text.match(/BEGIN:VEVENT/g)||[]).length,1);assert(!text.includes('UID:kids'));assert(!text.includes('UID:chop'));
- assert.deepEqual(await chronological(page,'diwali-only'),['1110'],'diwali-only shows only Nov 10');
+ assert.equal(await page.locator('.event-card').count(),3);
+ assert(await page.locator('input[value=kdc]').isChecked()&&await page.locator('#pujan-included').isChecked()&&await page.locator('input[value=evening]').isChecked(),'everything selected by default');
+ assert.deepEqual(await page.locator('.session span').allTextContents(),['4 PM – 6 PM','6 PM – 8 PM'],'sessions show full times only');
+ const text=await download();assert.equal((text.match(/BEGIN:VEVENT/g)||[]).length,3);assert(text.includes('UID:kids'));assert(text.includes('UID:chopra-pujan'));
+ assert.deepEqual(await chronological(page,'diwali-only'),['1031','1108','1110'],'second page order is Oct 31, Nov 8, 10');
  assert.equal(await page.locator('details').count(),0,'help must not be an inline disclosure');
  await page.locator('#help').click();await page.waitForSelector('#help-sheet:not([hidden])');
  await covers(page,'#help-sheet','Help');
@@ -262,7 +264,7 @@ async function fits(page,name){
  }
  // A weight ceiling, so a future full-size asset cannot quietly land back in
  // the page. These are the measured figures plus headroom, not aspirations.
- for(const [name,dpr,ceiling] of [['add-calendar',3,800],['diwali-only',3,1200]]){
+ for(const [name,dpr,ceiling] of [['add-calendar',3,800],['diwali-only',3,800]]){
   const ctx=await browser.newContext({viewport:{width:402,height:740},deviceScaleFactor:dpr,serviceWorkers:'block'});
   const weighed=await ctx.newPage();const seen=new Map();
   weighed.on('requestfinished',async req=>{try{seen.set(req.url(),(await (await req.response()).body()).length)}catch(e){}});
@@ -276,5 +278,5 @@ async function fits(page,name){
   await ctx.close();
  }
  assert.deepEqual(errors,[]);await browser.close();
- console.log('PASS: Google Calendar sheet styled and linked per event, no scroll on iPhone 17 Pro/Pro Max, no clipping on short screens, any photo aspect fills its panel, fireworks markers match the data, clickable pujan card, six selection states, exclusive Chopda sessions, one calendar per phone platform and both when unknown, one-line titles over a layered accent, both-event page, downloads, responsive widths, no JS errors.');
+ console.log('PASS: Google Calendar sheet styled and linked per event, no scroll on iPhone 17 Pro/Pro Max, no clipping on short screens, any photo aspect fills its panel, fireworks markers match the data, clickable pujan card, six selection states, exclusive Chopda sessions, one calendar per phone platform and both when unknown, one-line titles over a layered accent, second all-events page, downloads, responsive widths, no JS errors.');
 })().catch(error=>{console.error(error);process.exit(1)});

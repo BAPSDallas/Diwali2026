@@ -1,5 +1,5 @@
 /* Diwali 2026 — shared design system.
-   Both pages load this file. diwali-only.css only overrides the card silhouette. */
+   Both pages load this file. */
 
 :root {
   color-scheme: light;
@@ -401,7 +401,7 @@ h2 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3px 4px;
+  padding: 3px 2px;
   border: 1px solid rgba(var(--accent-rgb), .4);
   border-radius: 9px;
   background: rgba(255, 255, 255, .5);
@@ -410,16 +410,9 @@ h2 {
   white-space: nowrap;
 }
 
-.session strong {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: .07em;
-  text-transform: uppercase;
-  opacity: .75;
-}
-
 .session span {
-  font-size: 12.5px;
+  /* Sized so the full "4 PM – 6 PM" fits a half-width segment from 361px up. */
+  font-size: 12px;
   font-weight: 700;
   line-height: 1.15;
 }
@@ -440,8 +433,6 @@ h2 {
   color: #fff6e6;
   box-shadow: 0 2px 6px var(--accent-shadow);
 }
-
-.session.selected strong { opacity: .85; }
 
 .session:focus-within { outline: 3px solid #f2c46a; outline-offset: 1px; }
 
@@ -748,11 +739,17 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
 
 /* ---------- Narrow phones ---------- */
 
+@media (min-width: 361px) and (max-width: 389px) {
+  .session span { font-size: 10.75px; }
+}
+
 @media (max-width: 360px) {
   .event-photo { flex-basis: 18%; }
   .date-rail { width: 92px; }
   .event-body { padding: 7px 8px; }
   .session { font-size: 10.5px; }
+  /* The full "4 PM – 6 PM" has to fit a half-width segment on the narrowest phones. */
+  .session span { font-size: 9px; letter-spacing: -.01em; }
   /* "SATURDAY · OCT" is the widest label and has to fit the narrow rail too. */
   .date-labels { font-size: 7px; letter-spacing: 0; padding: 2px 5px; }
   .event-time { padding: 4px 8px; font-size: 11.5px; }

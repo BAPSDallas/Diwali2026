@@ -6,6 +6,9 @@
 - Move both Chopda Pujan sessions to the evening: 4–6 PM (early) and 6–8 PM (late, default). UIDs unchanged, SEQUENCE bumped so imported copies update.
 - Change the Dallas Diwali & Annakut to 12 PM–8 PM.
 - QR codes, slides and page URLs unchanged.
+- Chopda Pujan sessions show only their full times, "4 PM – 6 PM" and "6 PM – 8 PM" (no Early/Late), sized to fit down to 320px.
+- The second QR's page (`diwali-only.html`) now shows all events, the same as `add-calendar.html`; `diwali-only.css` removed.
+- Every event is selected by default (Kids Diwali and Chopda Pujan 6 PM – 8 PM included).
 
 ## 2026-09-20
 
