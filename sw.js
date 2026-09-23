@@ -12,11 +12,11 @@
      so a changed photo means a changed URL, and a stale hit is impossible.
 
    Bump CACHE when the precache list changes; old caches are deleted on activate. */
-const CACHE = 'diwali-2026-v3';
+const CACHE = 'diwali-2026-v4';
 
 const PRECACHE = [
   'add-calendar.html', 'diwali-only.html', 'styles.css', 'lqip.css',
-  'calendar.js', 'page.js',
+  'diwali-only.css', 'calendar.js', 'page.js',
   'assets/diwali-logo-360.webp', 'assets/diwali-logo-360.png',
   'assets/festival-background.webp'
 ];

@@ -9,6 +9,7 @@
 - Chopda Pujan sessions show only their full times, "4 PM – 6 PM" and "6 PM – 8 PM" (no Early/Late), sized to fit down to 320px.
 - The second QR's page (`diwali-only.html`) now shows all events, the same as `add-calendar.html`; `diwali-only.css` removed.
 - Every event is selected by default (Kids Diwali and Chopda Pujan 6 PM – 8 PM included).
+- Restore the photo-on-top card layout on `diwali-only.html`, now with all three events; the page scrolls and the calendar bar stays pinned.
 
 ## 2026-09-20
 

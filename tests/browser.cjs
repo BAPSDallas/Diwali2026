@@ -14,6 +14,9 @@ const SHORT=[['SE',375,560],['13 mini',375,629],['landscape',874,340]];
 // Photos are swapped by hand, so any resolution or aspect must fill its panel
 // exactly: no layout shift, no overflow, no letterboxing.
 async function photosFill(page,name){
+ // Measured against the page's own height, since diwali-only scrolls by design;
+ // what must never happen is a photo's aspect changing that height.
+ const baseline=await page.evaluate(()=>document.documentElement.scrollHeight);
  for(const [w,h] of [[4000,1000],[800,2400],[500,500],[3000,2000],[120,80]]){
   const r=await page.evaluate(async ([w,h])=>{
    const c=document.createElement('canvas');c.width=w;c.height=h;
@@ -21,10 +24,10 @@ async function photosFill(page,name){
    const url=c.toDataURL('image/png');
    await Promise.all([...document.querySelectorAll('.event-photo img')].map(i=>new Promise(go=>{i.onload=go;i.onerror=go;i.src=url})));
    const p=document.querySelector('.event-photo').getBoundingClientRect(),i=document.querySelector('.event-photo img').getBoundingClientRect();
-   return {dw:Math.abs(p.width-i.width),dh:Math.abs(p.height-i.height),over:document.documentElement.scrollHeight-innerHeight};
+   return {dw:Math.abs(p.width-i.width),dh:Math.abs(p.height-i.height),height:document.documentElement.scrollHeight};
   },[w,h]);
   assert(r.dw<1&&r.dh<1,`${name}: ${w}x${h} photo does not fill its panel`);
-  assert(r.over<=0,`${name}: ${w}x${h} photo pushes the page into scroll`);
+  assert(r.height<=baseline+1,`${name}: ${w}x${h} photo grows the page by ${r.height-baseline}px`);
  }
  await page.reload();await page.waitForSelector('.event-card');
 }
@@ -228,6 +231,19 @@ async function fits(page,name){
  // The second QR's page now carries every event, exactly like the first.
  await page.goto(base+'diwali-only.html');await page.waitForSelector('.event-card');
  assert.equal(await page.locator('.event-card').count(),3);
+ // Same events, but in the photo-on-top layout: every photo sits above its details.
+ for(const card of await page.locator('.event-card').all()){
+  const photo=await card.locator('.event-photo').boundingBox(),body=await card.locator('.event-body').boundingBox();
+  assert(photo.y+photo.height<=body.y+1,'photo must sit above the details');
+  assert(photo.height>=120,`banner photo too short: ${photo.height}px`);
+ }
+ // Kids Diwali and Chopda Pujan stay changeable here too.
+ await page.locator('input[value=kdc]').uncheck();await page.locator('#pujan-included').uncheck();
+ assert.match(await page.locator('#selection-count').textContent(),/^3 events · 6 PM – 8 PM pujan included$/);
+ await page.locator('input[value=kdc]').check();await page.locator('#pujan-included').check();
+ await page.locator('.session-choice:has(input[value=morning])').click();
+ assert(await page.locator('input[value=morning]').isChecked());
+ await page.locator('.session-choice:has(input[value=evening])').click();
  assert(await page.locator('input[value=kdc]').isChecked()&&await page.locator('#pujan-included').isChecked()&&await page.locator('input[value=evening]').isChecked(),'everything selected by default');
  assert.deepEqual(await page.locator('.session span').allTextContents(),['4 PM – 6 PM','6 PM – 8 PM'],'sessions show full times only');
  const text=await download();assert.equal((text.match(/BEGIN:VEVENT/g)||[]).length,3);assert(text.includes('UID:kids'));assert(text.includes('UID:chopra-pujan'));
@@ -238,7 +254,16 @@ async function fits(page,name){
  await page.locator('#help-close').click();
  assert(await page.locator('#help-sheet').isHidden(),'help closes');
  await photosFill(page,'diwali-only');
- await fits(page,'diwali-only');
+ // This page scrolls by design — three photo-topped cards cannot share one
+ // phone screen — so the promise is no clipped text and calendar buttons that
+ // stay on screen, not "no scroll".
+ for(const [label,width,height] of [...PHONES,...SHORT]){
+  await page.setViewportSize({width,height});
+  const clipped=await page.evaluate(()=>[...document.querySelectorAll('.event-body')].filter(n=>n.scrollHeight>n.clientHeight+1).length);
+  assert.equal(clipped,0,`diwali-only clips card text on ${label}`);
+  const bar=await page.locator('.action-bar').boundingBox();
+  assert(bar.y+bar.height<=height+1&&bar.y>=0,`calendar buttons off screen on ${label}`);
+ }
  await page.setViewportSize({width:390,height:844});
  await page.screenshot({path:'/private/tmp/diwali-only.png',fullPage:true});
  // The action buttons and the help steps must name the same calendar, so both
@@ -264,7 +289,7 @@ async function fits(page,name){
  }
  // A weight ceiling, so a future full-size asset cannot quietly land back in
  // the page. These are the measured figures plus headroom, not aspirations.
- for(const [name,dpr,ceiling] of [['add-calendar',3,800],['diwali-only',3,800]]){
+ for(const [name,dpr,ceiling] of [['add-calendar',3,800],['diwali-only',3,1200]]){
   const ctx=await browser.newContext({viewport:{width:402,height:740},deviceScaleFactor:dpr,serviceWorkers:'block'});
   const weighed=await ctx.newPage();const seen=new Map();
   weighed.on('requestfinished',async req=>{try{seen.set(req.url(),(await (await req.response()).body()).length)}catch(e){}});

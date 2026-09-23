@@ -1,0 +1,42 @@
+/* diwali-only.html — loaded after styles.css. Same events as add-calendar.
+   Same glass, type scale and date rail; only the card silhouette changes:
+   a wide 3:2-friendly photo banner on top, details and date rail beneath. */
+
+/* Three photo-topped cards cannot share one phone screen without clipping
+   their details, so this page scrolls. The action bar is sticky, so the
+   calendar buttons stay on screen throughout. */
+body { height: auto; min-height: 100svh; }
+
+.cards { max-height: none; grid-auto-rows: auto; }
+
+.event-card { flex-direction: column; }
+
+.event-photo {
+  flex: none;
+  height: clamp(130px, 38vw, 200px);
+  max-width: none;
+  width: 100%;
+}
+
+.card-main { flex: none; }
+
+.event-body { padding: 9px 12px 14px; gap: 2px; }
+
+h2 { font-size: clamp(19px, 5.6vw, 24px); }
+
+.subtitle { font-size: 12px; }
+
+/* Same rhythm as add-calendar, scaled to this page's larger type. The base
+   stylesheet supplies the badge treatment; only the size and spacing change. */
+.event-time { font-size: 14px; margin-top: 9px; }
+
+.address { font-size: 10.5px; margin-top: 13px; }
+
+/* The accent is absolutely positioned now, so it is sized by width. */
+.date-rail { width: 124px; }
+
+.date-labels { font-size: 11px; }
+
+@media (max-width: 360px) {
+  .date-rail { width: 104px; }
+}

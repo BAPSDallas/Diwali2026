@@ -63,9 +63,11 @@ function sourceSet(base, extension, widths) {
   return widths.map(width => `${base}-${width}.${extension} ${width}w`).join(', ');
 }
 
-/* The card photo panel is ~92px wide whatever the viewport. Telling the browser
+/* The side panel on add-calendar is ~92px wide whatever the viewport; on
+   diwali-only the photo is a banner across the full card. Telling the browser
    the real display width is what lets it skip the large files. */
-const PHOTO_SIZES = '92px';
+const bannerLayout = document.body.dataset.layout === 'banner';
+const PHOTO_SIZES = bannerLayout ? '(max-width: 560px) 100vw, 538px' : '92px';
 
 function makePhoto(event) {
   const photo = element('div', `event-photo ${event.id}`);
