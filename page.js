@@ -37,13 +37,13 @@ function railParts(event) {
   };
 }
 
-/* Drop only the mandir name; street, city, state and ZIP all stay. Street and
-   locality are separate lines rather than one string left to wrap, so every card
-   breaks in the same place at every width, the way a postal address reads. */
+/* Mandir, street and locality are separate lines rather than one string left
+   to wrap, so every card breaks in the same place at every width, the way a
+   postal address reads. */
 function addressNode(venue) {
-  const [, street, city, stateZip] = addresses[venue].split(', ');
+  const [mandir, street, city, stateZip] = addresses[venue].split(', ');
   const node = element('p', 'address');
-  node.append(element('span', '', `${street},`), element('span', '', `${city}, ${stateZip}`));
+  node.append(element('span', 'mandir', mandir), element('span', '', `${street},`), element('span', '', `${city}, ${stateZip}`));
   return node;
 }
 
@@ -159,9 +159,9 @@ function makeCard(event, selectable = false) {
   return card;
 }
 
-/* Both sessions are in the evening and are labelled by their times alone. The
-   ids stay 'morning' and 'evening' so the UIDs, and any copy a visitor has
-   already imported, carry over. */
+/* The two sessions are named "Chopda Pujan 1" and "Chopda Pujan 2". The ids
+   stay 'morning' and 'evening' so the UIDs, and any copy a visitor has already
+   imported, carry over. */
 /* The Chopda Pujan card keeps the shared silhouette; the time line becomes a
    two-segment session picker so the card stays the same height as the others. */
 function makePujanCard() {
@@ -188,11 +188,11 @@ function makePujanCard() {
     input.name = 'pujan';
     input.value = id;
     input.checked = id === 'evening';
-    input.setAttribute('aria-label', `Chopda Pujan, ${event.timeLabel}`);
+    input.setAttribute('aria-label', `${event.session}, ${event.timeLabel}`);
     input.addEventListener('change', () => { pujanIncluded.checked = true; updateSelection(); });
     optionalInputs.push(input);
     sessions.push(input);
-    choice.append(input, element('span', '', event.timeLabel));
+    choice.append(input, element('strong', '', event.session), element('span', '', event.timeLabel));
     toggle.append(choice);
   }
 
@@ -290,7 +290,7 @@ function openSheet() {
   for (const event of selectedEvents(downloadIds())) {
     const item = element('li', 'gcal-item');
     const text = element('div', '');
-    text.append(element('strong', '', titleOf(event)), element('span', '', subtitleOf(event)),
+    text.append(element('strong', '', titleOf(event)), element('span', '', [event.session, subtitleOf(event)].filter(Boolean).join(' · ')),
                 element('span', 'gcal-when', `${event.dateLabel} · ${event.timeLabel}`));
     const link = element('a', 'gcal-add', 'Add');
     link.href = googleCalendarUrl(event);

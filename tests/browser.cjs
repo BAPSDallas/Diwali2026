@@ -112,11 +112,12 @@ async function fits(page,name){
  assert(selected>0,'expected a non-zero selection count');
  for(const width of [320,345,361,375,390,402,440,778,1280]){
   await page.setViewportSize({width,height:863});
-  // The full "4 PM – 6 PM" must fit its segment, not be clipped by it.
-  assert(await page.locator('.session span').evaluateAll(ns=>ns.every(n=>{const box=n.parentElement.getBoundingClientRect(),t=n.getBoundingClientRect();return t.left>=box.left&&t.right<=box.right;})),`session time clipped at ${width}px`);
+  // The full "6:30 PM – 7:30 PM" and its label must fit their row, not be clipped.
+  assert(await page.locator('.session span, .session strong').evaluateAll(ns=>ns.every(n=>{const box=n.parentElement.getBoundingClientRect(),t=n.getBoundingClientRect();return t.left>=box.left&&t.right<=box.right;})),`session time clipped at ${width}px`);
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`overflow ${width}`);
   const boxes=await page.locator('.session-choice').evaluateAll(nodes=>nodes.map(n=>({y:n.getBoundingClientRect().y,x:n.getBoundingClientRect().x})));
-  assert.equal(boxes[0].y,boxes[1].y);assert(boxes[0].x<boxes[1].x);
+  // Stacked: Chopda Pujan 1 directly above Chopda Pujan 2.
+  assert.equal(boxes[0].x,boxes[1].x);assert(boxes[0].y<boxes[1].y);
  }
  // The fireworks wash is optional decoration: however many events carry the flag,
  // that many columns must render it, and any asset referenced must load.
@@ -189,8 +190,8 @@ async function fits(page,name){
            addresses:[...document.querySelectorAll('.address')].map(lines)};
   });
   assert.deepEqual(shape.titles,[],`title wrapped onto two lines at ${width}px`);
-  // Street and locality are separate spans, so this is two lines at every width.
-  assert(shape.addresses.every(n=>n===2),`address not two lines at ${width}px: ${shape.addresses}`);
+  // Mandir, street and locality are separate spans, so three lines at every width.
+  assert(shape.addresses.every(n=>n===3),`address not three lines at ${width}px: ${shape.addresses}`);
   const layered=await page.evaluate(()=>getComputedStyle(document.querySelector('.date-rail')).position);
   assert.equal(layered,'absolute',`date accent must stay a layer at ${width}px`);
  }
@@ -205,7 +206,8 @@ async function fits(page,name){
  // identically; the two rules live apart and would otherwise drift.
  const badges=await page.evaluate(()=>{
   const g=sel=>{const c=getComputedStyle(document.querySelector(sel));
-   return [c.backgroundColor,c.color,c.borderRadius,Math.round(document.querySelector(sel).getBoundingClientRect().height)].join('|');};
+   // Colour and shape only: the stacked session rows are shorter than the badge by design.
+   return [c.backgroundColor,c.color,c.borderRadius].join('|');};
   return {fixed:g('.event-time'),selected:g('.session.selected'),unselected:g('.session:not(.selected)')};
  });
  assert.equal(badges.fixed,badges.selected,'fixed time must match a selected session badge');
@@ -227,7 +229,7 @@ async function fits(page,name){
  const hero=await page.evaluate(()=>{const h=document.querySelector('.hero'),r=h.getBoundingClientRect();
   return {w:r.width,h:r.height,radius:getComputedStyle(h).borderTopLeftRadius};});
  assert(Math.abs(hero.w-hero.h)<1&&hero.radius==='50%',`logo badge must be a circle: ${JSON.stringify(hero)}`);
- if(page.viewportSize().height>=740) assert(hero.h>=110,`logo badge too small: ${hero.h}px`);
+ if(page.viewportSize().height>=740) assert(hero.h>=100,`logo badge too small: ${hero.h}px`);
  const order=await chronological(page,'add-calendar');
  assert.deepEqual(order,['1031','1108','1110'],'all-events order is Oct 31, Nov 8, 10');
  await photosFill(page,'add-calendar');

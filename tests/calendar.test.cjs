@@ -21,7 +21,7 @@ for (let mask = 0; mask < 8; mask++) {
 }
 test('all four events have exact requested times, titles, locations and description', () => {
   const text = unfold(buildCalendar(['kdc','morning'])) + unfold(buildCalendar(['evening']));
-  const expected = [['dallas','20261110','120000','200000'], ['kdc','20261031','100000','180000'], ['morning','20261108','160000','180000'], ['evening','20261108','180000','200000']];
+  const expected = [['dallas','20261110','120000','203000'], ['kdc','20261031','100000','170000'], ['morning','20261108','170000','180000'], ['evening','20261108','183000','193000']];
   for (const [id, date, start, end] of expected) {
     const event = events.find(e => e.id === id);
     const block = text.split('BEGIN:VEVENT\r\n').find(b => b.startsWith(`UID:${event.uid}\r\n`));
@@ -29,7 +29,8 @@ test('all four events have exact requested times, titles, locations and descript
     assert(block.includes(`DTEND;TZID=America/Chicago:${date}T${end}\r\n`));
     assert(block.includes('Dallas TX'));
     assert(block.includes('4601 N State Hwy 161'));
-    assert(block.includes('DESCRIPTION:https://www.baps.org/dallas\r\n'));
+    // Chopda Pujan carries "Followed by Mahaprasad" above the link.
+    assert(block.includes(event.note ? 'DESCRIPTION:Followed by Mahaprasad\\nhttps://www.baps.org/dallas\r\n' : 'DESCRIPTION:https://www.baps.org/dallas\r\n'));
     for (const days of [7, 1]) assert(block.includes(`TRIGGER:-P${days}D\r\n`));
   }
   assert.equal(new Set(events.map(e => e.uid)).size, 4);

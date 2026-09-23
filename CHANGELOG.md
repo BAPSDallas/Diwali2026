@@ -2,6 +2,10 @@
 
 ## 2026-09-23
 
+- Times: Kids Diwali 10 AM – 5 PM; Chopda Pujan 1 5 – 6 PM, Chopda Pujan 2 6:30 – 7:30 PM; Annakut 12 PM – 8:30 PM. SEQUENCE 3 so imported copies update.
+- Rename the card to "Sharda (Chopda) Pujan" with "Followed by Mahaprasad" beneath (also in the calendar description); sessions stack as labelled rows.
+- "BAPS Shri Swaminarayan Mandir" above every address. Logo badge trimmed slightly to make room.
+- Re-render both how-to slides from a fresh phone screenshot.
 - Add a how-to slide in two variants (one per QR): Step 1 scan the QR, Step 2 tap Add to Calendar, with an arrow into the highlighted buttons on a real phone screenshot.
 - `diwali-only.html` now uses the `add-calendar.html` layout and looks identical to it; only its link-preview tags differ, so the second QR is unaffected.
 - Keep the photo-on-top layout as a backup, `diwali-only-banner.html` + `banner.css` (renamed from `diwali-only.css`), for one or two events; with three or more it falls back to the `add-calendar.html` layout.

@@ -18,10 +18,10 @@ All dates are in 2026 and times are America/Chicago. Event dates are retained fr
 
 | Event | Date | Time | Included |
 | --- | --- | --- | --- |
-| Diwali & Annakut (Nutan Varsh), Dallas TX | November 10 | 12 PM–8 PM | Always |
-| Kids Diwali Celebration (KDC), Dallas TX | October 31 | 10 AM–6 PM | Optional |
-| Chopda Pujan (4 PM Session), Dallas TX | November 8 | 4–6 PM | Optional |
-| Chopda Pujan (6 PM Session), Dallas TX | November 8 | 6–8 PM | Optional, selected by default |
+| Diwali & Annakut (Nutan Varsh), Dallas TX | November 10 | 12 PM–8:30 PM | Always |
+| Kids Diwali Celebration (KDC), Dallas TX | October 31 | 10 AM–5 PM | Optional, selected by default |
+| Sharda (Chopda) Pujan – Chopda Pujan 1, Dallas TX | November 8 | 5–6 PM, followed by Mahaprasad | Optional |
+| Sharda (Chopda) Pujan – Chopda Pujan 2, Dallas TX | November 8 | 6:30–7:30 PM, followed by Mahaprasad | Optional, selected by default |
 
 The Frisco Diwali & Annakut (November 14) was removed on 2026-09-22. The file name `Diwali_Events_Dallas_Frisco_2026.ics` is kept so existing links keep working. Internally the two Chopda sessions keep the ids `morning` and `evening` so their UIDs carry over and already-imported copies update in place (`SEQUENCE` is 2).
 

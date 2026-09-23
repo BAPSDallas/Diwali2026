@@ -20,11 +20,11 @@ END:STANDARD
 END:VTIMEZONE
 BEGIN:VEVENT
 UID:kids-diwali-kdc-2026@krupesh9.github.io
-DTSTAMP:20260922T180000Z
-SEQUENCE:2
+DTSTAMP:20260923T180000Z
+SEQUENCE:3
 SUMMARY:Kids Diwali Celebration (KDC) 2026\, Dallas TX
 DTSTART;TZID=America/Chicago:20261031T100000
-DTEND;TZID=America/Chicago:20261031T180000
+DTEND;TZID=America/Chicago:20261031T170000
 LOCATION:BAPS Shri Swaminarayan Mandir\, 4601 N State Hwy 161\, Irving\, TX
   75038
 DESCRIPTION:https://www.baps.org/dallas
@@ -42,14 +42,14 @@ END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:chopra-pujan-dallas-2026@krupesh9.github.io
-DTSTAMP:20260922T180000Z
-SEQUENCE:2
-SUMMARY:Chopda Pujan (6 PM Session) 2026\, Dallas TX
-DTSTART;TZID=America/Chicago:20261108T180000
-DTEND;TZID=America/Chicago:20261108T200000
+DTSTAMP:20260923T180000Z
+SEQUENCE:3
+SUMMARY:Sharda (Chopda) Pujan – Chopda Pujan 2 2026\, Dallas TX
+DTSTART;TZID=America/Chicago:20261108T183000
+DTEND;TZID=America/Chicago:20261108T193000
 LOCATION:BAPS Shri Swaminarayan Mandir\, 4601 N State Hwy 161\, Irving\, TX
   75038
-DESCRIPTION:https://www.baps.org/dallas
+DESCRIPTION:Followed by Mahaprasad\nhttps://www.baps.org/dallas
 URL:https://www.baps.org/dallas
 BEGIN:VALARM
 TRIGGER:-P7D
@@ -64,11 +64,11 @@ END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:annakut-dallas-2026@krupesh9.github.io
-DTSTAMP:20260922T180000Z
-SEQUENCE:2
+DTSTAMP:20260923T180000Z
+SEQUENCE:3
 SUMMARY:Diwali & Annakut (Nutan Varsh) 2026\, Dallas TX
 DTSTART;TZID=America/Chicago:20261110T120000
-DTEND;TZID=America/Chicago:20261110T200000
+DTEND;TZID=America/Chicago:20261110T203000
 LOCATION:BAPS Shri Swaminarayan Mandir\, 4601 N State Hwy 161\, Irving\, TX
   75038
 DESCRIPTION:https://www.baps.org/dallas
