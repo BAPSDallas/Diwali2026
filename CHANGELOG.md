@@ -12,6 +12,7 @@
 - Restore the photo-on-top card layout on `diwali-only.html`, now with all three events; the page scrolls and the calendar bar stays pinned.
 - Make `diwali-only.html` fit one screen again (down to 600px tall): tighter details, one-line address, photo banner takes the remaining height.
 - Round glass badge for the logo on both pages; larger on `add-calendar.html` (up to 140px).
+- Remove unused images: frisco.png, frisco-old.png, dallas-old.png, dallas-annakut.png, dallas-fireworks.png, kids-diwali-old.png, kids-diwali-2.png, fireworks.svg (~15.5 MB).
 
 ## 2026-09-20
 

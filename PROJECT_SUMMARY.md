@@ -161,12 +161,12 @@ backdrop turns olive rather than mint. A browser test asserts the two venues
 differ on every accent surface, because a typo in the token block would silently
 fall back to red and look deliberate.
 
-**The fireworks marker is dormant, not deleted.** No event carries the
-`fireworks` property right now, but `.has-fireworks` in the stylesheet,
-`assets/events/fireworks.svg` and the generator in the skill all remain. Setting
-`fireworks: 'assets/events/fireworks.svg'` on any event brings it back, and the
-tests count rendered markers against flagged events rather than expecting a
-fixed number.
+**The fireworks marker is dormant.** No event carries the `fireworks` property,
+and `assets/events/fireworks.svg` was removed on 2026-09-22. `.has-fireworks` in
+the stylesheet and the generator in the skill (`make_fireworks_svg.py`) remain:
+regenerate the SVG and set `fireworks: 'assets/events/fireworks.svg'` on an
+event to bring it back. The tests count rendered markers against flagged events
+rather than expecting a fixed number.
 
 **The date lives only in the right-hand accent.** The label badge carries the
 weekday and month (`TUESDAY · NOV`) and the numeral carries the day, so the card
