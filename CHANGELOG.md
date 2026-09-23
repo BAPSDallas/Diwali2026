@@ -10,6 +10,8 @@
 - The second QR's page (`diwali-only.html`) now shows all events, the same as `add-calendar.html`; `diwali-only.css` removed.
 - Every event is selected by default (Kids Diwali and Chopda Pujan 6 PM – 8 PM included).
 - Restore the photo-on-top card layout on `diwali-only.html`, now with all three events; the page scrolls and the calendar bar stays pinned.
+- Make `diwali-only.html` fit one screen again (down to 600px tall): tighter details, one-line address, photo banner takes the remaining height.
+- Round glass badge for the logo on both pages; larger on `add-calendar.html` (up to 140px).
 
 ## 2026-09-20
 

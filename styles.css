@@ -69,17 +69,20 @@ main {
 /* ---------- Hero ---------- */
 
 /* The logo artwork is deep red on transparent, so it needs a light surface to
-   read against the maroon backdrop. A glass pill keeps it on-theme. */
+   read against the maroon backdrop. A glass circle keeps it on-theme and
+   follows the round medallion of the artwork. Three cards leave room for it
+   to run large; the cards keep their content height, only their slack goes. */
 .hero {
   flex: none;
   align-self: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: clamp(54px, 8.2svh, 88px);
-  padding: 3px 22px;
+  height: clamp(84px, 16.5svh, 140px);
+  aspect-ratio: 1;
+  padding: 0;
   border: 1px solid var(--glass-edge);
-  border-radius: 20px;
+  border-radius: 50%;
   background: var(--glass);
   -webkit-backdrop-filter: var(--glass-blur);
   backdrop-filter: var(--glass-blur);
@@ -91,7 +94,8 @@ main {
    overflowing the pill. Giving the wrapper the height restores the chain. */
 .hero picture {
   display: block;
-  height: 100%;
+  /* Inset from the circle's edge so the medallion's rim clears it. */
+  height: 84%;
 }
 
 .logo {

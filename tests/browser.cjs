@@ -223,6 +223,11 @@ async function fits(page,name){
           img:Math.round(img.height),hero:Math.round(hero.height)};
  });
  assert(logo.fits,`logo overflows its pill: ${logo.img}px in ${logo.hero}px`);
+ // A round badge, and large now that there are three cards, not four.
+ const hero=await page.evaluate(()=>{const h=document.querySelector('.hero'),r=h.getBoundingClientRect();
+  return {w:r.width,h:r.height,radius:getComputedStyle(h).borderTopLeftRadius};});
+ assert(Math.abs(hero.w-hero.h)<1&&hero.radius==='50%',`logo badge must be a circle: ${JSON.stringify(hero)}`);
+ if(page.viewportSize().height>=740) assert(hero.h>=110,`logo badge too small: ${hero.h}px`);
  const order=await chronological(page,'add-calendar');
  assert.deepEqual(order,['1031','1108','1110'],'all-events order is Oct 31, Nov 8, 10');
  await photosFill(page,'add-calendar');
@@ -235,7 +240,7 @@ async function fits(page,name){
  for(const card of await page.locator('.event-card').all()){
   const photo=await card.locator('.event-photo').boundingBox(),body=await card.locator('.event-body').boundingBox();
   assert(photo.y+photo.height<=body.y+1,'photo must sit above the details');
-  assert(photo.height>=120,`banner photo too short: ${photo.height}px`);
+  assert(photo.height>=60,`banner photo too short: ${photo.height}px`);
  }
  // Kids Diwali and Chopda Pujan stay changeable here too.
  await page.locator('input[value=kdc]').uncheck();await page.locator('#pujan-included').uncheck();
@@ -254,15 +259,13 @@ async function fits(page,name){
  await page.locator('#help-close').click();
  assert(await page.locator('#help-sheet').isHidden(),'help closes');
  await photosFill(page,'diwali-only');
- // This page scrolls by design — three photo-topped cards cannot share one
- // phone screen — so the promise is no clipped text and calendar buttons that
- // stay on screen, not "no scroll".
- for(const [label,width,height] of [...PHONES,...SHORT]){
+ // Photo on top and still one screen: same promise as the first page.
+ await fits(page,'diwali-only');
+ for(const [label,width,height] of PHONES){
   await page.setViewportSize({width,height});
-  const clipped=await page.evaluate(()=>[...document.querySelectorAll('.event-body')].filter(n=>n.scrollHeight>n.clientHeight+1).length);
-  assert.equal(clipped,0,`diwali-only clips card text on ${label}`);
-  const bar=await page.locator('.action-bar').boundingBox();
-  assert(bar.y+bar.height<=height+1&&bar.y>=0,`calendar buttons off screen on ${label}`);
+  // The shorter cards must not push the date label up under the checkbox.
+  const gaps=await page.evaluate(()=>[...document.querySelectorAll('.date-rail input')].map(i=>i.closest('.date-rail').querySelector('.date-labels').getBoundingClientRect().top-i.getBoundingClientRect().bottom));
+  assert(gaps.every(g=>g>=2),`date label overlaps its checkbox on ${label}: ${gaps}`);
  }
  await page.setViewportSize({width:390,height:844});
  await page.screenshot({path:'/private/tmp/diwali-only.png',fullPage:true});
