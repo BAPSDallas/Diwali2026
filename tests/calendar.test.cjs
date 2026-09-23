@@ -55,7 +55,7 @@ test('image derivatives are current for every master', () => {
 test('every page advertises only photo widths that exist on disk', () => {
   // A width in the inlined map with no file behind it is a 404 and an empty
   // card. This is the check that catches a hand-edited map or a half-run build.
-  for (const page of ['add-calendar.html', 'diwali-only.html']) {
+  for (const page of ['add-calendar.html', 'diwali-only.html', 'diwali-only-banner.html']) {
     const html = fs.readFileSync(page, 'utf8');
     const map = JSON.parse(html.match(/window\.PHOTO_WIDTHS=(\{.*?\});/)[1]);
     for (const event of events.filter(e => e.image && map[e.id])) {

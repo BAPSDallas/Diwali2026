@@ -1,0 +1,71 @@
+/* Photo-on-top card layout — loaded after styles.css by diwali-only-banner.html.
+   Same glass and date rail; only the card silhouette changes: a photo banner
+   on top, details and date rail beneath.
+
+   Every rule is scoped to body.banner, which page.js sets only when the page
+   shows one or two cards. With three or more the banners get too thin to be
+   worth it, so the page falls back to the add-calendar layout untouched.
+
+   Even so the details are packed tight — one-line address, slimmer badges —
+   and the photo banner takes whatever height is left. */
+
+.banner .hero { height: clamp(58px, 8.6svh, 80px); }
+
+.banner .cards { max-height: none; grid-auto-rows: minmax(0, 1fr); }
+
+.banner .event-card { flex-direction: column; }
+
+.banner .event-photo {
+  flex: 1 1 0;
+  min-height: 48px;
+  max-width: none;
+  width: 100%;
+}
+
+.banner .card-main { flex: none; }
+
+.banner .event-body { padding: 5px 12px 8px; gap: 0; }
+
+.banner h2 { font-size: clamp(17px, 5vw, 21px); }
+
+.banner .subtitle { font-size: 11px; }
+
+/* Same badges as add-calendar, a little slimmer. */
+.banner .event-time { font-size: 13px; min-height: 30px; margin-top: 5px; padding: 2px 14px; }
+
+.banner .session-toggle { margin-top: 5px; }
+
+.banner .session { min-height: 30px; }
+
+/* Street and city on one line here; the card is wide enough, and the line
+   saved is what the photo gets. */
+.banner .address { font-size: 10px; margin-top: 5px; }
+.banner .address span { display: inline; }
+.banner .address span + span::before { content: ' '; }
+
+/* The accent is absolutely positioned now, so it is sized by width. */
+.banner .date-rail { width: 124px; }
+
+.banner .date-labels { font-size: 11px; }
+
+/* Sized to the rail's height rather than the viewport, so on these shorter
+   cards the date label stays clear of the checkbox above it. */
+.banner .date-num { font-size: min(76px, 64cqh); }
+
+@media (max-width: 360px) {
+  .banner .date-rail { width: 104px; }
+}
+
+/* Below 700px tall the base stylesheet lets the page scroll. This page still
+   fits down to 600px (iPhone SE and similar), so it keeps the one-screen
+   layout there; only below that does it scroll, with a real banner height
+   rather than photos collapsed to their minimum. */
+@media (min-height: 600px) and (max-height: 700px) {
+  body.banner { height: 100vh; height: 100svh; min-height: 0; }
+  .banner .cards { grid-auto-rows: minmax(0, 1fr); }
+  .banner .event-card { min-height: 0; }
+}
+
+@media (max-height: 599px) {
+  .banner .event-photo { flex: none; height: 110px; }
+}

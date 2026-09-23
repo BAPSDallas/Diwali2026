@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-23
+
+- `diwali-only.html` now uses the `add-calendar.html` layout and looks identical to it; only its link-preview tags differ, so the second QR is unaffected.
+- Keep the photo-on-top layout as a backup, `diwali-only-banner.html` + `banner.css` (renamed from `diwali-only.css`), for one or two events; with three or more it falls back to the `add-calendar.html` layout.
+
 ## 2026-09-22
 
 - Remove the Frisco Diwali & Annakut from both pages, the calendar files and the Google Calendar list; drop its teal accent and photo derivatives.

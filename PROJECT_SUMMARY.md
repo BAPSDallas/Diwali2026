@@ -14,7 +14,8 @@ subscription, no build step, no server.
 | Page | Shows | QR code |
 | --- | --- | --- |
 | `add-calendar.html` | All four event slots. Both Annakut celebrations are always included; Kids Diwali is optional; Chopda Pujan offers a mutually exclusive Morning/Evening session. | `Diwali_Events_2026_Add_All_QR.png` |
-| `diwali-only.html` | Only the two Diwali & Annakut celebrations, nothing selectable. | `Diwali_2026_Two_Events_QR.png` |
+| `diwali-only.html` | Identical to `add-calendar.html` (since 2026-09-23); only its link preview differs. | `Diwali_2026_Two_Events_QR.png` |
+| `diwali-only-banner.html` | Backup: photo-on-top cards for one or two events (`data-cards`), not behind any QR. | — |
 
 Both build the `.ics` in the browser from a Blob and hand it to the user as a
 download. Nothing points at a hosted `.ics` URL, because iOS Calendar treats a
@@ -48,7 +49,7 @@ Dallas: BAPS Shri Swaminarayan Mandir, 4601 N State Hwy 161, Irving, TX 75038.
 | `calendar.js` | Source of truth for event data and `.ics` generation. Shared by the pages and the tests. |
 | `page.js` | Builds the cards, handles selection, triggers the download. Shared by both pages; `body[data-scope=diwali]` switches it to two-event mode. |
 | `styles.css` | The whole design system, loaded by both pages. |
-| `diwali-only.css` | Loaded *after* `styles.css`. Holds only the banner-layout override, nothing else. |
+| `banner.css` | Loaded *after* `styles.css` by the backup page only. Every rule is scoped to `body.banner`, which `page.js` sets only for one or two cards. |
 | `assets/events/*.png` | Event photos, replaceable without touching code. See `IMAGES.md`. |
 | `tests/` | Unit tests for the calendar output, Playwright tests for the pages. |
 | `_flyer.html` | Slide generator. Rendered to PNG with Playwright; not served to visitors. |
@@ -186,8 +187,8 @@ fails in stricter clients.
 - **Photos**: drop replacements into `assets/events/` with the same filenames. No code
   changes. `IMAGES.md` has the slot sizes and framing guidance — note that the
   Included/Optional chip sits over the top-left corner of each photo.
-- **Layout**: prefer `styles.css`. Anything you add to `diwali-only.css` is a
-  divergence between the two pages and should earn its place.
+- **Layout**: prefer `styles.css`. Both live pages use only
+  `styles.css`; `banner.css` is for the backup page alone.
 - **Slides and previews**: edit `_flyer.html`, re-render, then re-decode the QR
   out of the finished PNG. The skill bundles scripts for both.
 

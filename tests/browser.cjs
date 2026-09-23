@@ -233,42 +233,65 @@ async function fits(page,name){
  await photosFill(page,'add-calendar');
  await fits(page,'add-calendar');
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:'/private/tmp/diwali-new.png',fullPage:true});
- // The second QR's page now carries every event, exactly like the first.
+ // The second QR's page is the first page in every respect but its link preview:
+ // same events, same selection, same layout, pixel for pixel.
+ const layoutOf=async()=>page.evaluate(()=>({
+  banner:document.body.classList.contains('banner'),
+  cards:[...document.querySelectorAll('.event-card')].map(c=>{const r=c.getBoundingClientRect(),p=c.querySelector('.event-photo').getBoundingClientRect();
+   return [c.className,Math.round(r.height),Math.round(p.width),Math.round(p.height)].join('|');}),
+  hero:Math.round(document.querySelector('.hero').getBoundingClientRect().height),
+  sheets:[...document.styleSheets].map(x=>(x.href||'').split('/').pop()).filter(Boolean)}));
+ await page.setViewportSize({width:402,height:740});
+ await page.goto(base+'add-calendar.html');await page.waitForSelector('.event-card');
+ const firstLayout=await layoutOf();
  await page.goto(base+'diwali-only.html');await page.waitForSelector('.event-card');
- assert.equal(await page.locator('.event-card').count(),3);
- // Same events, but in the photo-on-top layout: every photo sits above its details.
- for(const card of await page.locator('.event-card').all()){
-  const photo=await card.locator('.event-photo').boundingBox(),body=await card.locator('.event-body').boundingBox();
-  assert(photo.y+photo.height<=body.y+1,'photo must sit above the details');
-  assert(photo.height>=60,`banner photo too short: ${photo.height}px`);
- }
- // Kids Diwali and Chopda Pujan stay changeable here too.
- await page.locator('input[value=kdc]').uncheck();await page.locator('#pujan-included').uncheck();
- assert.match(await page.locator('#selection-count').textContent(),/^3 events · 6 PM – 8 PM pujan included$/);
- await page.locator('input[value=kdc]').check();await page.locator('#pujan-included').check();
- await page.locator('.session-choice:has(input[value=morning])').click();
- assert(await page.locator('input[value=morning]').isChecked());
- await page.locator('.session-choice:has(input[value=evening])').click();
+ assert.deepEqual(await layoutOf(),firstLayout,'diwali-only must look exactly like add-calendar');
+ assert(!firstLayout.banner&&!firstLayout.sheets.includes('banner.css'),'neither main page uses the banner layout');
  assert(await page.locator('input[value=kdc]').isChecked()&&await page.locator('#pujan-included').isChecked()&&await page.locator('input[value=evening]').isChecked(),'everything selected by default');
- assert.deepEqual(await page.locator('.session span').allTextContents(),['4 PM – 6 PM','6 PM – 8 PM'],'sessions show full times only');
- const text=await download();assert.equal((text.match(/BEGIN:VEVENT/g)||[]).length,3);assert(text.includes('UID:kids'));assert(text.includes('UID:chopra-pujan'));
+ const text=await download();assert.equal((text.match(/BEGIN:VEVENT/g)||[]).length,3);
  assert.deepEqual(await chronological(page,'diwali-only'),['1031','1108','1110'],'second page order is Oct 31, Nov 8, 10');
- assert.equal(await page.locator('details').count(),0,'help must not be an inline disclosure');
+ await photosFill(page,'diwali-only');
+ await fits(page,'diwali-only');
+ await page.setViewportSize({width:390,height:844});
+ await page.screenshot({path:'/private/tmp/diwali-only.png',fullPage:true});
+
+ // Backup: the photo-on-top layout, kept for a page showing one or two events.
+ await page.goto(base+'diwali-only-banner.html');await page.waitForSelector('.event-card');
+ assert(await page.evaluate(()=>document.body.classList.contains('banner')),'backup uses the banner layout');
+ assert.equal(await page.locator('.event-card').count(),1);assert.equal(await page.locator('input').count(),0);
+ const photoBox=await page.locator('.event-photo').first().boundingBox(),detailBox=await page.locator('.event-body').first().boundingBox();
+ assert(photoBox.y+photoBox.height<=detailBox.y+1,'backup: photo above details');
+ assert.equal(await page.locator('#selection-count').textContent(),'1 event included');
+ assert(await page.locator('#clear').isHidden(),'nothing optional to clear');
+ const one=await download();assert.equal((one.match(/BEGIN:VEVENT/g)||[]).length,1,'backup downloads only what it shows');
+ assert(!one.includes('UID:kids')&&!one.includes('UID:chop'));
  await page.locator('#help').click();await page.waitForSelector('#help-sheet:not([hidden])');
  await covers(page,'#help-sheet','Help');
  await page.locator('#help-close').click();
- assert(await page.locator('#help-sheet').isHidden(),'help closes');
- await photosFill(page,'diwali-only');
- // Photo on top and still one screen: same promise as the first page.
- await fits(page,'diwali-only');
- for(const [label,width,height] of PHONES){
-  await page.setViewportSize({width,height});
-  // The shorter cards must not push the date label up under the checkbox.
-  const gaps=await page.evaluate(()=>[...document.querySelectorAll('.date-rail input')].map(i=>i.closest('.date-rail').querySelector('.date-labels').getBoundingClientRect().top-i.getBoundingClientRect().bottom));
-  assert(gaps.every(g=>g>=2),`date label overlaps its checkbox on ${label}: ${gaps}`);
- }
+ await photosFill(page,'diwali-only-banner');
+ await fits(page,'diwali-only-banner');
  await page.setViewportSize({width:390,height:844});
- await page.screenshot({path:'/private/tmp/diwali-only.png',fullPage:true});
+ await page.screenshot({path:'/private/tmp/diwali-only-banner.png',fullPage:true});
+ // Two cards still get banners; three or more fall back to the add-calendar layout.
+ // A fresh context with the service worker blocked, or the cached page would
+ // bypass the route and the rewritten data-cards would never load.
+ for(const [cards,banner] of [['kdc,dallas',true],['kdc,evening,dallas',false]]){
+  const ctx=await browser.newContext({viewport:{width:402,height:740},serviceWorkers:'block'});
+  const variant=await ctx.newPage();
+  await variant.route('**/diwali-only-banner.html',async route=>{
+   const res=await route.fetch();
+   await route.fulfill({response:res,body:(await res.text()).replace('data-cards="dallas"',`data-cards="${cards}"`)});
+  });
+  await variant.goto(base+'diwali-only-banner.html');await variant.waitForSelector('.event-card');
+  assert.equal(await variant.evaluate(()=>document.body.classList.contains('banner')),banner,`${cards}: banner should be ${banner}`);
+  if(!banner){
+   const cardsLayout=await variant.evaluate(()=>[...document.querySelectorAll('.event-card')].map(c=>{const r=c.getBoundingClientRect(),p=c.querySelector('.event-photo').getBoundingClientRect();
+    return [c.className,Math.round(r.height),Math.round(p.width),Math.round(p.height)].join('|');}));
+   // banner.css is fully scoped, so nothing of it may leak into this layout.
+   assert.deepEqual(cardsLayout,firstLayout.cards,'three cards on the backup render exactly like add-calendar');
+  }
+  await ctx.close();
+ }
  // The action buttons and the help steps must name the same calendar, so both
  // read the same detection. Exercise it with real user agents rather than
  // trusting that two separate branches happen to agree.
@@ -292,7 +315,7 @@ async function fits(page,name){
  }
  // A weight ceiling, so a future full-size asset cannot quietly land back in
  // the page. These are the measured figures plus headroom, not aspirations.
- for(const [name,dpr,ceiling] of [['add-calendar',3,800],['diwali-only',3,1200]]){
+ for(const [name,dpr,ceiling] of [['add-calendar',3,800],['diwali-only',3,800],['diwali-only-banner',3,1200]]){
   const ctx=await browser.newContext({viewport:{width:402,height:740},deviceScaleFactor:dpr,serviceWorkers:'block'});
   const weighed=await ctx.newPage();const seen=new Map();
   weighed.on('requestfinished',async req=>{try{seen.set(req.url(),(await (await req.response()).body()).length)}catch(e){}});

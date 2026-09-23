@@ -63,10 +63,21 @@ function sourceSet(base, extension, widths) {
   return widths.map(width => `${base}-${width}.${extension} ${width}w`).join(', ');
 }
 
-/* The side panel on add-calendar is ~92px wide whatever the viewport; on
-   diwali-only the photo is a banner across the full card. Telling the browser
-   the real display width is what lets it skip the large files. */
-const bannerLayout = document.body.dataset.layout === 'banner';
+/* Which cards this page shows. A page may narrow the list with data-cards;
+   the default is every event. */
+const cardIds = document.body.dataset.cards
+  ? document.body.dataset.cards.split(',').map(id => id.trim())
+  : ['kdc', 'evening', 'dallas'];
+
+/* The photo-on-top layout (banner.css) only works for one or two cards: with
+   three or more the banners get too thin, so the page keeps the add-calendar
+   layout instead. The class is what every banner.css rule is scoped to. */
+const bannerLayout = document.body.dataset.layout === 'banner' && cardIds.length <= 2;
+document.body.classList.toggle('banner', bannerLayout);
+
+/* The side panel on add-calendar is ~92px wide whatever the viewport; in the
+   banner layout the photo spans the full card. Telling the browser the real
+   display width is what lets it skip the large files. */
 const PHOTO_SIZES = bannerLayout ? '(max-width: 560px) 100vw, 538px' : '92px';
 
 function makePhoto(event) {
@@ -206,7 +217,6 @@ function makePujanCard() {
    calendar rather than as "the fixed ones, then the optional ones". The Chopda
    Pujan card stands in for both of its sessions, so it is keyed by the evening
    event — the two share a date, so either would sort to the same place. */
-const cardIds = ['kdc', 'evening', 'dallas'];
 const cards = cardIds
   .map(byId)
   .sort((a, b) => a.date.localeCompare(b.date))
@@ -214,7 +224,11 @@ const cards = cardIds
 document.getElementById('cards').append(...cards);
 
 const ids = () => optionalInputs.filter(input => input.checked && (input.type !== 'radio' || pujanIncluded.checked)).map(input => input.value);
-const downloadIds = () => ids().length ? ids() : ['kdc', 'evening'];
+// With nothing chosen, fall back to the default selection — limited to the
+// cards this page actually shows.
+const fallbackIds = ['kdc', 'evening'].filter(id => cardIds.includes(id));
+const downloadIds = () => ids().length ? ids() : fallbackIds;
+const plural = n => `${n} event${n === 1 ? '' : 's'}`;
 
 function updateSelection() {
   for (const input of optionalInputs) {
@@ -224,8 +238,10 @@ function updateSelection() {
   if (pujanIncluded) pujanIncluded.closest('.event-card').classList.toggle('selected', pujanIncluded.checked);
   const hasChoice = ids().length > 0;
   // The button names the calendar; the summary line above it carries the count.
-  document.getElementById('selection-count').textContent = hasChoice
-    ? `${selectedEvents(downloadIds()).length} events selected` : '3 events · 6 PM – 8 PM pujan included';
+  const count = selectedEvents(downloadIds()).length;
+  document.getElementById('selection-count').textContent = hasChoice ? `${plural(count)} selected`
+    : fallbackIds.includes('evening') ? `${plural(count)} · 6 PM – 8 PM pujan included`
+    : `${plural(count)} included`;
   document.getElementById('clear').hidden = !hasChoice;
   document.getElementById('download-status').textContent = '';
 }

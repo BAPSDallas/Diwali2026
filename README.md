@@ -106,6 +106,8 @@ Transparent logo produced with the built-in imagegen tool using the supplied log
 - Second QR: `Diwali_2026_Two_Events_QR.png` (unchanged).
 - `Diwali_Only_2026.ics` is no longer linked from either page; it is kept, holding just the Dallas Diwali & Annakut, for anyone with a direct link.
 
-Both pages show the same events from the same data and rendering. `diwali-only.html` adds `diwali-only.css` (flagged by `data-layout="banner"` on `<body>`) for photo-on-top cards; its details are packed tighter so all three still fit one screen down to 600px tall; below that it scrolls with the calendar bar pinned. The logo sits in a round glass badge, larger on the main page. For conflicting programmatic pujan inputs, the generator keeps the 4 PM session and excludes the 6 PM one; the UI uses a radio group to prevent the conflict.
+`add-calendar.html` and `diwali-only.html` are identical apart from their link-preview (`og:`) tags, and a test asserts they render the same. The logo sits in a round glass badge.
+
+Backup layout: `diwali-only-banner.html` keeps the photo-on-top cards (`banner.css`) for a page showing only one or two events. It is not behind any QR and is marked `noindex`. Choose its events with `data-cards` on `<body>` (currently `dallas`). The photo-on-top layout applies only for one or two cards; with three or more, `page.js` leaves the page in the `add-calendar.html` layout, since the banners get too thin. To use it for the second QR, copy its `<body>` attributes and the `banner.css` link into `diwali-only.html`. For conflicting programmatic pujan inputs, the generator keeps the 4 PM session and excludes the 6 PM one; the UI uses a radio group to prevent the conflict.
 
 Latest visual update: uniform compact card heights on the full page, and larger, clearer date accents. Session selectors are radio controls styled as a two-part choice; inclusion uses the same square checkbox as KDC.

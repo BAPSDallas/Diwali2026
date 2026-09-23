@@ -61,8 +61,8 @@ What you control is the *crop*, because the two panels are very different shapes
 
 | Page | Photo slot | Measured on an iPhone 17 Pro | Effect |
 | --- | --- | --- | --- |
-| `add-calendar.html` | Tall panel down the left of each card | 76 x 126, taller than wide | A landscape photo is cropped hard on the left and right; only the middle third survives |
-| `diwali-only.html` | Wide banner across the top of each card | 378 x 118, about 3.2:1 | A landscape photo is cropped top and bottom; roughly the middle half survives |
+| `add-calendar.html`, `diwali-only.html` | Tall panel down the left of each card | 76 x 126, taller than wide | A landscape photo is cropped hard on the left and right; only the middle third survives |
+| `diwali-only-banner.html` (backup, 1–2 events) | Wide banner across the top of each card | 378 x 118, about 3.2:1 | A landscape photo is cropped top and bottom; roughly the middle half survives |
 
 So: **keep the subject centred in the frame** and leave room around it. A face near an
 edge will be cut on one page or the other. Aim for under 1 MB per file for mobile
