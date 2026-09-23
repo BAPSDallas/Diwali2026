@@ -2,6 +2,7 @@
 
 ## 2026-09-23
 
+- Add a how-to slide in two variants (one per QR): Step 1 scan the QR, Step 2 tap Add to Calendar, with an arrow into the highlighted buttons on a real phone screenshot.
 - `diwali-only.html` now uses the `add-calendar.html` layout and looks identical to it; only its link-preview tags differ, so the second QR is unaffected.
 - Keep the photo-on-top layout as a backup, `diwali-only-banner.html` + `banner.css` (renamed from `diwali-only.css`), for one or two events; with three or more it falls back to the `add-calendar.html` layout.
 

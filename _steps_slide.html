@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>How to add the events — slide</title>
+<!-- 16:9 "how to" slide: Step 1 scan the QR, Step 2 tap Add to Calendar.
+     Render at 1920x1080 @2x (3840x2160), then decode the QR out of the PNG.
+     ?v=all uses the add-calendar.html QR; ?v=second the diwali-only.html one.
+     The phone is a real screenshot: assets/slides/phone-add-calendar.png. -->
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { position: relative; width: 1920px; height: 1080px; overflow: hidden;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    background: #fefaee;
+    background-image: radial-gradient(ellipse 85% 75% at 50% 38%, #fffdf7 0%, #fdf6e6 52%, #f7ead0 100%);
+    color: #4a2a10; }
+  /* Faint gold hairline frame, as on the other slides. */
+  body::before { content: ''; position: absolute; inset: 26px;
+    border: 2px solid rgba(184,134,46,.28); border-radius: 18px; pointer-events: none; }
+
+  header { position: absolute; top: 56px; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: center; gap: 34px; }
+  header img { height: 132px; width: auto; }
+  h1 { font-size: 92px; font-weight: 600; letter-spacing: .16em; color: #b8261c; line-height: 1; }
+  .sub { margin-top: 12px; font-size: 34px; font-weight: 600; letter-spacing: .04em; color: #8a6428; }
+
+  /* A step: big numbered disc, then an instruction that reads from the back row. */
+  .step { display: flex; align-items: center; gap: 26px; }
+  .num { flex: none; width: 112px; height: 112px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: #8c1d16; color: #fff6e6; font-size: 70px; font-weight: 800; line-height: 1;
+    box-shadow: 0 8px 20px rgba(92,12,6,.3), inset 0 0 0 5px #e9b04d; }
+  .say { font-size: 64px; font-weight: 800; line-height: 1.05; color: #7a160f; }
+  .hint { margin-top: 12px; font-size: 34px; font-weight: 600; line-height: 1.25; color: #6d4a20; }
+
+  main { position: absolute; left: 110px; right: 110px; top: 250px; bottom: 58px;
+    display: flex; align-items: stretch; justify-content: space-between; }
+  .col1 { display: flex; flex-direction: column; align-items: center; gap: 34px; }
+  .col2 { position: relative; flex: 1; }
+  .say { font-size: 58px; white-space: nowrap; }
+  #s2 .say { font-size: 54px; }
+
+  .qr-card { padding: 26px; border-radius: 30px;
+    background: #fff; border: 2px solid rgba(184,134,46,.35);
+    box-shadow: 0 18px 44px rgba(120,74,20,.18); }
+  .qr-card img { display: block; width: 480px; height: 480px; image-rendering: pixelated; }
+
+  /* Step 2 is placed by the script so its heading sits level with the phone's
+     calendar buttons and the arrow runs straight into them. */
+  #s2 { position: absolute; left: 20px; }
+  #s2-hint { position: absolute; left: 158px; white-space: nowrap; }
+  .arrow { position: absolute; overflow: visible; }
+
+  .phone { flex: none; align-self: flex-end; width: 431px; height: 772px;
+    padding: 13px; border-radius: 60px; background: #1b1210;
+    box-shadow: 0 24px 60px rgba(60,20,4,.35), inset 0 0 0 3px #3a2a24; }
+  .screen { position: relative; width: 100%; height: 100%; border-radius: 48px; overflow: hidden; }
+  .screen img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  /* Ring around both calendar buttons, from the screenshot's measured button
+     box (y 687–731 of a 740px-tall viewport). */
+  .ring { position: absolute; left: 1%; right: 1%; top: calc(100% * 680 / 740);
+    height: calc(100% * 58 / 740); border: 8px solid #f2b233; border-radius: 20px;
+    box-shadow: 0 0 0 5px rgba(140,29,22,.55), 0 0 30px 6px rgba(242,178,51,.9); }
+</style></head>
+<body>
+  <header>
+    <img src="assets/diwali-logo-transparent.png" alt="">
+    <div>
+      <h1>SAVE THE DATE</h1>
+      <div class="sub">Add BAPS Dallas Diwali 2026 events to your phone calendar</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="col1">
+      <div class="step" id="s1">
+        <div class="num">1</div>
+        <div><div class="say">Scan the QR code</div>
+          <div class="hint">Open your phone camera<br>and point it here</div></div>
+      </div>
+      <div class="qr-card"><img id="qr" alt=""></div>
+    </div>
+    <div class="col2" id="col2">
+      <div class="step" id="s2">
+        <div class="num">2</div>
+        <div class="say">Tap<br>Add to Calendar</div>
+      </div>
+      <div class="hint" id="s2-hint">then Add or Save. Done!</div>
+      <svg class="arrow" id="arrow" aria-hidden="true">
+        <defs><marker id="head" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="3.4" markerHeight="3.4" orient="auto">
+          <path d="M0 0 L10 5 L0 10 z" fill="#e9a21f"/></marker></defs>
+        <path id="arrow-path" fill="none" stroke="#e9a21f" stroke-width="16" stroke-linecap="round" marker-end="url(#head)"/>
+      </svg>
+    </div>
+    <div class="phone"><div class="screen">
+      <img src="assets/slides/phone-add-calendar.png" alt="">
+      <div class="ring" id="ring"></div>
+    </div></div>
+  </main>
+<script>
+const QR = { all: 'Diwali_Events_2026_Add_All_QR.png', second: 'Diwali_2026_Two_Events_QR.png' };
+document.getElementById('qr').src = QR[new URLSearchParams(location.search).get('v') || 'all'];
+/* Line the Step 2 heading up with the ring, then run the arrow from the heading
+   to the ring's left edge. Measured, so moving anything keeps them joined. */
+addEventListener('load', () => {
+  const col = document.getElementById('col2').getBoundingClientRect();
+  const ring = document.getElementById('ring').getBoundingClientRect();
+  const step = document.getElementById('s2');
+  const say = step.querySelector('.say');
+  const y = ring.top + ring.height / 2 - col.top;
+  // Heading, then hint, then the arrow — all stacked above the ring's line.
+  const hint = document.getElementById('s2-hint');
+  hint.style.top = `${y - hint.offsetHeight - 30}px`;
+  step.style.top = `${y - hint.offsetHeight - 30 - step.offsetHeight - 10}px`;
+  const x0 = step.offsetLeft + 150, x1 = ring.left - col.left - 40;
+  // Nothing in the middle column may run under the phone.
+  const phone = document.querySelector('.phone').getBoundingClientRect();
+  for (const el of [step, hint]) if (el.getBoundingClientRect().right > phone.left - 16) throw new Error(`${el.id} runs under the phone`);
+  const arrow = document.getElementById('arrow');
+  Object.assign(arrow.style, { left: '0px', top: '0px', width: `${col.width}px`, height: `${col.height}px` });
+  document.getElementById('arrow-path').setAttribute('d', `M${x0} ${y} L${x1} ${y}`);
+});
+</script>
+</body></html>
