@@ -443,8 +443,10 @@ h2 {
 /* Chopda Pujan's two sessions stack as rows: "6:30 PM – 7:30 PM" is too wide
    for side-by-side segments on a phone. The session name is a small caps
    label; the time is what reads first. */
-.pujan-card .session-toggle { flex-direction: column; gap: 4px; max-width: calc(100% - 92px); }
-.pujan-card .session { min-height: 0; padding: 3px 8px; gap: 0; align-items: flex-start; }
+/* Sized to its text like the other time badges, not stretched across the
+   card; both rows take the width of the wider one. */
+.pujan-card .session-toggle { flex-direction: column; gap: 4px; align-self: flex-start; width: max-content; max-width: calc(100% - 92px); }
+.pujan-card .session { min-height: 0; padding: 3px 11px; gap: 0; align-items: flex-start; }
 .pujan-card .session strong {
   font-size: 7.5px;
   font-weight: 700;
@@ -453,7 +455,7 @@ h2 {
   line-height: 1.15;
   opacity: .8;
 }
-.pujan-card .session span { font-size: 12.5px; font-weight: 800; line-height: 1.15; }
+.pujan-card .session span { font-size: 11.5px; font-weight: 800; line-height: 1.15; }
 
 /* "Sharda (Chopda) Pujan · Dallas" is the longest title; below 390px it steps
    down so it still fits on one line. */
@@ -779,7 +781,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   /* The full "4 PM – 6 PM" has to fit a half-width segment on the narrowest phones. */
   .session span { font-size: 9px; letter-spacing: -.01em; }
   .pujan-card .session span { font-size: 11px; }
-  .pujan-card .session { padding: 3px 6px; }
+  .pujan-card .session { padding: 3px 8px; }
   /* "SATURDAY · OCT" is the widest label and has to fit the narrow rail too. */
   .date-labels { font-size: 7px; letter-spacing: 0; padding: 2px 5px; }
   .event-time { padding: 4px 8px; font-size: 11.5px; }
