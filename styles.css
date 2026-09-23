@@ -152,26 +152,6 @@ label.event-card,
   box-shadow: 0 10px 28px rgba(52, 6, 2, .3), inset 0 0 0 1px rgba(var(--accent-rgb), .45), inset 0 1px 0 rgba(255, 255, 255, .6);
 }
 
-/* Frisco is the one celebration away from the Irving mandir, and it shares its
-   name with the Dallas one, so colour is what tells the two apart at a glance.
-   It takes the complementary half of the festival palette — peacock teal, a
-   traditional partner to this maroon — rather than a second shade of red,
-   which would read as a variation rather than a different place. */
-.venue-frisco {
-  --accent: #0c5b56;
-  --accent-rgb: 12, 91, 86;
-  --accent-label: #0a4a46;
-  --accent-shadow: rgba(4, 46, 44, .35);
-  /* Restating the glass tokens re-tints the card itself, since .event-card
-     paints background and border from them. */
-  /* Held more opaque than the cream cards: a teal wash thin enough to let the
-     maroon backdrop through turns olive rather than mint. */
-  --glass: linear-gradient(150deg, rgba(232, 253, 249, .93), rgba(180, 231, 224, .88));
-  --glass-edge: rgba(12, 91, 86, .34);
-}
-
-.venue-frisco .badge { color: var(--accent); }
-
 .event-card:focus-within { outline: 3px solid #f2c46a; outline-offset: 2px; }
 
 .event-photo {
@@ -271,7 +251,7 @@ h2 {
 }
 
 /* The time reads as a badge, matching the Chopda Pujan session segments so the
-   four cards share one visual language whether the time is fixed or chosen. */
+   the cards share one visual language whether the time is fixed or chosen. */
 /* A fixed time is an already-chosen time, so it wears the same filled badge the
    selected Chopda Pujan session does — same fill, height and radius. */
 .event-time {

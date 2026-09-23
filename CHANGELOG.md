@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-22
+
+- Remove the Frisco Diwali & Annakut from both pages, the calendar files and the Google Calendar list; drop its teal accent and photo derivatives.
+- Move both Chopda Pujan sessions to the evening: 4–6 PM (early) and 6–8 PM (late, default). UIDs unchanged, SEQUENCE bumped so imported copies update.
+- Change the Dallas Diwali & Annakut to 12 PM–8 PM.
+- QR codes, slides and page URLs unchanged.
+
 ## 2026-09-20
 
 - Bring calendar project into BAPSDallas/Diwali2026 with supplied Diwali branding.

@@ -19,7 +19,7 @@ function titleNode(event) {
             element('span', 'title-city', `· ${cities[event.venue]}`));
   return h2;
 }
-const subtitleOf = event => event.subtitle.replace(/ · (?:Dallas|Frisco) TX$/, '');
+const subtitleOf = event => event.subtitle.replace(/ · Dallas TX$/, '');
 
 function element(tag, className, text) {
   const node = document.createElement(tag);
@@ -38,7 +38,7 @@ function railParts(event) {
   };
 }
 
-/* "9 AM – 11 AM" -> "9–11 AM" so the session segments can run larger type. */
+/* "4 PM – 6 PM" -> "4–6 PM" so the session segments can run larger type. */
 const compactTime = label => label.replace(/(\d+) (AM|PM) – (\d+) \2/, '$1–$3 $2');
 
 /* Drop only the mandir name; street, city, state and ZIP all stay. Street and
@@ -68,8 +68,8 @@ function sourceSet(base, extension, widths) {
 }
 
 /* The narrow card panel is ~92px wide whatever the viewport; the banner on the
-   two-event page runs the full card. Telling the browser the real display width
-   is what lets it skip the large files on the four-card page. */
+   Diwali-only page runs the full card. Telling the browser the real display width
+   is what lets it skip the large files on the all-events page. */
 const PHOTO_SIZES = diwaliOnly ? '(max-width: 560px) 100vw, 538px' : '92px';
 
 function makePhoto(event) {
@@ -149,6 +149,11 @@ function makeCard(event, selectable = false) {
   return card;
 }
 
+/* Both sessions are in the evening, so they are told apart as early and late.
+   The ids stay 'morning' and 'evening' so the UIDs, and any copy a visitor has
+   already imported, carry over. */
+const sessionName = id => id === 'evening' ? 'Late' : 'Early';
+
 /* The Chopda Pujan card keeps the shared silhouette; the time line becomes a
    two-segment session picker so the card stays the same height as the others. */
 function makePujanCard() {
@@ -175,19 +180,19 @@ function makePujanCard() {
     input.name = 'pujan';
     input.value = id;
     input.checked = id === 'evening';
-    input.setAttribute('aria-label', `${id === 'evening' ? 'Evening' : 'Morning'} Chopda Pujan, ${event.timeLabel}`);
+    input.setAttribute('aria-label', `${sessionName(id)} Chopda Pujan session, ${event.timeLabel}`);
     input.addEventListener('change', () => { pujanIncluded.checked = true; updateSelection(); });
     optionalInputs.push(input);
     sessions.push(input);
-    choice.append(input, element('strong', '', id === 'evening' ? 'Evening' : 'Morning'), element('span', '', compactTime(event.timeLabel)));
+    choice.append(input, element('strong', '', sessionName(id)), element('span', '', compactTime(event.timeLabel)));
     toggle.append(choice);
   }
 
   card.querySelector('.event-time').replaceWith(toggle);
 
   /* Tapping anywhere else on the card includes or removes Chopda Pujan, the way
-     the Kids Diwali card behaves. An already-chosen session is kept; evening is
-     the fallback. Taps on the session toggle or the checkbox handle themselves. */
+     the Kids Diwali card behaves. An already-chosen session is kept; the late
+     session is the fallback. Taps on the session toggle or the checkbox handle themselves. */
   card.addEventListener('click', event => {
     if (event.target === pujanIncluded || event.target.closest('.session-toggle')) return;
     pujanIncluded.checked = !pujanIncluded.checked;
@@ -204,7 +209,7 @@ function makePujanCard() {
    calendar rather than as "the fixed ones, then the optional ones". The Chopda
    Pujan card stands in for both of its sessions, so it is keyed by the evening
    event — the two share a date, so either would sort to the same place. */
-const cardIds = diwaliOnly ? ['dallas', 'frisco'] : ['kdc', 'evening', 'dallas', 'frisco'];
+const cardIds = diwaliOnly ? ['dallas'] : ['kdc', 'evening', 'dallas'];
 const cards = cardIds
   .map(byId)
   .sort((a, b) => a.date.localeCompare(b.date))
@@ -223,8 +228,8 @@ function updateSelection() {
   const hasChoice = ids().length > 0;
   // The button names the calendar; the summary line above it carries the count.
   document.getElementById('selection-count').textContent = diwaliOnly
-    ? '2 events included'
-    : hasChoice ? `${selectedEvents(downloadIds()).length} events selected` : '4 events · evening pujan included';
+    ? '1 event included'
+    : hasChoice ? `${selectedEvents(downloadIds()).length} events selected` : '3 events · 6–8 PM pujan included';
   const clear = document.getElementById('clear');
   if (clear) clear.hidden = !hasChoice;
   document.getElementById('download-status').textContent = '';

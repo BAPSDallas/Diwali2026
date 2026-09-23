@@ -32,14 +32,14 @@ before.
 
 | Event | Date | Time | Included |
 | --- | --- | --- | --- |
-| Diwali & Annakut (Nutan Varsh), Dallas | Tue, November 10 | 11 AM – 8 PM | Always |
-| Diwali & Annakut (Nutan Varsh), Frisco | Sat, November 14 | 11 AM – 8 PM | Always |
+| Diwali & Annakut (Nutan Varsh), Dallas | Tue, November 10 | 12 PM – 8 PM | Always |
 | Kids Diwali Celebration (KDC), Dallas | Sat, October 31 | 10 AM – 6 PM | Optional |
-| Chopda Pujan (Morning), Dallas | Sun, November 8 | 9 – 11 AM | Optional, provisional time |
-| Chopda Pujan (Evening), Dallas | Sun, November 8 | 5 – 7 PM | Optional, selected by default |
+| Chopda Pujan (4 PM Session), Dallas | Sun, November 8 | 4 – 6 PM | Optional |
+| Chopda Pujan (6 PM Session), Dallas | Sun, November 8 | 6 – 8 PM | Optional, selected by default |
+
+The Frisco Diwali & Annakut was removed on 2026-09-22.
 
 Dallas: BAPS Shri Swaminarayan Mandir, 4601 N State Hwy 161, Irving, TX 75038.
-Frisco: BAPS Shri Swaminarayan Mandir, 9190 Sam Rayburn Tollway S, Frisco, TX 75035.
 
 ## Files
 

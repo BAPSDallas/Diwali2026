@@ -77,7 +77,7 @@ async function fits(page,name){
  assert.equal(await page.locator('#download-label').textContent(),'Add to Apple Calendar');
  assert(await page.locator('#pujan-included').isChecked());
  assert(await page.locator('input[value=evening]').isChecked());
- const initial=await download();assert.equal((initial.match(/BEGIN:VEVENT/g)||[]).length,3);
+ const initial=await download();assert.equal((initial.match(/BEGIN:VEVENT/g)||[]).length,2);
  assert.deepEqual(await page.locator('input[name=pujan]').evaluateAll(nodes=>nodes.map(n=>n.value)),['morning','evening']);
  for(const session of [null,'evening','morning']) for(const kids of [false,true]){
   if(await page.locator('#clear').isVisible()) await page.locator('#clear').click();
@@ -85,9 +85,9 @@ async function fits(page,name){
   if(kids)await page.locator('input[value=kdc]').check();
   const hasChoice=Boolean(session||kids);
   assert.equal(await page.locator('#download-label').textContent(),'Add to Apple Calendar');
-  assert.match(await page.locator('#selection-count').textContent(),hasChoice?/^\d+ events selected$/:/^4 events · evening pujan included$/);
+  assert.match(await page.locator('#selection-count').textContent(),hasChoice?/^\d+ events selected$/:/^3 events · 6–8 PM pujan included$/);
   const text=await download();
-  assert.equal((text.match(/BEGIN:VEVENT/g)||[]).length,hasChoice?2+Number(Boolean(session))+Number(kids):4);
+  assert.equal((text.match(/BEGIN:VEVENT/g)||[]).length,hasChoice?1+Number(Boolean(session))+Number(kids):3);
   assert.equal(text.includes('UID:chopda-pujan-morning'),session==='morning');
   assert.equal(text.includes('UID:chopra-pujan'),session==='evening'||!hasChoice);
   assert.equal(text.includes('UID:kids-diwali'),kids||!hasChoice);
@@ -98,12 +98,12 @@ async function fits(page,name){
  // Tapping the pujan card body includes/removes it like the KDC card, keeping any chosen session.
  const pujan=async()=>({i:await page.locator('#pujan-included').isChecked(),m:await page.locator('input[value=morning]').isChecked()});
  await page.locator('#pujan-included').check();
- await page.locator('.pujan-card h2').click();assert.deepEqual(await pujan(),{i:false,m:true},'card tap removes, morning kept');
- await page.locator('.pujan-card .address').click();assert.deepEqual(await pujan(),{i:true,m:true},'card tap restores morning');
+ await page.locator('.pujan-card h2').click();assert.deepEqual(await pujan(),{i:false,m:true},'card tap removes, early session kept');
+ await page.locator('.pujan-card .address').click();assert.deepEqual(await pujan(),{i:true,m:true},'card tap restores the early session');
  await page.locator('.session-choice:has(input[value=evening])').click();
  assert.deepEqual(await pujan(),{i:true,m:false},'session tap must not toggle the card');
  await page.locator('.pujan-card h2').click();await page.locator('.pujan-card h2').click();
- assert(await page.locator('input[value=evening]').isChecked(),'evening is the fallback session');
+ assert(await page.locator('input[value=evening]').isChecked(),'the late session is the fallback');
  const selected=Number(((await page.locator('#selection-count').textContent()).match(/^(\d+)/)||[])[1]);
  assert(selected>0,'expected a non-zero selection count');
  for(const width of [320,390,778,1280]){
@@ -204,23 +204,9 @@ async function fits(page,name){
  });
  assert.equal(badges.fixed,badges.selected,'fixed time must match a selected session badge');
  assert.notEqual(badges.fixed,badges.unselected,'selected and unselected must stay distinguishable');
- // Frisco is meant to read as a different place, not a variation of Dallas, so
- // its accent has to actually resolve to a different colour on every surface
- // that carries one. A typo in the token block would silently fall back to red.
- const accents=await page.evaluate(()=>{
-  const read=venue=>{const card=document.querySelector(`.venue-${venue}`),s=getComputedStyle(card);
-   return {time:getComputedStyle(card.querySelector('.event-time')||card.querySelector('.session.selected')).backgroundColor,
-           rail:getComputedStyle(card.querySelector('.date-rail')).color,
-           label:getComputedStyle(card.querySelector('.date-labels')).color,
-           surface:s.backgroundImage,border:s.borderTopColor};};
-  return {dallas:read('dallas'),frisco:read('frisco')};
- });
- for(const key of ['time','rail','label','surface','border']){
-  assert.notEqual(accents.frisco[key],accents.dallas[key],`Frisco must differ from Dallas in ${key}`);
- }
- assert.equal(await page.locator('.venue-frisco').count(),1,'exactly one Frisco card');
+ assert.equal(await page.locator('.venue-frisco').count(),0,'Frisco is no longer an event');
  for(const title of await page.locator('h2').allTextContents()){
-  assert(/·\s*(Dallas|Frisco)$/.test(title.replace(/\s+/g,' ').trim()),`title missing its city: "${title}"`);
+  assert(/·\s*Dallas$/.test(title.replace(/\s+/g,' ').trim()),`title missing its city: "${title}"`);
  }
  // The logo sits in a fixed-height pill; a wrapper that breaks the percentage
  // height chain lets it overflow at intrinsic size, which looks like a crop.
@@ -232,18 +218,18 @@ async function fits(page,name){
  });
  assert(logo.fits,`logo overflows its pill: ${logo.img}px in ${logo.hero}px`);
  const order=await chronological(page,'add-calendar');
- assert.deepEqual(order,['1031','1108','1110','1114'],'all-events order is Oct 31, Nov 8, 10, 14');
+ assert.deepEqual(order,['1031','1108','1110'],'all-events order is Oct 31, Nov 8, 10');
  await photosFill(page,'add-calendar');
  await fits(page,'add-calendar');
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:'/private/tmp/diwali-new.png',fullPage:true});
  await page.goto(base+'diwali-only.html');await page.waitForSelector('.event-card');
- assert.equal(await page.locator('.event-card').count(),2);assert.equal(await page.locator('input').count(),0);
+ assert.equal(await page.locator('.event-card').count(),1);assert.equal(await page.locator('input').count(),0);
  const photoBox=await page.locator('.event-photo').first().boundingBox();
  const detailBox=await page.locator('.event-body').first().boundingBox();
  assert(photoBox.y+photoBox.height<=detailBox.y+1);
  assert(await page.locator('.event-photo img').evaluateAll(images=>images.every(i=>i.complete&&i.naturalWidth>0)));
- const text=await download();assert.equal((text.match(/BEGIN:VEVENT/g)||[]).length,2);assert(!text.includes('UID:kids'));assert(!text.includes('UID:chop'));
- assert.deepEqual(await chronological(page,'diwali-only'),['1110','1114'],'diwali-only order is Nov 10 then 14');
+ const text=await download();assert.equal((text.match(/BEGIN:VEVENT/g)||[]).length,1);assert(!text.includes('UID:kids'));assert(!text.includes('UID:chop'));
+ assert.deepEqual(await chronological(page,'diwali-only'),['1110'],'diwali-only shows only Nov 10');
  assert.equal(await page.locator('details').count(),0,'help must not be an inline disclosure');
  await page.locator('#help').click();await page.waitForSelector('#help-sheet:not([hidden])');
  await covers(page,'#help-sheet','Help');

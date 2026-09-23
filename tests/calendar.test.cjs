@@ -10,8 +10,8 @@ for (let mask = 0; mask < 8; mask++) {
     const ids = raw.includes('morning') ? raw.filter(id => id !== 'evening') : raw;
     const calendar = buildCalendar(ids);
     const text = unfold(calendar);
-    assert.equal((text.match(/BEGIN:VEVENT/g) || []).length, 2 + ids.length);
-    assert.equal((text.match(/BEGIN:VALARM/g) || []).length, 2 * (2 + ids.length));
+    assert.equal((text.match(/BEGIN:VEVENT/g) || []).length, 1 + ids.length);
+    assert.equal((text.match(/BEGIN:VALARM/g) || []).length, 2 * (1 + ids.length));
     for (const event of events) {
       assert.equal(text.includes(`UID:${event.uid}\r\n`), event.required || ids.includes(event.id));
     }
@@ -19,22 +19,23 @@ for (let mask = 0; mask < 8; mask++) {
     assert(calendar.split('\r\n').every(line => Buffer.byteLength(line) <= 75));
   });
 }
-test('all five events have exact requested times, titles, locations and description', () => {
+test('all four events have exact requested times, titles, locations and description', () => {
   const text = unfold(buildCalendar(['kdc','morning'])) + unfold(buildCalendar(['evening']));
-  const expected = [['dallas','20261110','110000','200000'], ['frisco','20261114','110000','200000'], ['kdc','20261031','100000','180000'], ['morning','20261108','090000','110000'], ['evening','20261108','170000','190000']];
+  const expected = [['dallas','20261110','120000','200000'], ['kdc','20261031','100000','180000'], ['morning','20261108','160000','180000'], ['evening','20261108','180000','200000']];
   for (const [id, date, start, end] of expected) {
     const event = events.find(e => e.id === id);
     const block = text.split('BEGIN:VEVENT\r\n').find(b => b.startsWith(`UID:${event.uid}\r\n`));
     assert(block.includes(`DTSTART;TZID=America/Chicago:${date}T${start}\r\n`));
     assert(block.includes(`DTEND;TZID=America/Chicago:${date}T${end}\r\n`));
-    assert(block.includes(id === 'frisco' ? 'Frisco TX' : 'Dallas TX'));
-    assert(block.includes(id === 'frisco' ? '9190 Sam Rayburn Tollway S' : '4601 N State Hwy 161'));
+    assert(block.includes('Dallas TX'));
+    assert(block.includes('4601 N State Hwy 161'));
     assert(block.includes('DESCRIPTION:https://www.baps.org/dallas\r\n'));
     for (const days of [7, 1]) assert(block.includes(`TRIGGER:-P${days}D\r\n`));
   }
-  assert.equal(new Set(events.map(e => e.uid)).size, 5);
+  assert.equal(new Set(events.map(e => e.uid)).size, 4);
   assert(!text.includes('SUMMARY:Chopra'));
   assert(!text.includes('VALUE=DATE'));
+  assert(!/frisco/i.test(text), 'Frisco is no longer an event');
   assert.equal(fs.readFileSync('Diwali_Events_Dallas_Frisco_2026.ics', 'utf8'), buildCalendar(['kdc','evening']));
   assert.equal(fs.readFileSync('Diwali_Only_2026.ics', 'utf8'), buildCalendar([]));
 });
@@ -123,5 +124,5 @@ test('conflicting pujan input never includes both sessions', () => {
  const text=buildCalendar(['morning','evening','kdc']);
  assert(text.includes('UID:chopda-pujan-morning'));
  assert(!text.includes('UID:chopra-pujan'));
- assert.equal((text.match(/BEGIN:VEVENT/g)||[]).length,4);
+ assert.equal((text.match(/BEGIN:VEVENT/g)||[]).length,3);
 });

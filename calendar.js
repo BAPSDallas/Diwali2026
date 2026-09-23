@@ -1,18 +1,15 @@
 (function (root) {
   'use strict';
   const addresses = {
-    dallas: 'BAPS Shri Swaminarayan Mandir, 4601 N State Hwy 161, Irving, TX 75038',
-    frisco: 'BAPS Shri Swaminarayan Mandir, 9190 Sam Rayburn Tollway S, Frisco, TX 75035'
+    dallas: 'BAPS Shri Swaminarayan Mandir, 4601 N State Hwy 161, Irving, TX 75038'
   };
-  // Short city label per venue, used in every displayed title. Two events share
-  // the name "Diwali & Annakut", so the city is what tells them apart.
-  const cities = { dallas: 'Dallas', frisco: 'Frisco' };
+  // Short city label per venue, used in every displayed title.
+  const cities = { dallas: 'Dallas' };
   const events = [
     { id: 'kdc', uid: 'kids-diwali-kdc-2026@krupesh9.github.io', title: 'Kids Diwali Celebration (KDC) 2026, Dallas TX', name: 'Kids Diwali', subtitle: 'Kids Diwali Celebration (KDC) · Dallas TX', date: '20261031', start: '100000', end: '180000', dateLabel: 'Saturday, October 31', timeLabel: '10 AM – 6 PM', venue: 'dallas', required: false, image: 'assets/events/kids-diwali.png' },
-    { id: 'morning', uid: 'chopda-pujan-morning-dallas-2026@bapsdallas.github.io', title: 'Chopda Pujan (Morning) 2026, Dallas TX', name: 'Chopda Pujan', subtitle: 'Sharda & Chopda Pujan · Dallas TX', date: '20261108', start: '090000', end: '110000', dateLabel: 'Sunday, November 8', timeLabel: '9 AM – 11 AM', tentative: true, venue: 'dallas', required: false, image: 'assets/events/chopda-pujan.png' },
-    { id: 'evening', uid: 'chopra-pujan-dallas-2026@krupesh9.github.io', title: 'Chopda Pujan (Evening) 2026, Dallas TX', name: 'Chopda Pujan', subtitle: 'Sharda & Chopda Pujan · Dallas TX', date: '20261108', start: '170000', end: '190000', dateLabel: 'Sunday, November 8', timeLabel: '5 PM – 7 PM', venue: 'dallas', required: false, image: 'assets/events/chopda-pujan.png' },
-    { id: 'dallas', uid: 'annakut-dallas-2026@krupesh9.github.io', title: 'Diwali & Annakut (Nutan Varsh) 2026, Dallas TX', name: 'Diwali & Annakut', subtitle: 'Nutan Varsh · Dallas TX', date: '20261110', start: '110000', end: '200000', dateLabel: 'Tuesday, November 10', timeLabel: '11 AM – 8 PM', venue: 'dallas', required: true, image: 'assets/events/dallas.png' },
-    { id: 'frisco', uid: 'annakut-frisco-2026@krupesh9.github.io', title: 'Diwali & Annakut (Nutan Varsh) 2026, Frisco TX', name: 'Diwali & Annakut', subtitle: 'Nutan Varsh · Frisco TX', date: '20261114', start: '110000', end: '200000', dateLabel: 'Saturday, November 14', timeLabel: '11 AM – 8 PM', venue: 'frisco', required: true, image: 'assets/events/frisco.png' }
+    { id: 'morning', uid: 'chopda-pujan-morning-dallas-2026@bapsdallas.github.io', title: 'Chopda Pujan (4 PM Session) 2026, Dallas TX', name: 'Chopda Pujan', subtitle: 'Sharda & Chopda Pujan · Dallas TX', date: '20261108', start: '160000', end: '180000', dateLabel: 'Sunday, November 8', timeLabel: '4 PM – 6 PM', venue: 'dallas', required: false, image: 'assets/events/chopda-pujan.png' },
+    { id: 'evening', uid: 'chopra-pujan-dallas-2026@krupesh9.github.io', title: 'Chopda Pujan (6 PM Session) 2026, Dallas TX', name: 'Chopda Pujan', subtitle: 'Sharda & Chopda Pujan · Dallas TX', date: '20261108', start: '180000', end: '200000', dateLabel: 'Sunday, November 8', timeLabel: '6 PM – 8 PM', venue: 'dallas', required: false, image: 'assets/events/chopda-pujan.png' },
+    { id: 'dallas', uid: 'annakut-dallas-2026@krupesh9.github.io', title: 'Diwali & Annakut (Nutan Varsh) 2026, Dallas TX', name: 'Diwali & Annakut', subtitle: 'Nutan Varsh · Dallas TX', date: '20261110', start: '120000', end: '200000', dateLabel: 'Tuesday, November 10', timeLabel: '12 PM – 8 PM', venue: 'dallas', required: true, image: 'assets/events/dallas.png' }
   ];
   const TZID = 'America/Chicago';
   const timezone = ['BEGIN:VTIMEZONE', `TZID:${TZID}`, 'BEGIN:DAYLIGHT', 'DTSTART:19700308T020000', 'TZOFFSETFROM:-0600', 'TZOFFSETTO:-0500', 'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU', 'END:DAYLIGHT', 'BEGIN:STANDARD', 'DTSTART:19701101T020000', 'TZOFFSETFROM:-0500', 'TZOFFSETTO:-0600', 'RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU', 'END:STANDARD', 'END:VTIMEZONE'];
@@ -27,14 +24,14 @@
     return result;
   }
   function selectedEvents(ids = []) {
-    // Morning wins for conflicting programmatic input; the UI permits only one session.
+    // The earlier session wins for conflicting programmatic input; the UI permits only one.
     const chosen = ids.includes('morning') ? ids.filter(id => id !== 'evening') : ids;
     return events.filter(event => event.required || chosen.includes(event.id));
   }
   function buildCalendar(ids = []) {
     const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//BAPS Dallas//Diwali 2026//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', ...timezone];
     for (const event of selectedEvents(ids)) {
-      lines.push('BEGIN:VEVENT', `UID:${event.uid}`, 'DTSTAMP:20260920T180000Z', 'SEQUENCE:1', `SUMMARY:${escapeText(event.title)}`, `DTSTART;TZID=${TZID}:${event.date}T${event.start}`, `DTEND;TZID=${TZID}:${event.date}T${event.end}`, `LOCATION:${escapeText(addresses[event.venue])}`, 'DESCRIPTION:https://www.baps.org/dallas', 'URL:https://www.baps.org/dallas');
+      lines.push('BEGIN:VEVENT', `UID:${event.uid}`, 'DTSTAMP:20260922T180000Z', 'SEQUENCE:2', `SUMMARY:${escapeText(event.title)}`, `DTSTART;TZID=${TZID}:${event.date}T${event.start}`, `DTEND;TZID=${TZID}:${event.date}T${event.end}`, `LOCATION:${escapeText(addresses[event.venue])}`, 'DESCRIPTION:https://www.baps.org/dallas', 'URL:https://www.baps.org/dallas');
       for (const days of [7, 1]) lines.push('BEGIN:VALARM', `TRIGGER:-P${days}D`, 'ACTION:DISPLAY', 'DESCRIPTION:Event reminder', 'END:VALARM');
       lines.push('END:VEVENT');
     }

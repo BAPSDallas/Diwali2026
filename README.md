@@ -1,6 +1,6 @@
 # Diwali 2026 Calendar
 
-Mobile-first BAPS Dallas and Frisco event selection page. Two Annakut celebrations are always included. Kids Diwali is optional. Chopda Pujan offers mutually exclusive evening/morning sessions in one row. A single calendar button adapts to the choices.
+Mobile-first BAPS Dallas event selection page. The Diwali & Annakut celebration is always included. Kids Diwali is optional. Chopda Pujan offers two mutually exclusive evening sessions (early 4–6 PM, late 6–8 PM) in one row. A single calendar button adapts to the choices.
 
 ## Site and publishing
 
@@ -18,11 +18,12 @@ All dates are in 2026 and times are America/Chicago. Event dates are retained fr
 
 | Event | Date | Time | Included |
 | --- | --- | --- | --- |
-| Diwali & Annakut (Nutan Varsh), Dallas TX | November 10 | 11 AM–8 PM | Always |
-| Diwali & Annakut (Nutan Varsh), Frisco TX | November 14 | 11 AM–8 PM | Always |
+| Diwali & Annakut (Nutan Varsh), Dallas TX | November 10 | 12 PM–8 PM | Always |
 | Kids Diwali Celebration (KDC), Dallas TX | October 31 | 10 AM–6 PM | Optional |
-| Chopda Pujan (Morning), Dallas TX | November 8 | 9–11 AM, provisional | Optional |
-| Chopda Pujan (Evening), Dallas TX | November 8 | 5–7 PM | Optional |
+| Chopda Pujan (4 PM Session), Dallas TX | November 8 | 4–6 PM | Optional |
+| Chopda Pujan (6 PM Session), Dallas TX | November 8 | 6–8 PM | Optional, selected by default |
+
+The Frisco Diwali & Annakut (November 14) was removed on 2026-09-22. The file name `Diwali_Events_Dallas_Frisco_2026.ics` is kept so existing links keep working. Internally the two Chopda sessions keep the ids `morning` and `evening` so their UIDs carry over and already-imported copies update in place (`SEQUENCE` is 2).
 
 Every event includes its full address, a description containing only `https://www.baps.org/dallas`, and reminders one week and one day beforehand.
 
@@ -34,11 +35,9 @@ Android gets a list of per-event Google Calendar links instead, because Google C
 
 iPhones and iPads see a single **Add to Apple Calendar** button; Android sees **Add to Google Calendar**. Where the device cannot be identified — desktop, in-app browsers — both are shown, since hiding the wrong one there would leave someone with no way to add anything. iPadOS reports itself as a Mac, so iPad detection combines the platform string with `maxTouchPoints`.
 
-Every displayed title carries its city — `Diwali & Annakut · Dallas` and `Diwali & Annakut · Frisco` — because the two share a name and are otherwise indistinguishable, both on the cards and in the Google Calendar list.
+Every displayed title carries its city, e.g. `Diwali & Annakut · Dallas`, on the cards and in the Google Calendar list.
 
 Dallas events: BAPS Shri Swaminarayan Mandir, 4601 N State Hwy 161, Irving, TX 75038. This matches the address on the official [BAPS Dallas site](https://www.baps.org/Dallas).
-
-Frisco: BAPS Shri Swaminarayan Mandir, 9190 Sam Rayburn Tollway S, Frisco, TX 75035, retained from the supplied event file; organizer confirmation remains recommended.
 
 ## Editing
 
@@ -90,7 +89,7 @@ The button downloads a local `.ics` file and never opens a subscription URL. Act
 ## Before final distribution
 
 - Confirm the provisional morning Chopda Pujan time.
-- Supply event photos and confirm the Frisco address.
+- Supply event photos.
 - Verify the deployed QR destination and test calendar import on real devices.
 
 ## Compact page revision
@@ -105,8 +104,8 @@ Transparent logo produced with the built-in imagegen tool using the supplied log
 - Full-page QR: `Diwali_Events_2026_Add_All_QR.png` (unchanged destination).
 - Diwali-only page: https://bapsdallas.github.io/Diwali2026/diwali-only.html
 - Diwali-only QR: `Diwali_2026_Two_Events_QR.png`.
-- Diwali-only calendar: `Diwali_Only_2026.ics` (exactly Dallas and Frisco).
+- Diwali-only calendar: `Diwali_Only_2026.ics` (the Dallas Diwali & Annakut only).
 
-The two-event page uses photo-on-top cards via `diwali-only.css`, while the full page has edge-to-edge photos, faded date accents, and stronger glass styling. Both use shared event data and rendering. For conflicting programmatic pujan inputs, the generator keeps morning and excludes evening; the UI uses a radio group to prevent the conflict.
+The two-event page uses photo-on-top cards via `diwali-only.css`, while the full page has edge-to-edge photos, faded date accents, and stronger glass styling. Both use shared event data and rendering. For conflicting programmatic pujan inputs, the generator keeps the 4 PM session and excludes the 6 PM one; the UI uses a radio group to prevent the conflict.
 
 Latest visual update: uniform compact card heights on the full page, larger and clearer date accents on both pages, and photo-first cards on the Diwali-only page. Session selectors are radio controls styled as a two-part choice; inclusion uses the same square checkbox as KDC.

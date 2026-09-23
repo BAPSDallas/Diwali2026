@@ -1,12 +1,11 @@
 # Replace event photos
 
-Both pages load the same four files. No HTML or JavaScript editing is needed.
+Both pages load the same three files. No HTML or JavaScript editing is needed.
 
 | File in `assets/events/` | Appears on |
 | --- | --- |
 | `dallas.png` | Dallas Diwali & Annakut, on both pages |
-| `frisco.png` | Frisco Diwali & Annakut, on both pages |
-| `chopda-pujan.png` | Chopda Pujan, shared by morning and evening |
+| `chopda-pujan.png` | Chopda Pujan, shared by both sessions |
 | `kids-diwali.png` | Kids Diwali Celebration |
 
 ## After replacing any photo, rebuild the variants
